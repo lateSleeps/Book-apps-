@@ -356,6 +356,121 @@ export default function OverviewPage() {
 
   return (
     <>
+    <style>{`
+      /* ═══════════════════════════════════════════════════════════════════ */
+      /* ADDITIVE RESPONSIVE DESIGN - Mobile & Tablet Optimizations         */
+      /* ═══════════════════════════════════════════════════════════════════ */
+
+      /* TABLET: 768px - 1023px ─────────────────────────────────────────── */
+      @media (max-width: 1023px) {
+        /* Payment grid — better spacing on tablet */
+        .payment-grid-tablet {
+          gap: 2.5rem !important;
+        }
+      }
+
+      /* MOBILE: up to 767px ────────────────────────────────────────────── */
+      @media (max-width: 767px) {
+        /* Expanded details — stack to single column on mobile */
+        .expanded-details-mobile {
+          grid-template-columns: 1fr !important;
+        }
+
+        /* Remove column separators on mobile */
+        .expanded-col-separator {
+          border-right: none !important;
+          border-bottom: 1px solid #f0f0f0 !important;
+        }
+
+        /* Padding cleanup on mobile — make more compact */
+        .expanded-details-mobile > div > div {
+          padding-bottom: 1rem !important;
+          padding-right: 0 !important;
+          padding-left: 0 !important;
+        }
+
+        /* Visitor row badges — better wrapping on mobile */
+        .visitor-row-badges {
+          flex-wrap: wrap !important;
+          gap: 0.5rem !important;
+        }
+
+        /* Visitor row — reduce font sizes for mobile */
+        .visitor-name-mobile {
+          font-size: 0.8125rem !important;
+        }
+
+        .visitor-service-mobile {
+          font-size: 0.75rem !important;
+        }
+
+        /* Tabs bar — better mobile spacing */
+        .visitor-tabs-mobile {
+          gap: 0.25rem !important;
+        }
+
+        /* Search bar — full width on mobile */
+        .search-bar-mobile {
+          flex: 1 !important;
+          width: auto !important;
+        }
+
+        /* Sort + Search — stack on mobile */
+        .visitor-header-controls {
+          flex-direction: column !important;
+          gap: 0.5rem !important;
+        }
+
+        .sort-button-mobile {
+          width: 100% !important;
+        }
+
+        /* Payment input section — full width layout on mobile */
+        .payment-section-mobile {
+          grid-template-columns: 1fr !important;
+        }
+
+        /* Card col-span reset for mobile */
+        .payment-status-card-mobile {
+          col-span: 1 !important;
+        }
+
+        .payment-input-card-mobile {
+          col-span: 1 !important;
+        }
+
+        /* Button groups — better mobile sizing */
+        .button-group-mobile {
+          gap: 0.5rem !important;
+        }
+
+        .button-group-mobile button {
+          font-size: 0.75rem !important;
+          padding: 0.5rem 0.75rem !important;
+          height: auto !important;
+        }
+
+        /* Greeting section — adjust on mobile */
+        .greeting-section-mobile {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+        }
+
+        .greeting-text-mobile h1 {
+          font-size: 1.125rem !important;
+        }
+
+        /* Collapse some text on mobile */
+        .hide-on-mobile {
+          display: none !important;
+        }
+
+        /* Make dropdowns more touch-friendly */
+        .dropdown-item-mobile {
+          padding: 0.75rem !important;
+        }
+      }
+    `}</style>
     <div className="flex flex-col flex-1 overflow-y-auto" style={{ backgroundColor: '#fafaf8' }}>
       <div className="w-full px-4 py-5 sm:px-6 sm:py-7 md:px-8 md:py-10 flex flex-col gap-5 sm:gap-7 md:gap-10">
 
@@ -463,13 +578,13 @@ export default function OverviewPage() {
           {/* Schedule */}
           <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="px-6 pt-5 pb-0 flex items-center justify-between gap-4">
-              <h2 className="text-[1rem] font-semibold text-[#1a1a1a] shrink-0">Pengunjung Hari Ini</h2>
-              <div className="flex items-center gap-2 ml-auto">
+            <div className="px-6 pt-5 pb-0 flex items-center justify-between gap-4 visitor-header-controls">
+              <h2 className="text-[1rem] font-semibold text-[#1a1a1a] shrink-0 hide-on-mobile">Pengunjung Hari Ini</h2>
+              <div className="flex items-center gap-2 ml-auto visitor-header-controls">
                 {/* Sort button */}
                 <button
                   onClick={() => setSortOrder(o => o === 'ASC' ? 'DESC' : 'ASC')}
-                  className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#f5f5f3] hover:bg-[#ececea] transition-colors text-[0.8125rem] text-[#555] font-medium shrink-0"
+                  className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#f5f5f3] hover:bg-[#ececea] transition-colors text-[0.8125rem] text-[#555] font-medium shrink-0 sort-button-mobile"
                 >
                   <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     {sortOrder === 'ASC' ? (
@@ -487,7 +602,7 @@ export default function OverviewPage() {
                   {sortOrder === 'ASC' ? 'Terlama' : 'Terbaru'}
                 </button>
                 {/* Search bar */}
-                <div className="flex items-center gap-2 bg-[#f5f5f3] rounded-lg px-2 sm:px-3 h-7 sm:h-8 flex-1 sm:w-[14rem] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#ddd] transition-all">
+                <div className="flex items-center gap-2 bg-[#f5f5f3] rounded-lg px-2 sm:px-3 h-7 sm:h-8 flex-1 sm:w-[14rem] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#ddd] transition-all search-bar-mobile">
                   <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#aaa" strokeWidth="1.8" strokeLinecap="round"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
                   <input
                     type="text"
@@ -714,10 +829,10 @@ export default function OverviewPage() {
                       {/* Expanded detail */}
                       {isExpanded && (
                         <div className="px-3 sm:px-6 pb-5 bg-[#fafaf8] flex flex-col relative min-h-[23rem]" onClick={e => e.stopPropagation()}>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px pt-4 border-t border-[#f0f0f0]" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px pt-4 border-t border-[#f0f0f0] expanded-details-mobile" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
 
                             {/* Col 1: Kontak */}
-                            <div className="pr-0 sm:pr-0 md:pr-6 flex flex-col gap-3 pb-3 sm:pb-3 md:pb-0 border-b sm:border-b md:border-b-0 md:border-r border-[#f0f0f0] md:border-l-0">
+                            <div className="pr-0 sm:pr-0 md:pr-6 flex flex-col gap-3 pb-3 sm:pb-3 md:pb-0 border-b sm:border-b md:border-b-0 md:border-r border-[#f0f0f0] md:border-l-0 expanded-col-separator">
                               <div>
                                 <p className="text-[0.6875rem] text-[#555] uppercase tracking-wider mb-1">Nomor HP</p>
                                 <p className="text-[0.875rem] font-medium text-[#1a1a1a] tabular-nums">{b.customerPhone}</p>
@@ -794,7 +909,7 @@ export default function OverviewPage() {
                             </div>
 
                             {/* Col 2: Layanan + Pembayaran */}
-                            <div className="px-0 sm:px-3 md:px-6 pt-3 sm:pt-3 md:pt-0 md:border-l border-b sm:border-b md:border-b-0 border-[#f0f0f0] flex flex-col gap-3 pb-3 sm:pb-3 md:pb-0">
+                            <div className="px-0 sm:px-3 md:px-6 pt-3 sm:pt-3 md:pt-0 md:border-l border-b sm:border-b md:border-b-0 border-[#f0f0f0] flex flex-col gap-3 pb-3 sm:pb-3 md:pb-0 expanded-col-separator">
                               <div>
                                 <p className="text-[0.6875rem] text-[#555] uppercase tracking-wider mb-1.5">Layanan</p>
                                 {editServiceId === b.id ? (
@@ -950,7 +1065,7 @@ export default function OverviewPage() {
                             </div>
 
                             {/* Col 3: Add-ons + Catatan Terapis */}
-                            <div className="pl-0 sm:pl-3 md:pl-6 pt-3 sm:pt-3 md:pt-0 md:border-l border-[#f0f0f0] flex flex-col gap-3">
+                            <div className="pl-0 sm:pl-3 md:pl-6 pt-3 sm:pt-3 md:pt-0 md:border-l border-[#f0f0f0] flex flex-col gap-3 expanded-col-separator">
                               <div>
                                 <p className="text-[0.6875rem] text-[#555] uppercase tracking-wider mb-2">Product Add-on</p>
                                 {addOns.length === 0 && (
@@ -1042,10 +1157,10 @@ export default function OverviewPage() {
                           <div className="mt-6 pt-3 border-t border-[#f0f0f0] flex flex-col gap-2.5">
 
                             {/* Row 1: Status + Input pembayaran baru — same grid as columns above */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 payment-section-mobile">
 
                               {/* Card: Status pembayaran — col 1 */}
-                              <div className="bg-white rounded-xl border border-[#efefed] px-4 sm:px-5 py-4 sm:py-5 flex flex-col gap-4 col-span-1 sm:col-span-2 md:col-span-1">
+                              <div className="bg-white rounded-xl border border-[#efefed] px-4 sm:px-5 py-4 sm:py-5 flex flex-col gap-4 col-span-1 sm:col-span-2 md:col-span-1 payment-status-card-mobile">
                                 {/* Label + badge row */}
                                 <div className="flex items-center justify-between gap-2">
                                   <p className="text-[0.75rem] text-[#555] uppercase tracking-wider font-semibold">Status Pembayaran</p>
@@ -1093,7 +1208,7 @@ export default function OverviewPage() {
                               </div>
 
                               {/* Card: Input pembayaran baru */}
-                              <div className="col-span-1 sm:col-span-2 md:col-span-2 bg-white rounded-xl border border-[#efefed] px-3 sm:px-4 py-3 sm:py-3 flex flex-col gap-2.5">
+                              <div className="col-span-1 sm:col-span-2 md:col-span-2 bg-white rounded-xl border border-[#efefed] px-3 sm:px-4 py-3 sm:py-3 flex flex-col gap-2.5 payment-input-card-mobile">
                                 <p className="text-[0.6875rem] text-[#555] uppercase tracking-wider font-medium">Input Pembayaran</p>
                                 {/* Method pills */}
                                 <div className="flex items-center gap-2">
