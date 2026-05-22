@@ -528,7 +528,7 @@ export default function OverviewPage() {
         {/* Stats row — Colorful cards with doodles */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {/* Pendapatan - Light Teal/Green */}
-          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#E8F5F3' }}>
+          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#D1EAE6' }}>
             {/* Doodle background - wavy lines */}
             <svg className="absolute top-0 right-0 opacity-50" width="100" height="100" viewBox="0 0 100 100" fill="none">
               {/* Wavy line doodles */}
@@ -544,7 +544,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Booking - Light Blue */}
-          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#EDF7FF' }}>
+          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#D4EBFF' }}>
             {/* Doodle background - wavy lines */}
             <svg className="absolute top-0 right-0 opacity-50" width="100" height="100" viewBox="0 0 100 100" fill="none">
               {/* Wavy line doodles */}
@@ -560,7 +560,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Rata-rata - Light Coral */}
-          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#FFF0EA' }}>
+          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#FFD9C4' }}>
             {/* Doodle background - wavy lines */}
             <svg className="absolute top-0 right-0 opacity-50" width="100" height="100" viewBox="0 0 100 100" fill="none">
               {/* Wavy line doodles */}
@@ -576,7 +576,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Penyelesaian - Light Pink */}
-          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#FEF3FB' }}>
+          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F5D9ED' }}>
             {/* Doodle background - wavy lines */}
             <svg className="absolute top-0 right-0 opacity-50" width="100" height="100" viewBox="0 0 100 100" fill="none">
               {/* Wavy line doodles */}
