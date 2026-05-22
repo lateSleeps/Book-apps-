@@ -528,7 +528,7 @@ export default function OverviewPage() {
         {/* Stats row — Colorful cards with doodles */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {/* Pendapatan - Gold/Yellow */}
-          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 flex flex-col shadow-sm" style={{ backgroundColor: '#F4B942' }}>
+          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F4B942' }}>
             {/* Doodle background - coins */}
             <svg className="absolute top-0 right-0 opacity-30" width="120" height="120" viewBox="0 0 120 120" fill="none">
               <circle cx="90" cy="30" r="18" stroke="#FFD700" strokeWidth="2" fill="none"/>
@@ -544,7 +544,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Booking - Blue */}
-          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 flex flex-col shadow-sm" style={{ backgroundColor: '#4A9FD8' }}>
+          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#4A9FD8' }}>
             {/* Doodle background - calendar */}
             <svg className="absolute top-0 right-0 opacity-25" width="120" height="120" viewBox="0 0 120 120" fill="none">
               <rect x="70" y="20" width="40" height="50" rx="3" stroke="white" strokeWidth="2" fill="none"/>
@@ -563,7 +563,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Rata-rata - Coral/Orange */}
-          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 flex flex-col shadow-sm" style={{ backgroundColor: '#FF7A5C' }}>
+          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#FF7A5C' }}>
             {/* Doodle background - stars */}
             <svg className="absolute top-0 right-0 opacity-30" width="120" height="120" viewBox="0 0 120 120" fill="none">
               <path d="M85 25 L88 35 L98 35 L90 42 L93 52 L85 45 L77 52 L80 42 L72 35 L82 35 Z" fill="#FFB347"/>
@@ -577,7 +577,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Penyelesaian - Pink/Magenta */}
-          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 flex flex-col shadow-sm" style={{ backgroundColor: '#E91E8C' }}>
+          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#E91E8C' }}>
             {/* Doodle background - checkmarks */}
             <svg className="absolute top-0 right-0 opacity-25" width="120" height="120" viewBox="0 0 120 120" fill="none">
               <path d="M75 35 L82 42 L95 25" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
