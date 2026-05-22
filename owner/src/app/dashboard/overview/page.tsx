@@ -356,7 +356,7 @@ export default function OverviewPage() {
 
   return (
     <>
-    <style>{`
+    <style suppressHydrationWarning>{`
       /* ═══════════════════════════════════════════════════════════════════ */
       /* ADDITIVE RESPONSIVE DESIGN - Mobile & Tablet Optimizations         */
       /* ═══════════════════════════════════════════════════════════════════ */
