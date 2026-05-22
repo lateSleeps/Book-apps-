@@ -33,29 +33,16 @@ const config: Config = {
         sans: ['DM Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       fontSize: {
-        // ── Type scale (Apple HIG-aligned, WCAG AA accessible) ──────────────
-        // Caption 2 — absolute minimum, use sparingly (legend dots, badges)
         'ts-cap2':  ['11px', { lineHeight: '1.4', letterSpacing: '0.02em' }],
-        // Caption 1 — labels, tags, eyebrow text, calendar day letters
         'ts-cap1':  ['12px', { lineHeight: '1.4', letterSpacing: '0.015em' }],
-        // Footnote — secondary meta, time slots, step indicators
         'ts-fn':    ['13px', { lineHeight: '1.5', letterSpacing: '0' }],
-        // Subheadline — supporting body, chip text, helper text
         'ts-sub':   ['15px', { lineHeight: '1.5', letterSpacing: '0' }],
-        // Callout / Body — descriptions, secondary content
         'ts-body':  ['16px', { lineHeight: '1.5', letterSpacing: '0' }],
-        // Headline — primary body, button labels, card titles
         'ts-head':  ['17px', { lineHeight: '1.4', letterSpacing: '-0.01em' }],
-        // Title 3 — calendar date numbers, section titles
         'ts-t3':    ['20px', { lineHeight: '1.2', letterSpacing: '-0.015em' }],
-        // Title 2 — page sub-headings
         'ts-t2':    ['22px', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
-        // Title 1 — page headings ("Pilih Stylist")
         'ts-t1':    ['28px', { lineHeight: '1.1', letterSpacing: '-0.025em' }],
-        // Large Title — hero headings ("Selamat pagi.")
         'ts-hero':  ['34px', { lineHeight: '1.0', letterSpacing: '-0.03em' }],
-
-        // ── Legacy aliases (kept for backwards compat) ──────────────────────
         t12: ['12px', { lineHeight: '1.4', letterSpacing: '0.015em' }],
         t14: ['14px', { lineHeight: '1.5' }],
         t16: ['16px', { lineHeight: '1.5' }],
@@ -120,6 +107,10 @@ const config: Config = {
           '75%':       { transform: 'translateX(-2px)' },
           '90%':       { transform: 'translateX(2px)' },
         },
+        slideUp: {
+          from: { opacity: '0', transform: 'translateY(16px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         sIn: 'sIn 280ms cubic-bezier(.25,.46,.45,.94)',
@@ -128,6 +119,7 @@ const config: Config = {
         up: 'up 200ms ease',
         fadeIn: 'fadeIn 260ms ease',
         shake: 'shake 500ms ease 400ms both',
+        slideUp: 'slideUp 280ms cubic-bezier(.25,.46,.45,.94)',
       },
     },
   },

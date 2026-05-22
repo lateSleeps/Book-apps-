@@ -360,14 +360,14 @@ export default function OverviewPage() {
       <div className="w-full px-4 py-5 sm:px-6 sm:py-7 md:px-8 md:py-10 flex flex-col gap-5 sm:gap-7 md:gap-10">
 
         {/* Greeting */}
-        <div className="flex flex-col gap-4 sm:gap-4">
+        <div className="flex justify-between items-start gap-4 sm:gap-4">
           <div>
             <p className="text-[0.75rem] sm:text-[0.875rem] text-[#555] mb-1">{dateLabel}</p>
             <h1 className="text-[1.25rem] sm:text-[1.5rem] md:text-[1.75rem] font-semibold text-[#1a1a1a] tracking-tight">{greeting || 'Halo'}, Rara ✦</h1>
           </div>
 
           {/* Desktop button */}
-          <div className="relative hidden sm:block">
+          <div className="relative hidden sm:block flex-shrink-0">
             <button
               onClick={() => setAddDropdownOpen(o => !o)}
               className="flex items-center justify-start gap-2 h-10 px-4 bg-[#1a1a1a] text-white text-[0.875rem] font-medium rounded-xl hover:bg-[#333] transition-colors w-auto"

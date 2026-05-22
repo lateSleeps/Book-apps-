@@ -2,11 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "rara-dev",
+      "name": "salon-booking-customer",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "port": 3002,
-      "autoPort": false
+      "port": 3000
     }
   ]
 }

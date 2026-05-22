@@ -20,7 +20,7 @@
   },
   "overrides": [
     {
-      "files": ["**/*.test.ts", "**/*.test.tsx"],
+      "files": ["**/*.test.ts", "**/*.test.tsx", "tests/**/*"],
       "rules": {
         "import/order": "off",
         "@typescript-eslint/no-unused-vars": "off"
