@@ -529,14 +529,13 @@ export default function OverviewPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {/* Pendapatan - Light Teal/Green */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#E8F5F3' }}>
-            {/* Doodle background - wallet & organic shape */}
+            {/* Doodle background - wavy lines */}
             <svg className="absolute top-0 right-0 opacity-50" width="100" height="100" viewBox="0 0 100 100" fill="none">
-              {/* Organic blob shape */}
-              <path d="M75 20 Q85 15 90 30 Q95 45 85 55 Q75 60 70 50 Q68 35 75 20" fill="#7CB9C3" opacity="0.6"/>
-              {/* Wallet icon - Bold */}
-              <rect x="62" y="26" width="26" height="20" rx="2.5" fill="#4A9FB5" />
-              <line x1="62" y1="34" x2="88" y2="34" stroke="#E8F5F3" strokeWidth="2"/>
-              <circle cx="80" cy="42" r="3" fill="#E8F5F3"/>
+              {/* Wavy line doodles */}
+              <path d="M60 30 Q70 25 80 30 Q90 35 100 30" stroke="#7CB9C3" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+              <path d="M55 40 Q65 35 75 40 Q85 45 95 40" stroke="#4A9FB5" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+              <path d="M50 50 Q60 45 70 50 Q80 55 90 50" stroke="#7CB9C3" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.8"/>
+              <path d="M60 60 Q70 55 80 60 Q90 65 100 60" stroke="#4A9FB5" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.7"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
               <p className="text-[0.65rem] sm:text-[0.75rem] text-[#2B7A87] font-medium uppercase tracking-wide opacity-85">Pendapatan</p>
@@ -546,18 +545,13 @@ export default function OverviewPage() {
 
           {/* Booking - Light Blue */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#EDF7FF' }}>
-            {/* Doodle background - calendar & organic shape */}
-            <svg className="absolute top-0 right-0 opacity-45" width="100" height="100" viewBox="0 0 100 100" fill="none">
-              {/* Organic blob shape */}
-              <path d="M70 10 Q85 8 90 25 Q92 40 80 50 Q65 55 60 40 Q58 20 70 10" fill="#D6ECFF" opacity="0.7"/>
-              {/* Calendar icon - Bold */}
-              <g>
-                <rect x="52" y="30" width="24" height="24" rx="2" fill="#2B7FD9" />
-                <line x1="52" y1="38" x2="76" y2="38" stroke="#EDF7FF" strokeWidth="2"/>
-                <rect x="58" y="44" width="3" height="3" rx="1" fill="#EDF7FF"/>
-                <rect x="66" y="44" width="3" height="3" rx="1" fill="#EDF7FF"/>
-                <rect x="74" y="44" width="3" height="3" rx="1" fill="#EDF7FF"/>
-              </g>
+            {/* Doodle background - wavy lines */}
+            <svg className="absolute top-0 right-0 opacity-50" width="100" height="100" viewBox="0 0 100 100" fill="none">
+              {/* Wavy line doodles */}
+              <path d="M60 30 Q70 25 80 30 Q90 35 100 30" stroke="#A8D5FF" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+              <path d="M55 40 Q65 35 75 40 Q85 45 95 40" stroke="#2B7FD9" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+              <path d="M50 50 Q60 45 70 50 Q80 55 90 50" stroke="#A8D5FF" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.8"/>
+              <path d="M60 60 Q70 55 80 60 Q90 65 100 60" stroke="#2B7FD9" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.7"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
               <p className="text-[0.65rem] sm:text-[0.75rem] text-[#1B5BB5] font-medium uppercase tracking-wide opacity-85">Booking Hari Ini</p>
@@ -567,12 +561,13 @@ export default function OverviewPage() {
 
           {/* Rata-rata - Light Coral */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#FFF0EA' }}>
-            {/* Doodle background - heart & organic shape */}
-            <svg className="absolute top-0 right-0 opacity-45" width="100" height="100" viewBox="0 0 100 100" fill="none">
-              {/* Organic blob shape */}
-              <path d="M72 15 Q88 12 92 32 Q94 48 78 58 Q62 62 58 45 Q56 22 72 15" fill="#FFE0D0" opacity="0.7"/>
-              {/* Heart icon - Bold */}
-              <path d="M64 36 C64 32 66 28 70 28 C73 28 75 30 77 33 C79 30 81 28 84 28 C88 28 90 32 90 36 C90 44 77 54 77 54 C77 54 64 44 64 36" fill="#E63946"/>
+            {/* Doodle background - wavy lines */}
+            <svg className="absolute top-0 right-0 opacity-50" width="100" height="100" viewBox="0 0 100 100" fill="none">
+              {/* Wavy line doodles */}
+              <path d="M60 30 Q70 25 80 30 Q90 35 100 30" stroke="#FFD4C4" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+              <path d="M55 40 Q65 35 75 40 Q85 45 95 40" stroke="#E8966E" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+              <path d="M50 50 Q60 45 70 50 Q80 55 90 50" stroke="#FFD4C4" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.8"/>
+              <path d="M60 60 Q70 55 80 60 Q90 65 100 60" stroke="#E8966E" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.7"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
               <p className="text-[0.65rem] sm:text-[0.75rem] text-[#A83C36] font-medium uppercase tracking-wide opacity-85">Rata-rata Nilai</p>
@@ -582,13 +577,13 @@ export default function OverviewPage() {
 
           {/* Penyelesaian - Light Pink */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#FEF3FB' }}>
-            {/* Doodle background - checkmark & organic shape */}
-            <svg className="absolute top-0 right-0 opacity-45" width="100" height="100" viewBox="0 0 100 100" fill="none">
-              {/* Organic blob shape */}
-              <path d="M75 18 Q88 15 92 30 Q95 48 80 60 Q65 65 60 48 Q58 25 75 18" fill="#F5E0F0" opacity="0.7"/>
-              {/* Checkmark icon - Bold */}
-              <circle cx="77" cy="42" r="16" fill="#D946A6"/>
-              <path d="M70 42 L75 48 L85 35" stroke="#FEF3FB" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            {/* Doodle background - wavy lines */}
+            <svg className="absolute top-0 right-0 opacity-50" width="100" height="100" viewBox="0 0 100 100" fill="none">
+              {/* Wavy line doodles */}
+              <path d="M60 30 Q70 25 80 30 Q90 35 100 30" stroke="#F5D5F0" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+              <path d="M55 40 Q65 35 75 40 Q85 45 95 40" stroke="#D946A6" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+              <path d="M50 50 Q60 45 70 50 Q80 55 90 50" stroke="#F5D5F0" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.8"/>
+              <path d="M60 60 Q70 55 80 60 Q90 65 100 60" stroke="#D946A6" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.7"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
               <p className="text-[0.65rem] sm:text-[0.75rem] text-[#A8348C] font-medium uppercase tracking-wide opacity-85">Penyelesaian</p>
