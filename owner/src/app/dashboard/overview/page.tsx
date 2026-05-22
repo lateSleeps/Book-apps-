@@ -527,19 +527,19 @@ export default function OverviewPage() {
         </div>
         {/* Stats row — Colorful cards with doodles */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          {/* Pendapatan - Light Beige */}
-          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#FDFAF0' }}>
+          {/* Pendapatan - Light Teal/Green */}
+          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#E8F5F3' }}>
             {/* Doodle background - wallet & organic shape */}
-            <svg className="absolute top-0 right-0 opacity-45" width="100" height="100" viewBox="0 0 100 100" fill="none">
+            <svg className="absolute top-0 right-0 opacity-50" width="100" height="100" viewBox="0 0 100 100" fill="none">
               {/* Organic blob shape */}
-              <path d="M75 20 Q85 15 90 30 Q95 45 85 55 Q75 60 70 50 Q68 35 75 20" fill="#F5E6D3" opacity="0.7"/>
+              <path d="M75 20 Q85 15 90 30 Q95 45 85 55 Q75 60 70 50 Q68 35 75 20" fill="#7CB9C3" opacity="0.6"/>
               {/* Wallet icon - Bold */}
-              <rect x="62" y="26" width="26" height="20" rx="2.5" fill="#E8A844" />
-              <line x1="62" y1="34" x2="88" y2="34" stroke="#FDFAF0" strokeWidth="2"/>
-              <circle cx="80" cy="42" r="3" fill="#FDFAF0"/>
+              <rect x="62" y="26" width="26" height="20" rx="2.5" fill="#4A9FB5" />
+              <line x1="62" y1="34" x2="88" y2="34" stroke="#E8F5F3" strokeWidth="2"/>
+              <circle cx="80" cy="42" r="3" fill="#E8F5F3"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
-              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#6B5331] font-medium uppercase tracking-wide opacity-85">Pendapatan</p>
+              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#2B7A87] font-medium uppercase tracking-wide opacity-85">Pendapatan</p>
             </div>
             <p className="relative z-10 text-[1.5rem] sm:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">{formatRupiah(stats.revenueToday)}</p>
           </div>
