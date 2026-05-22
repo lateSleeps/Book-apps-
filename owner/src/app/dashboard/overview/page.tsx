@@ -488,7 +488,7 @@ export default function OverviewPage() {
             >
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M8 3v10M3 8h10"/></svg>
               <span>Tambah Pelanggan</span>
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${addDropdownOpen ? 'rotate-180' : ''}`}><path d="M4 6l4 4 4-4"/></svg>
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${addDropdownOpen ? 'rotate-180' : ''}`}><path d="M4 6l4 4 4-4"/></svg>
             </button>
             {addDropdownOpen && (
               <>
@@ -530,12 +530,12 @@ export default function OverviewPage() {
           {/* Pendapatan - Light Teal/Green */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#D1EAE6' }}>
             {/* Doodle background - stacked coins/bills */}
-            <svg className="absolute top-0 right-0 opacity-70" width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <svg className="absolute top-0 right-0 opacity-90" width="120" height="120" viewBox="0 0 120 120" fill="none">
               {/* Stacked rounded rectangles (coins/bills) */}
-              <rect x="65" y="20" width="40" height="14" rx="7" stroke="#0F5A65" strokeWidth="2.5" fill="none"/>
-              <rect x="60" y="38" width="45" height="15" rx="7.5" stroke="#0F5A65" strokeWidth="2.5" fill="none" opacity="0.85"/>
-              <rect x="68" y="58" width="38" height="13" rx="6.5" stroke="#0F5A65" strokeWidth="2.5" fill="none" opacity="0.75"/>
-              <rect x="62" y="76" width="42" height="14" rx="7" stroke="#0F5A65" strokeWidth="2.5" fill="none" opacity="0.65"/>
+              <rect x="65" y="20" width="40" height="14" rx="7" stroke="#0F5A65" strokeWidth="3" fill="none"/>
+              <rect x="60" y="38" width="45" height="15" rx="7.5" stroke="#0F5A65" strokeWidth="3" fill="none" opacity="0.85"/>
+              <rect x="68" y="58" width="38" height="13" rx="6.5" stroke="#0F5A65" strokeWidth="3" fill="none" opacity="0.75"/>
+              <rect x="62" y="76" width="42" height="14" rx="7" stroke="#0F5A65" strokeWidth="3" fill="none" opacity="0.65"/>
               {/* Accent lines for shine effect */}
               <line x1="70" y1="26" x2="100" y2="26" stroke="#0F5A65" strokeWidth="1.5" opacity="0.6"/>
               <line x1="68" y1="46" x2="105" y2="46" stroke="#0F5A65" strokeWidth="1.5" opacity="0.5"/>
@@ -549,17 +549,17 @@ export default function OverviewPage() {
           {/* Booking - Light Blue */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#D4EBFF' }}>
             {/* Doodle background - diagonal lines/grid pattern */}
-            <svg className="absolute top-0 right-0 opacity-70" width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <svg className="absolute top-0 right-0 opacity-90" width="120" height="120" viewBox="0 0 120 120" fill="none">
               {/* Diagonal lines (top-left to bottom-right) */}
-              <line x1="60" y1="20" x2="100" y2="60" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round"/>
-              <line x1="65" y1="15" x2="105" y2="55" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round" opacity="0.85"/>
-              <line x1="70" y1="20" x2="110" y2="60" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round" opacity="0.7"/>
+              <line x1="60" y1="20" x2="100" y2="60" stroke="#0041A6" strokeWidth="3" strokeLinecap="round"/>
+              <line x1="65" y1="15" x2="105" y2="55" stroke="#0041A6" strokeWidth="3" strokeLinecap="round" opacity="0.85"/>
+              <line x1="70" y1="20" x2="110" y2="60" stroke="#0041A6" strokeWidth="3" strokeLinecap="round" opacity="0.7"/>
               {/* Diagonal lines (top-right to bottom-left) */}
-              <line x1="110" y1="25" x2="70" y2="65" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round" opacity="0.8"/>
-              <line x1="105" y1="20" x2="65" y2="60" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round" opacity="0.75"/>
+              <line x1="110" y1="25" x2="70" y2="65" stroke="#0041A6" strokeWidth="3" strokeLinecap="round" opacity="0.8"/>
+              <line x1="105" y1="20" x2="65" y2="60" stroke="#0041A6" strokeWidth="3" strokeLinecap="round" opacity="0.75"/>
               {/* Additional diagonal lines for grid effect */}
-              <line x1="75" y1="70" x2="110" y2="105" stroke="#0041A6" strokeWidth="2" strokeLinecap="round" opacity="0.65"/>
-              <line x1="105" y1="75" x2="70" y2="110" stroke="#0041A6" strokeWidth="2" strokeLinecap="round" opacity="0.6"/>
+              <line x1="75" y1="70" x2="110" y2="105" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round" opacity="0.65"/>
+              <line x1="105" y1="75" x2="70" y2="110" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round" opacity="0.6"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
               <p className="text-[0.65rem] sm:text-[0.75rem] text-[#1B5BB5] font-medium uppercase tracking-wide opacity-85">Booking Hari Ini</p>
@@ -570,13 +570,13 @@ export default function OverviewPage() {
           {/* Rata-rata - Light Coral */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#FFD9C4' }}>
             {/* Doodle background - stars and sparkles */}
-            <svg className="absolute top-0 right-0 opacity-70" width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <svg className="absolute top-0 right-0 opacity-90" width="120" height="120" viewBox="0 0 120 120" fill="none">
               {/* Large star */}
-              <path d="M85 15 L88 28 L101 30 L91 38 L94 51 L85 45 L76 51 L79 38 L69 30 L82 28 Z" stroke="#9B3600" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
+              <path d="M85 15 L88 28 L101 30 L91 38 L94 51 L85 45 L76 51 L79 38 L69 30 L82 28 Z" stroke="#9B3600" strokeWidth="3" fill="none" strokeLinejoin="round"/>
               {/* Medium star */}
-              <path d="M65 60 L67 70 L77 71 L69 77 L72 87 L65 81 L58 87 L61 77 L53 71 L63 70 Z" stroke="#9B3600" strokeWidth="2.5" fill="none" strokeLinejoin="round" opacity="0.85"/>
+              <path d="M65 60 L67 70 L77 71 L69 77 L72 87 L65 81 L58 87 L61 77 L53 71 L63 70 Z" stroke="#9B3600" strokeWidth="3" fill="none" strokeLinejoin="round" opacity="0.85"/>
               {/* Small star with sparkle lines */}
-              <path d="M100 70 L102 78 L110 79 L104 84 L107 92 L100 88 L93 92 L96 84 L90 79 L98 78 Z" stroke="#9B3600" strokeWidth="2" fill="none" strokeLinejoin="round" opacity="0.75"/>
+              <path d="M100 70 L102 78 L110 79 L104 84 L107 92 L100 88 L93 92 L96 84 L90 79 L98 78 Z" stroke="#9B3600" strokeWidth="2.5" fill="none" strokeLinejoin="round" opacity="0.75"/>
               {/* Sparkle lines around stars */}
               <line x1="85" y1="5" x2="85" y2="15" stroke="#9B3600" strokeWidth="1.5" opacity="0.6"/>
               <line x1="95" y1="10" x2="100" y2="20" stroke="#9B3600" strokeWidth="1.5" opacity="0.5"/>
@@ -592,15 +592,15 @@ export default function OverviewPage() {
           {/* Penyelesaian - Light Pink */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F5D9ED' }}>
             {/* Doodle background - flowing ribbons and swirls */}
-            <svg className="absolute top-0 right-0 opacity-70" width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <svg className="absolute top-0 right-0 opacity-90" width="120" height="120" viewBox="0 0 120 120" fill="none">
               {/* Flowing ribbon curve 1 */}
               <path d="M65 20 Q85 35 75 55 Q65 75 90 95" stroke="#7F1555" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
               {/* Flowing ribbon curve 2 */}
-              <path d="M95 15 Q80 40 100 60 Q110 80 85 100" stroke="#7F1555" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.8"/>
+              <path d="M95 15 Q80 40 100 60 Q110 80 85 100" stroke="#7F1555" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.8"/>
               {/* Swirl curve 1 */}
-              <path d="M70 70 Q75 65 82 68 Q88 72 85 80" stroke="#7F1555" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.75"/>
+              <path d="M70 70 Q75 65 82 68 Q88 72 85 80" stroke="#7F1555" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.75"/>
               {/* Swirl curve 2 */}
-              <path d="M105 40 Q100 45 105 52 Q112 55 110 62" stroke="#7F1555" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
+              <path d="M105 40 Q100 45 105 52 Q112 55 110 62" stroke="#7F1555" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
               {/* Small accent swirl */}
               <path d="M75 30 Q78 25 82 28" stroke="#7F1555" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.6"/>
             </svg>
@@ -652,7 +652,7 @@ export default function OverviewPage() {
                   />
                   {visitorSearch && (
                     <button onClick={() => setVisitorSearch('')} className="text-[#bbb] hover:text-[#777] transition-colors">
-                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
                     </button>
                   )}
                 </div>
@@ -910,7 +910,7 @@ export default function OverviewPage() {
                                     {/* Zoom hint overlay */}
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center">
                                       <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-full p-1.5">
-                                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><circle cx="7" cy="7" r="4"/><path d="M11 11l3 3"/><path d="M5.5 7h3M7 5.5v3"/></svg>
+                                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><circle cx="7" cy="7" r="4"/><path d="M11 11l3 3"/><path d="M5.5 7h3M7 5.5v3"/></svg>
                                       </div>
                                     </div>
                                   </button>
@@ -929,7 +929,7 @@ export default function OverviewPage() {
                                       }}
                                       className="flex-1 h-9 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-[0.8125rem] font-semibold transition-colors flex items-center justify-center gap-1.5"
                                     >
-                                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8l3 3 7-7"/></svg>
+                                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8l3 3 7-7"/></svg>
                                       Konfirmasi
                                     </button>
                                     <button
@@ -939,7 +939,7 @@ export default function OverviewPage() {
                                       }}
                                       className="flex-1 h-9 rounded-xl bg-[#f5f5f3] hover:bg-[#efefed] text-[#ef4444] text-[0.8125rem] font-semibold transition-colors flex items-center justify-center gap-1.5 border border-[#e0e0e0]"
                                     >
-                                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+                                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
                                       Tolak
                                     </button>
                                   </div>
@@ -969,7 +969,7 @@ export default function OverviewPage() {
                                           onClick={() => { setEditServiceId(null); setServiceSearchQuery(''); }}
                                           className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-[#ccc] hover:text-[#888] transition-colors"
                                         >
-                                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7"/></svg>
+                                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7"/></svg>
                                         </button>
                                       </div>
                                       {/* Results */}
@@ -1055,7 +1055,7 @@ export default function OverviewPage() {
                                               onClick={() => { setShowServicePicker(null); setServiceSearchQuery(''); }}
                                               className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-[#ccc] hover:text-[#888] transition-colors"
                                             >
-                                              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7"/></svg>
+                                              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7"/></svg>
                                             </button>
                                           </div>
                                           {/* Results */}
@@ -1094,7 +1094,7 @@ export default function OverviewPage() {
                                         onClick={() => setShowServicePicker(b.id)}
                                         className="mt-2.5 flex items-center gap-1.5 text-[0.75rem] font-medium text-[#555] bg-[#f0f0ee] hover:bg-[#e5e5e2] px-3 py-1.5 rounded-lg transition-colors"
                                       >
-                                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 1v10M1 6h10"/></svg>
+                                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M6 1v10M1 6h10"/></svg>
                                         Tambah layanan
                                       </button>
                                     )}
@@ -1144,7 +1144,7 @@ export default function OverviewPage() {
                                           onClick={() => { setShowProductPicker(null); setProductSearchQuery(''); }}
                                           className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-[#ccc] hover:text-[#888] transition-colors"
                                         >
-                                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7"/></svg>
+                                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7"/></svg>
                                         </button>
                                       </div>
                                       {/* Results */}
@@ -1171,7 +1171,7 @@ export default function OverviewPage() {
                                     onClick={() => setShowProductPicker(b.id)}
                                     className="mt-2.5 flex items-center gap-1.5 text-[0.75rem] font-medium text-[#555] bg-[#f0f0ee] hover:bg-[#e5e5e2] px-3 py-1.5 rounded-lg transition-colors"
                                   >
-                                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 1v10M1 6h10"/></svg>
+                                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M6 1v10M1 6h10"/></svg>
                                     Tambah add-on
                                   </button>
                                 )}
@@ -1477,7 +1477,7 @@ export default function OverviewPage() {
                 onClick={() => setDeclineDialog(null)}
                 className="w-8 h-8 rounded-full flex items-center justify-center text-[#aaa] hover:bg-[#f5f5f3] hover:text-[#444] transition-colors shrink-0"
               >
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
               </button>
             </div>
             {/* Reason input */}
@@ -1527,7 +1527,7 @@ export default function OverviewPage() {
                 disabled={!declineReason.trim()}
                 className="flex-1 h-10 rounded-xl bg-[#ef4444] text-white text-[0.875rem] font-semibold hover:bg-[#dc2626] transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#ef4444]"
               >
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
                 Ya, Tolak
               </button>
             </div>
@@ -1551,13 +1551,13 @@ export default function OverviewPage() {
                 </p>
               </div>
               <button onClick={() => setProofZoom(null)} className="w-8 h-8 rounded-full flex items-center justify-center text-[#aaa] hover:bg-[#f5f5f3] hover:text-[#444] transition-colors">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
               </button>
             </div>
             {/* Mock full receipt */}
             <div className="bg-gradient-to-br from-[#eff6ff] to-[#dbeafe] px-6 py-8 flex flex-col items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-[#2563eb] flex items-center justify-center shadow-lg">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="2"/></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="2"/></svg>
               </div>
               <div className="text-center">
                 <p className="text-[0.75rem] text-[#3b82f6] font-medium uppercase tracking-wider">BCA — Transfer Berhasil</p>
@@ -1606,7 +1606,7 @@ export default function OverviewPage() {
               </h3>
             </div>
             <button onClick={() => setAddDrawer('CLOSED')} className="w-8 h-8 rounded-full flex items-center justify-center text-[#aaa] hover:bg-[#f5f5f3] hover:text-[#444] transition-colors">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
             </button>
           </div>
 
@@ -1654,7 +1654,7 @@ export default function OverviewPage() {
                           ? MOCK_SERVICES.find(s => s.id === walkInForm.serviceId)?.name
                           : 'Pilih layanan...'}
                       </span>
-                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#aaa" strokeWidth="2" strokeLinecap="round" className={`transition-transform ${drawerServiceOpen ? 'rotate-180' : ''}`}><path d="M4 6l4 4 4-4"/></svg>
+                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#aaa" strokeWidth="2.5" strokeLinecap="round" className={`transition-transform ${drawerServiceOpen ? 'rotate-180' : ''}`}><path d="M4 6l4 4 4-4"/></svg>
                     </button>
                     {/* Dropdown */}
                     {drawerServiceOpen && (
@@ -1672,7 +1672,7 @@ export default function OverviewPage() {
                           />
                           {drawerServiceSearch && (
                             <button onClick={() => setDrawerServiceSearch('')} className="text-[#ccc] hover:text-[#888]">
-                              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+                              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
                             </button>
                           )}
                         </div>
@@ -1854,7 +1854,7 @@ export default function OverviewPage() {
             onClick={stopBarcodeScanner}
             className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
@@ -1875,7 +1875,7 @@ export default function OverviewPage() {
         onClick={() => setAddDropdownOpen(o => !o)}
         className="w-14 h-14 rounded-full bg-[#1a1a1a] text-white shadow-lg hover:bg-[#333] transition-all active:scale-95 flex items-center justify-center"
       >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
           <path d="M12 5v14M5 12h14"/>
         </svg>
       </button>
