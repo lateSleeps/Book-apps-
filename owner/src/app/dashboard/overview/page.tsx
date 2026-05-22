@@ -529,16 +529,16 @@ export default function OverviewPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {/* Pendapatan - Light Teal/Green */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#D1EAE6' }}>
-            {/* Doodle background - geometric triangles */}
+            {/* Doodle background - stacked coins/bills */}
             <svg className="absolute top-0 right-0 opacity-70" width="120" height="120" viewBox="0 0 120 120" fill="none">
-              {/* Large triangle pointing up */}
-              <polygon points="85,30 100,55 70,55" stroke="#0F5A65" strokeWidth="3" fill="none" strokeLinejoin="round"/>
-              {/* Triangle pointing down */}
-              <polygon points="75,65 95,45 110,65" stroke="#0F5A65" strokeWidth="3" fill="none" strokeLinejoin="round" opacity="0.85"/>
-              {/* Small triangle pointing up */}
-              <polygon points="95,80 105,95 85,95" stroke="#0F5A65" strokeWidth="2.5" fill="none" strokeLinejoin="round" opacity="0.75"/>
-              {/* Diamond shape */}
-              <polygon points="65,50 72,38 80,50 72,62" stroke="#0F5A65" strokeWidth="2.5" fill="none" strokeLinejoin="round" opacity="0.8"/>
+              {/* Stacked rounded rectangles (coins/bills) */}
+              <rect x="65" y="20" width="40" height="14" rx="7" stroke="#0F5A65" strokeWidth="2.5" fill="none"/>
+              <rect x="60" y="38" width="45" height="15" rx="7.5" stroke="#0F5A65" strokeWidth="2.5" fill="none" opacity="0.85"/>
+              <rect x="68" y="58" width="38" height="13" rx="6.5" stroke="#0F5A65" strokeWidth="2.5" fill="none" opacity="0.75"/>
+              <rect x="62" y="76" width="42" height="14" rx="7" stroke="#0F5A65" strokeWidth="2.5" fill="none" opacity="0.65"/>
+              {/* Accent lines for shine effect */}
+              <line x1="70" y1="26" x2="100" y2="26" stroke="#0F5A65" strokeWidth="1.5" opacity="0.6"/>
+              <line x1="68" y1="46" x2="105" y2="46" stroke="#0F5A65" strokeWidth="1.5" opacity="0.5"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
               <p className="text-[0.65rem] sm:text-[0.75rem] text-[#2B7A87] font-medium uppercase tracking-wide opacity-85">Pendapatan</p>
@@ -548,16 +548,18 @@ export default function OverviewPage() {
 
           {/* Booking - Light Blue */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#D4EBFF' }}>
-            {/* Doodle background - geometric grid squares */}
+            {/* Doodle background - diagonal lines/grid pattern */}
             <svg className="absolute top-0 right-0 opacity-70" width="120" height="120" viewBox="0 0 120 120" fill="none">
-              {/* Large squares grid */}
-              <rect x="65" y="20" width="18" height="18" stroke="#0041A6" strokeWidth="2.5" fill="none"/>
-              <rect x="88" y="20" width="18" height="18" stroke="#0041A6" strokeWidth="2.5" fill="none" opacity="0.8"/>
-              <rect x="65" y="43" width="18" height="18" stroke="#0041A6" strokeWidth="2.5" fill="none" opacity="0.85"/>
-              <rect x="88" y="43" width="18" height="18" stroke="#0041A6" strokeWidth="2.5" fill="none" opacity="0.7"/>
-              {/* Smaller squares */}
-              <rect x="75" y="70" width="12" height="12" stroke="#0041A6" strokeWidth="2" fill="none" opacity="0.75"/>
-              <rect x="92" y="75" width="12" height="12" stroke="#0041A6" strokeWidth="2" fill="none" opacity="0.65"/>
+              {/* Diagonal lines (top-left to bottom-right) */}
+              <line x1="60" y1="20" x2="100" y2="60" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round"/>
+              <line x1="65" y1="15" x2="105" y2="55" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round" opacity="0.85"/>
+              <line x1="70" y1="20" x2="110" y2="60" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round" opacity="0.7"/>
+              {/* Diagonal lines (top-right to bottom-left) */}
+              <line x1="110" y1="25" x2="70" y2="65" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round" opacity="0.8"/>
+              <line x1="105" y1="20" x2="65" y2="60" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round" opacity="0.75"/>
+              {/* Additional diagonal lines for grid effect */}
+              <line x1="75" y1="70" x2="110" y2="105" stroke="#0041A6" strokeWidth="2" strokeLinecap="round" opacity="0.65"/>
+              <line x1="105" y1="75" x2="70" y2="110" stroke="#0041A6" strokeWidth="2" strokeLinecap="round" opacity="0.6"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
               <p className="text-[0.65rem] sm:text-[0.75rem] text-[#1B5BB5] font-medium uppercase tracking-wide opacity-85">Booking Hari Ini</p>
@@ -567,14 +569,19 @@ export default function OverviewPage() {
 
           {/* Rata-rata - Light Coral */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#FFD9C4' }}>
-            {/* Doodle background - geometric stars */}
+            {/* Doodle background - stars and sparkles */}
             <svg className="absolute top-0 right-0 opacity-70" width="120" height="120" viewBox="0 0 120 120" fill="none">
               {/* Large star */}
               <path d="M85 15 L88 28 L101 30 L91 38 L94 51 L85 45 L76 51 L79 38 L69 30 L82 28 Z" stroke="#9B3600" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
               {/* Medium star */}
-              <path d="M68 55 L70 63 L79 64 L72 70 L74 78 L68 74 L62 78 L64 70 L57 64 L66 63 Z" stroke="#9B3600" strokeWidth="2" fill="none" strokeLinejoin="round" opacity="0.8"/>
-              {/* Small star */}
-              <path d="M100 70 L101 76 L107 77 L102 81 L104 87 L100 84 L96 87 L98 81 L93 77 L99 76 Z" stroke="#9B3600" strokeWidth="2" fill="none" strokeLinejoin="round" opacity="0.7"/>
+              <path d="M65 60 L67 70 L77 71 L69 77 L72 87 L65 81 L58 87 L61 77 L53 71 L63 70 Z" stroke="#9B3600" strokeWidth="2.5" fill="none" strokeLinejoin="round" opacity="0.85"/>
+              {/* Small star with sparkle lines */}
+              <path d="M100 70 L102 78 L110 79 L104 84 L107 92 L100 88 L93 92 L96 84 L90 79 L98 78 Z" stroke="#9B3600" strokeWidth="2" fill="none" strokeLinejoin="round" opacity="0.75"/>
+              {/* Sparkle lines around stars */}
+              <line x1="85" y1="5" x2="85" y2="15" stroke="#9B3600" strokeWidth="1.5" opacity="0.6"/>
+              <line x1="95" y1="10" x2="100" y2="20" stroke="#9B3600" strokeWidth="1.5" opacity="0.5"/>
+              <line x1="75" y1="10" x2="70" y2="20" stroke="#9B3600" strokeWidth="1.5" opacity="0.5"/>
+              <line x1="100" y1="60" x2="110" y2="60" stroke="#9B3600" strokeWidth="1.5" opacity="0.5"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
               <p className="text-[0.65rem] sm:text-[0.75rem] text-[#A83C36] font-medium uppercase tracking-wide opacity-85">Rata-rata Nilai</p>
@@ -584,16 +591,18 @@ export default function OverviewPage() {
 
           {/* Penyelesaian - Light Pink */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F5D9ED' }}>
-            {/* Doodle background - geometric hexagons & diamonds */}
+            {/* Doodle background - flowing ribbons and swirls */}
             <svg className="absolute top-0 right-0 opacity-70" width="120" height="120" viewBox="0 0 120 120" fill="none">
-              {/* Large hexagon */}
-              <polygon points="85,20 100,28 100,44 85,52 70,44 70,28" stroke="#7F1555" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
-              {/* Medium hexagon */}
-              <polygon points="75,65 85,70 85,80 75,85 65,80 65,70" stroke="#7F1555" strokeWidth="2.5" fill="none" strokeLinejoin="round" opacity="0.8"/>
-              {/* Small hexagon */}
-              <polygon points="100,85 107,89 107,97 100,101 93,97 93,89" stroke="#7F1555" strokeWidth="2" fill="none" strokeLinejoin="round" opacity="0.7"/>
-              {/* Diamond shape */}
-              <polygon points="65,30 72,25 80,30 72,38" stroke="#7F1555" strokeWidth="2.5" fill="none" strokeLinejoin="round" opacity="0.75"/>
+              {/* Flowing ribbon curve 1 */}
+              <path d="M65 20 Q85 35 75 55 Q65 75 90 95" stroke="#7F1555" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              {/* Flowing ribbon curve 2 */}
+              <path d="M95 15 Q80 40 100 60 Q110 80 85 100" stroke="#7F1555" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.8"/>
+              {/* Swirl curve 1 */}
+              <path d="M70 70 Q75 65 82 68 Q88 72 85 80" stroke="#7F1555" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.75"/>
+              {/* Swirl curve 2 */}
+              <path d="M105 40 Q100 45 105 52 Q112 55 110 62" stroke="#7F1555" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
+              {/* Small accent swirl */}
+              <path d="M75 30 Q78 25 82 28" stroke="#7F1555" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.6"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
               <p className="text-[0.65rem] sm:text-[0.75rem] text-[#A8348C] font-medium uppercase tracking-wide opacity-85">Penyelesaian</p>
