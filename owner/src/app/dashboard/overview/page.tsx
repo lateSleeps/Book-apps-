@@ -529,16 +529,16 @@ export default function OverviewPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {/* Pendapatan - Light Teal/Green */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#D1EAE6' }}>
-            {/* Doodle background - circles & dots pattern */}
-            <svg className="absolute top-0 right-0 opacity-60" width="120" height="120" viewBox="0 0 120 120" fill="none">
-              {/* Large circles */}
-              <circle cx="90" cy="25" r="12" stroke="#1B8A99" strokeWidth="2.5" fill="none"/>
-              <circle cx="75" cy="55" r="15" stroke="#1B8A99" strokeWidth="2.5" fill="none" opacity="0.8"/>
-              <circle cx="95" cy="75" r="10" stroke="#1B8A99" strokeWidth="2.5" fill="none" opacity="0.7"/>
-              {/* Small accent dots */}
-              <circle cx="110" cy="40" r="3" fill="#1B8A99" opacity="0.9"/>
-              <circle cx="65" cy="30" r="2.5" fill="#1B8A99" opacity="0.8"/>
-              <circle cx="85" cy="95" r="2" fill="#1B8A99" opacity="0.7"/>
+            {/* Doodle background - geometric triangles */}
+            <svg className="absolute top-0 right-0 opacity-70" width="120" height="120" viewBox="0 0 120 120" fill="none">
+              {/* Large triangle pointing up */}
+              <polygon points="85,30 100,55 70,55" stroke="#0F5A65" strokeWidth="3" fill="none" strokeLinejoin="round"/>
+              {/* Triangle pointing down */}
+              <polygon points="75,65 95,45 110,65" stroke="#0F5A65" strokeWidth="3" fill="none" strokeLinejoin="round" opacity="0.85"/>
+              {/* Small triangle pointing up */}
+              <polygon points="95,80 105,95 85,95" stroke="#0F5A65" strokeWidth="2.5" fill="none" strokeLinejoin="round" opacity="0.75"/>
+              {/* Diamond shape */}
+              <polygon points="65,50 72,38 80,50 72,62" stroke="#0F5A65" strokeWidth="2.5" fill="none" strokeLinejoin="round" opacity="0.8"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
               <p className="text-[0.65rem] sm:text-[0.75rem] text-[#2B7A87] font-medium uppercase tracking-wide opacity-85">Pendapatan</p>
@@ -548,18 +548,16 @@ export default function OverviewPage() {
 
           {/* Booking - Light Blue */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#D4EBFF' }}>
-            {/* Doodle background - vertical dashes & lines pattern */}
-            <svg className="absolute top-0 right-0 opacity-60" width="120" height="120" viewBox="0 0 120 120" fill="none">
-              {/* Vertical dash groups */}
-              <line x1="75" y1="15" x2="75" y2="35" stroke="#0052CC" strokeWidth="3" strokeLinecap="round"/>
-              <line x1="90" y1="20" x2="90" y2="50" stroke="#0052CC" strokeWidth="3" strokeLinecap="round" opacity="0.8"/>
-              <line x1="105" y1="25" x2="105" y2="45" stroke="#0052CC" strokeWidth="3" strokeLinecap="round" opacity="0.7"/>
-              {/* Curved accent lines */}
-              <path d="M70 65 Q80 60 90 70" stroke="#0052CC" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.9"/>
-              <path d="M75 85 Q85 80 100 90" stroke="#0052CC" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.7"/>
-              {/* Small dots */}
-              <circle cx="110" cy="65" r="2.5" fill="#0052CC" opacity="0.8"/>
-              <circle cx="65" cy="95" r="2" fill="#0052CC" opacity="0.7"/>
+            {/* Doodle background - geometric grid squares */}
+            <svg className="absolute top-0 right-0 opacity-70" width="120" height="120" viewBox="0 0 120 120" fill="none">
+              {/* Large squares grid */}
+              <rect x="65" y="20" width="18" height="18" stroke="#0041A6" strokeWidth="2.5" fill="none"/>
+              <rect x="88" y="20" width="18" height="18" stroke="#0041A6" strokeWidth="2.5" fill="none" opacity="0.8"/>
+              <rect x="65" y="43" width="18" height="18" stroke="#0041A6" strokeWidth="2.5" fill="none" opacity="0.85"/>
+              <rect x="88" y="43" width="18" height="18" stroke="#0041A6" strokeWidth="2.5" fill="none" opacity="0.7"/>
+              {/* Smaller squares */}
+              <rect x="75" y="70" width="12" height="12" stroke="#0041A6" strokeWidth="2" fill="none" opacity="0.75"/>
+              <rect x="92" y="75" width="12" height="12" stroke="#0041A6" strokeWidth="2" fill="none" opacity="0.65"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
               <p className="text-[0.65rem] sm:text-[0.75rem] text-[#1B5BB5] font-medium uppercase tracking-wide opacity-85">Booking Hari Ini</p>
@@ -569,18 +567,14 @@ export default function OverviewPage() {
 
           {/* Rata-rata - Light Coral */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#FFD9C4' }}>
-            {/* Doodle background - spirals & curves pattern */}
-            <svg className="absolute top-0 right-0 opacity-60" width="120" height="120" viewBox="0 0 120 120" fill="none">
-              {/* Spiral curves */}
-              <path d="M85 20 Q95 25 90 40 Q85 55 75 50" stroke="#C84500" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-              <path d="M70 35 Q80 40 85 55 Q80 70 65 68" stroke="#C84500" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.8"/>
-              {/* Large dots */}
-              <circle cx="100" cy="70" r="8" fill="none" stroke="#C84500" strokeWidth="2.5" opacity="0.9"/>
-              <circle cx="65" cy="25" r="6" fill="none" stroke="#C84500" strokeWidth="2.5" opacity="0.8"/>
-              {/* Small accent dots */}
-              <circle cx="110" cy="50" r="2.5" fill="#C84500" opacity="0.9"/>
-              <circle cx="75" cy="90" r="2" fill="#C84500" opacity="0.8"/>
-              <circle cx="95" cy="100" r="1.5" fill="#C84500" opacity="0.7"/>
+            {/* Doodle background - geometric stars */}
+            <svg className="absolute top-0 right-0 opacity-70" width="120" height="120" viewBox="0 0 120 120" fill="none">
+              {/* Large star */}
+              <path d="M85 15 L88 28 L101 30 L91 38 L94 51 L85 45 L76 51 L79 38 L69 30 L82 28 Z" stroke="#9B3600" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
+              {/* Medium star */}
+              <path d="M68 55 L70 63 L79 64 L72 70 L74 78 L68 74 L62 78 L64 70 L57 64 L66 63 Z" stroke="#9B3600" strokeWidth="2" fill="none" strokeLinejoin="round" opacity="0.8"/>
+              {/* Small star */}
+              <path d="M100 70 L101 76 L107 77 L102 81 L104 87 L100 84 L96 87 L98 81 L93 77 L99 76 Z" stroke="#9B3600" strokeWidth="2" fill="none" strokeLinejoin="round" opacity="0.7"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
               <p className="text-[0.65rem] sm:text-[0.75rem] text-[#A83C36] font-medium uppercase tracking-wide opacity-85">Rata-rata Nilai</p>
@@ -590,19 +584,16 @@ export default function OverviewPage() {
 
           {/* Penyelesaian - Light Pink */}
           <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F5D9ED' }}>
-            {/* Doodle background - checkmarks & plus signs pattern */}
-            <svg className="absolute top-0 right-0 opacity-65" width="120" height="120" viewBox="0 0 120 120" fill="none">
-              {/* Checkmarks */}
-              <path d="M70 25 L75 32 L85 18" stroke="#A3126A" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M95 50 L100 58 L115 40" stroke="#A3126A" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.85"/>
-              {/* Plus signs */}
-              <line x1="75" y1="65" x2="75" y2="85" stroke="#A3126A" strokeWidth="2.5" strokeLinecap="round"/>
-              <line x1="65" y1="75" x2="85" y2="75" stroke="#A3126A" strokeWidth="2.5" strokeLinecap="round" opacity="0.8"/>
-              {/* Accent circle */}
-              <circle cx="110" cy="85" r="10" fill="none" stroke="#A3126A" strokeWidth="2.5" opacity="0.75"/>
-              {/* Small dots */}
-              <circle cx="60" cy="50" r="2.5" fill="#A3126A" opacity="0.8"/>
-              <circle cx="100" cy="30" r="2" fill="#A3126A" opacity="0.7"/>
+            {/* Doodle background - geometric hexagons & diamonds */}
+            <svg className="absolute top-0 right-0 opacity-70" width="120" height="120" viewBox="0 0 120 120" fill="none">
+              {/* Large hexagon */}
+              <polygon points="85,20 100,28 100,44 85,52 70,44 70,28" stroke="#7F1555" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
+              {/* Medium hexagon */}
+              <polygon points="75,65 85,70 85,80 75,85 65,80 65,70" stroke="#7F1555" strokeWidth="2.5" fill="none" strokeLinejoin="round" opacity="0.8"/>
+              {/* Small hexagon */}
+              <polygon points="100,85 107,89 107,97 100,101 93,97 93,89" stroke="#7F1555" strokeWidth="2" fill="none" strokeLinejoin="round" opacity="0.7"/>
+              {/* Diamond shape */}
+              <polygon points="65,30 72,25 80,30 72,38" stroke="#7F1555" strokeWidth="2.5" fill="none" strokeLinejoin="round" opacity="0.75"/>
             </svg>
             <div className="relative z-10 flex items-start justify-between mb-4">
               <p className="text-[0.65rem] sm:text-[0.75rem] text-[#A8348C] font-medium uppercase tracking-wide opacity-85">Penyelesaian</p>
