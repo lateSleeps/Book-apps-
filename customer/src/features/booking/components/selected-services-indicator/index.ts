@@ -1,1 +1,0 @@
-export { SelectedServicesIndicator } from './SelectedServicesIndicator';
