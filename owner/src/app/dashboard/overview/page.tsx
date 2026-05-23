@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useDashboardData } from '@/features/dashboard/hooks/use-dashboard-data';
 import { formatRupiah } from '@/shared/lib/format';
 import type { AddOn } from '@/features/dashboard/types/dashboard.types';
-import styles from './page.module.css';
 
 const DAYS_ID   = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -213,9 +212,9 @@ export default function OverviewPage() {
     // Convert to grayscale
     const grayscale: number[] = [];
     for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
+      const r = data[i] ?? 0;
+      const g = data[i + 1] ?? 0;
+      const b = data[i + 2] ?? 0;
       const gray = (r + g + b) / 3;
       grayscale.push(gray > 127 ? 1 : 0);
     }
@@ -324,11 +323,11 @@ export default function OverviewPage() {
     }));
   }
 
-  const effectiveBookings = useMemo(() => {
-    return [...todayBookings, ...manualBookings]
+  const effectiveBookings = useMemo(() =>
+    [...todayBookings, ...manualBookings]
       .map(b => ({ ...b, status: bookingStatusMap[b.id] ?? b.status }))
-      .filter(b => !(b.visitorType === 'BOOKING' && b.paymentStatus === 'UNPAID'));
-  }, [todayBookings, manualBookings, bookingStatusMap]);
+      .filter(b => !(b.visitorType === 'BOOKING' && b.paymentStatus === 'UNPAID')),
+  [todayBookings, manualBookings, bookingStatusMap]);
 
   const filteredVisitors = useMemo(() => {
     let list = effectiveBookings;
@@ -352,23 +351,136 @@ export default function OverviewPage() {
     return list;
   }, [effectiveBookings, visitorTab, visitorSearch, sortOrder]);
 
-  const visitorCounts = useMemo(() => {
-    return {
-      ALL:       effectiveBookings.length,
-      BOOKING:   effectiveBookings.filter(b => b.visitorType === 'BOOKING' && b.paymentStatus !== 'UNPAID').length,
-      WALK_IN:   effectiveBookings.filter(b => b.visitorType === 'WALK_IN').length,
-      COMPLETED: effectiveBookings.filter(b => b.status === 'COMPLETED').length,
-    };
-  }, [effectiveBookings]);
+  const visitorCounts = useMemo(() => ({
+    ALL:       effectiveBookings.length,
+    BOOKING:   effectiveBookings.filter(b => b.visitorType === 'BOOKING' && b.paymentStatus !== 'UNPAID').length,
+    WALK_IN:   effectiveBookings.filter(b => b.visitorType === 'WALK_IN').length,
+    COMPLETED: effectiveBookings.filter(b => b.status === 'COMPLETED').length,
+  }), [effectiveBookings]);
 
-  const pendingConfirmCount = useMemo(() => {
-    return effectiveBookings.filter(b => b.visitorType === 'BOOKING' && b.status === 'UPCOMING').length;
-  }, [effectiveBookings]);
+  const pendingConfirmCount = useMemo(() =>
+    effectiveBookings.filter(b => b.visitorType === 'BOOKING' && b.status === 'UPCOMING').length,
+  [effectiveBookings]);
 
 
 
   return (
     <>
+    <style suppressHydrationWarning>{`
+      /* ═══════════════════════════════════════════════════════════════════ */
+      /* ADDITIVE RESPONSIVE DESIGN - Mobile & Tablet Optimizations         */
+      /* ═══════════════════════════════════════════════════════════════════ */
+
+      /* TABLET: 768px - 1023px ─────────────────────────────────────────── */
+      @media (max-width: 1023px) {
+        /* Payment grid — better spacing on tablet */
+        .payment-grid-tablet {
+          gap: 2.5rem !important;
+        }
+      }
+
+      /* MOBILE: up to 767px ────────────────────────────────────────────── */
+      @media (max-width: 767px) {
+        /* Expanded details — stack to single column on mobile */
+        .expanded-details-mobile {
+          grid-template-columns: 1fr !important;
+        }
+
+        /* Remove column separators on mobile */
+        .expanded-col-separator {
+          border-right: none !important;
+          border-bottom: 1px solid #f0f0f0 !important;
+        }
+
+        /* Padding cleanup on mobile — make more compact */
+        .expanded-details-mobile > div > div {
+          padding-bottom: 1rem !important;
+          padding-right: 0 !important;
+          padding-left: 0 !important;
+        }
+
+        /* Visitor row badges — better wrapping on mobile */
+        .visitor-row-badges {
+          flex-wrap: wrap !important;
+          gap: 0.5rem !important;
+        }
+
+        /* Visitor row — reduce font sizes for mobile */
+        .visitor-name-mobile {
+          font-size: 0.8125rem !important;
+        }
+
+        .visitor-service-mobile {
+          font-size: 0.75rem !important;
+        }
+
+        /* Tabs bar — better mobile spacing */
+        .visitor-tabs-mobile {
+          gap: 0.25rem !important;
+        }
+
+        /* Search bar — full width on mobile */
+        .search-bar-mobile {
+          flex: 1 !important;
+          width: auto !important;
+        }
+
+        /* Sort + Search — stack on mobile */
+        .visitor-header-controls {
+          flex-direction: column !important;
+          gap: 0.5rem !important;
+        }
+
+        .sort-button-mobile {
+          width: 100% !important;
+        }
+
+        /* Payment input section — full width layout on mobile */
+        .payment-section-mobile {
+          grid-template-columns: 1fr !important;
+        }
+
+        /* Card col-span reset for mobile */
+        .payment-status-card-mobile {
+          col-span: 1 !important;
+        }
+
+        .payment-input-card-mobile {
+          col-span: 1 !important;
+        }
+
+        /* Button groups — better mobile sizing */
+        .button-group-mobile {
+          gap: 0.5rem !important;
+        }
+
+        .button-group-mobile button {
+          font-size: 0.75rem !important;
+          padding: 0.5rem 0.75rem !important;
+          height: auto !important;
+        }
+
+        /* Greeting section — adjust on mobile */
+        .greeting-section-mobile {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+        }
+
+        .greeting-text-mobile h1 {
+          font-size: 1.125rem !important;
+        }
+
+        /* Collapse some text on mobile */
+        .hide-on-mobile {
+          display: none !important;
+        }
+
+        /* Make dropdowns more touch-friendly */
+        .dropdown-item-mobile {
+          padding: 0.75rem !important;
+        }
+      }
+    `}</style>
     <div className="flex flex-col flex-1 overflow-y-auto" style={{ backgroundColor: '#fafaf8' }}>
       <div className="w-full px-4 py-5 sm:px-6 sm:py-7 md:px-8 md:py-10 flex flex-col gap-5 sm:gap-7 md:gap-10">
 
@@ -426,40 +538,40 @@ export default function OverviewPage() {
         {/* Stats row — Colorful cards with abstract shapes */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {/* Pendapatan - Grayscale */}
-          <div className="relative overflow-hidden rounded-2xl px-3 py-3 sm:p-4 flex flex-col shadow backdrop-blur-sm" style={{ backgroundColor: '#F1F2F3' }}>
+          <div className="relative overflow-hidden rounded-2xl p-4 flex flex-col shadow backdrop-blur-sm" style={{ backgroundColor: '#F1F2F3' }}>
             {/* Abstract shapes - circles */}
-            <svg className="absolute right-3 bottom-2 sm:right-4 sm:bottom-3 opacity-80 scale-85 sm:scale-100 origin-bottom-right" width="70" height="70" viewBox="0 0 70 70" fill="none">
+            <svg className="absolute right-4 bottom-6 sm:bottom-3 opacity-80" width="70" height="70" viewBox="0 0 70 70" fill="none">
               <circle cx="20" cy="20" r="12" fill="#054A57" opacity="0.6"/>
               <circle cx="50" cy="30" r="16" fill="#054A57" opacity="0.75"/>
               <circle cx="35" cy="55" r="14" fill="#054A57" opacity="0.85"/>
             </svg>
-            <div className="relative z-10 flex items-start justify-between mb-[2rem] sm:mb-[3rem]">
-              <p className="text-[0.75rem] sm:text-[0.85rem] text-[#737373] font-medium uppercase tracking-wide opacity-85">Pendapatan</p>
+            <div className="relative z-10 flex items-start justify-between mb-[3rem]">
+              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#737373] font-medium uppercase tracking-wide opacity-85">Pendapatan</p>
             </div>
-            <p className="relative z-10 text-[1.25rem] sm:text-[1.5rem] md:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">
+            <p className="relative z-10 text-[1.5rem] sm:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">
               <span className="sm:hidden">{formatCompactRupiah(stats.revenueToday)}</span>
               <span className="hidden sm:inline">{formatRupiah(stats.revenueToday)}</span>
             </p>
           </div>
 
           {/* Booking - Grayscale */}
-          <div className="relative overflow-hidden rounded-2xl px-3 py-3 sm:p-4 flex flex-col shadow backdrop-blur-sm" style={{ backgroundColor: '#F1F2F3' }}>
+          <div className="relative overflow-hidden rounded-2xl p-4 flex flex-col shadow backdrop-blur-sm" style={{ backgroundColor: '#F1F2F3' }}>
             {/* Abstract shapes - squares */}
-            <svg className="absolute right-3 bottom-2 sm:right-4 sm:bottom-3 opacity-80 scale-85 sm:scale-100 origin-bottom-right" width="70" height="70" viewBox="0 0 70 70" fill="none">
+            <svg className="absolute right-4 bottom-6 sm:bottom-3 opacity-80" width="70" height="70" viewBox="0 0 70 70" fill="none">
               <rect x="10" y="10" width="16" height="16" fill="#3A1F6B" opacity="0.6" rx="2"/>
               <rect x="35" y="20" width="24" height="24" fill="#3A1F6B" opacity="0.75" rx="2"/>
               <rect x="15" y="45" width="20" height="20" fill="#3A1F6B" opacity="0.85" rx="2"/>
             </svg>
-            <div className="relative z-10 flex items-start justify-between mb-[2rem] sm:mb-[3rem]">
-              <p className="text-[0.75rem] sm:text-[0.85rem] text-[#737373] font-medium uppercase tracking-wide opacity-85">Booking Hari Ini</p>
+            <div className="relative z-10 flex items-start justify-between mb-[3rem]">
+              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#737373] font-medium uppercase tracking-wide opacity-85">Booking Hari Ini</p>
             </div>
-            <p className="relative z-10 text-[1.25rem] sm:text-[1.5rem] md:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">{String(stats.bookingsToday)}</p>
+            <p className="relative z-10 text-[1.5rem] sm:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">{String(stats.bookingsToday)}</p>
           </div>
 
           {/* Rating - Grayscale */}
-          <div className="relative overflow-hidden rounded-2xl px-3 py-3 sm:p-4 flex flex-col shadow backdrop-blur-sm" style={{ backgroundColor: '#F1F2F3' }}>
+          <div className="relative overflow-hidden rounded-2xl p-4 flex flex-col shadow backdrop-blur-sm" style={{ backgroundColor: '#F1F2F3' }}>
             {/* Smooth wavy lines */}
-            <svg className="absolute right-3 bottom-2 sm:right-4 sm:bottom-3 opacity-80 scale-85 sm:scale-100 origin-bottom-right" width="70" height="70" viewBox="0 0 70 70" fill="none">
+            <svg className="absolute right-4 bottom-6 sm:bottom-3 opacity-80" width="70" height="70" viewBox="0 0 70 70" fill="none">
               {/* Wave 1 - smooth sine curve */}
               <path d="M10,25 Q20,15 30,25 T50,25 T70,25" stroke="#8B0E43" strokeWidth="2.5" opacity="0.65" strokeLinecap="round" fill="none"/>
               {/* Wave 2 - smooth sine curve */}
@@ -467,16 +579,16 @@ export default function OverviewPage() {
               {/* Wave 3 - smooth sine curve */}
               <path d="M10,60 Q20,50 30,60 T50,60 T70,60" stroke="#8B0E43" strokeWidth="2" opacity="0.85" strokeLinecap="round" fill="none"/>
             </svg>
-            <div className="relative z-10 flex items-start justify-between mb-[2rem] sm:mb-[3rem]">
-              <p className="text-[0.75rem] sm:text-[0.85rem] text-[#737373] font-medium uppercase tracking-wide opacity-85">Rating</p>
+            <div className="relative z-10 flex items-start justify-between mb-[3rem]">
+              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#737373] font-medium uppercase tracking-wide opacity-85">Rating</p>
             </div>
-            <p className="relative z-10 text-[1.25rem] sm:text-[1.5rem] md:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">{stats.avgRating}/5 ⭐</p>
+            <p className="relative z-10 text-[1.5rem] sm:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">{stats.avgRating}/5 ⭐</p>
           </div>
 
           {/* Penyelesaian - Grayscale */}
-          <div className="relative overflow-hidden rounded-2xl px-3 py-3 sm:p-4 flex flex-col shadow backdrop-blur-sm" style={{ backgroundColor: '#F1F2F3' }}>
+          <div className="relative overflow-hidden rounded-2xl p-4 flex flex-col shadow backdrop-blur-sm" style={{ backgroundColor: '#F1F2F3' }}>
             {/* Zigzag lines */}
-            <svg className="absolute right-3 bottom-2 sm:right-4 sm:bottom-3 opacity-80 scale-85 sm:scale-100 origin-bottom-right" width="70" height="70" viewBox="0 0 70 70" fill="none">
+            <svg className="absolute right-4 bottom-6 sm:bottom-3 opacity-80" width="70" height="70" viewBox="0 0 70 70" fill="none">
               {/* Zigzag line 1 - diagonal */}
               <polyline points="50,10 58,20 50,30 58,40" stroke="#737373" strokeWidth="2.5" opacity="0.65" strokeLinecap="round" strokeLinejoin="round"/>
               {/* Zigzag line 2 - steeper */}
@@ -484,10 +596,10 @@ export default function OverviewPage() {
               {/* Zigzag line 3 - shorter */}
               <polyline points="50,50 60,60 50,70" stroke="#737373" strokeWidth="2" opacity="0.85" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            <div className="relative z-10 flex items-start justify-between mb-[2rem] sm:mb-[3rem]">
-              <p className="text-[0.75rem] sm:text-[0.85rem] text-[#737373] font-medium uppercase tracking-wide opacity-85">Penyelesaian</p>
+            <div className="relative z-10 flex items-start justify-between mb-[3rem]">
+              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#737373] font-medium uppercase tracking-wide opacity-85">Penyelesaian</p>
             </div>
-            <p className="relative z-10 text-[1.25rem] sm:text-[1.5rem] md:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">{stats.completionRate}%</p>
+            <p className="relative z-10 text-[1.5rem] sm:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">{stats.completionRate}%</p>
           </div>
         </div>
 
@@ -645,7 +757,7 @@ export default function OverviewPage() {
                   const usedServiceNames = new Set([currentService.serviceName, ...additionalServices.map(s => s.serviceName)]);
                   const availableServices = MOCK_SERVICES.filter(s => !usedServiceNames.has(s.name));
 
-                  const statusMeta: Record<string, { color: string; bg: string; label: string; icon: React.ReactNode }> = {
+                  const statusMeta: Record<'UPCOMING' | 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW', { color: string; bg: string; label: string; icon: React.ReactNode }> = {
                     UPCOMING: {
                       color: '#d97706', bg: '#fffbeb',
                       label: 'Perlu Konfirmasi',
@@ -681,8 +793,8 @@ export default function OverviewPage() {
                   const sm = statusMeta[b.status] ?? statusMeta.NO_SHOW;
 
                   return (
-                    <div key={b.id} className="hidden md:block border-b border-[#f7f7f7] last:border-0">
-                      {/* Collapsed row - Desktop */}
+                    <div key={b.id} className="border-b border-[#f7f7f7] last:border-0">
+                      {/* Collapsed row */}
                       <div
                         onClick={() => toggleExpand(b.id)}
                         className="flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-[#fafaf8] transition-colors text-sm sm:text-base"
@@ -729,7 +841,7 @@ export default function OverviewPage() {
                           </div>
                         </div>
                         <span className="text-[0.875rem] text-[#777] tabular-nums flex-shrink-0">{b.timeSlot}</span>
-                        {(b.status === 'UPCOMING' || b.status === 'CONFIRMED') && (
+                        {(b.status === 'UPCOMING' || b.status === 'CONFIRMED' || b.status === 'IN_PROGRESS') && (
                           <span className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.6875rem] font-semibold border" style={{ backgroundColor: sm.bg, color: sm.color, borderColor: `${sm.color}30` }}>
                             {b.status === 'IN_PROGRESS' && (
                               <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 animate-pulse" style={{ backgroundColor: sm.color }} />
@@ -1253,112 +1365,6 @@ export default function OverviewPage() {
                         </div>
                       )}
                     </div>
-
-                    {/* Mobile Card Layout */}
-                    <div key={b.id} className="block md:hidden bg-white rounded-xl border border-[#f0f0f0] p-4 mb-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => toggleExpand(b.id)}>
-                      {/* Header row - Avatar + Name + Time */}
-                      <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="flex items-start gap-2 flex-1 min-w-0">
-                          {/* Avatar with status icon */}
-                          <div className="relative flex-shrink-0">
-                            <div className="w-9 h-9 rounded-full flex items-center justify-center text-[0.75rem] font-semibold" style={{ backgroundColor: avatarColor(b.customerName).bg, color: avatarColor(b.customerName).text }}>
-                              {b.customerName.charAt(0)}
-                            </div>
-                            {(b.status === 'UPCOMING' || b.status === 'CONFIRMED') && (
-                              <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center ring-2 ring-white" style={{ backgroundColor: sm.color }}>
-                                {sm.icon && <div style={{ transform: 'scale(0.9)' }}>{sm.icon}</div>}
-                              </div>
-                            )}
-                          </div>
-                          {/* Name + Service */}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[0.875rem] font-semibold text-[#1a1a1a] truncate">{b.customerName}</p>
-                            <p className="text-[0.75rem] text-[#777] truncate">{b.serviceName}</p>
-                          </div>
-                        </div>
-                        {/* Time */}
-                        <span className="text-[0.8125rem] font-medium text-[#777] flex-shrink-0 tabular-nums">{b.timeSlot}</span>
-                      </div>
-
-                      {/* Status + Payment + Price row */}
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {(b.status === 'UPCOMING' || b.status === 'CONFIRMED') && (
-                          <span className="flex items-center gap-1 px-2 py-1 rounded-full text-[0.625rem] font-semibold border" style={{ backgroundColor: sm.bg, color: sm.color, borderColor: `${sm.color}30` }}>
-                            {b.status === 'IN_PROGRESS' && (
-                              <span className="w-1 h-1 rounded-full flex-shrink-0 animate-pulse" style={{ backgroundColor: sm.color }} />
-                            )}
-                            {sm.label}
-                          </span>
-                        )}
-                        <span className={`text-[0.625rem] font-medium px-2 py-1 rounded-full flex-shrink-0 ${
-                          b.paymentStatus === 'PAID'    ? 'bg-[#dcfce7] text-[#16a34a]'
-                          : b.paymentStatus === 'DEPOSIT' ? 'bg-[#fef9c3] text-[#a16207]'
-                          : 'bg-[#fee2e2] text-[#dc2626]'
-                        }`}>
-                          {b.paymentStatus === 'PAID' ? 'Lunas' : b.paymentStatus === 'DEPOSIT' ? 'DP' : 'Belum bayar'}
-                        </span>
-                        <span className={`text-[0.625rem] font-medium px-2 py-1 rounded-full ml-auto flex-shrink-0 ${b.visitorType === 'WALK_IN' ? 'bg-[#fef3c2] text-[#92400e]' : 'bg-[#dbeafe] text-[#1e40af]'}`}>
-                          {b.visitorType === 'WALK_IN' ? 'Walk-in' : 'Booking'}
-                        </span>
-                      </div>
-
-                      {/* Price */}
-                      <div className="mt-3 pt-3 border-t border-[#f0f0f0] flex items-center justify-between">
-                        <span className="text-[0.75rem] text-[#777]">Total</span>
-                        <p className="text-[0.9375rem] font-bold text-[#1a1a1a] tabular-nums">{formatRupiah(totalPrice)}</p>
-                      </div>
-
-                      {/* Expanded detail - Mobile */}
-                      {isExpanded && (
-                        <div className="mt-4 pt-4 border-t border-[#f0f0f0] bg-[#fafaf8] -mx-4 -mb-4 px-4 py-4 rounded-b-xl" onClick={e => e.stopPropagation()}>
-                          {/* Simplified detail for mobile */}
-                          <div className="flex flex-col gap-4 text-[0.8125rem]">
-                            {/* Contact */}
-                            <div>
-                              <p className="text-[0.65rem] text-[#777] uppercase tracking-wider font-semibold mb-1.5">Kontak</p>
-                              <p className="text-[0.875rem] font-medium text-[#1a1a1a] mb-2">{b.customerPhone}</p>
-                              <a
-                                href={waLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-[0.7rem] font-medium text-white bg-[#25d366] hover:opacity-85 transition-opacity"
-                              >
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                                Chat WA
-                              </a>
-                            </div>
-
-                            {/* Service info */}
-                            <div>
-                              <p className="text-[0.65rem] text-[#777] uppercase tracking-wider font-semibold mb-1.5">Layanan</p>
-                              <p className="font-medium text-[#1a1a1a]">{currentService.serviceName}</p>
-                              <p className="text-[0.75rem] text-[#777] mt-0.5">oleh {b.stylistName}</p>
-                            </div>
-
-                            {/* Payment info */}
-                            <div>
-                              <p className="text-[0.65rem] text-[#777] uppercase tracking-wider font-semibold mb-1.5">Pembayaran</p>
-                              <div className="space-y-1.5">
-                                <div className="flex justify-between">
-                                  <span className="text-[#777]">Subtotal</span>
-                                  <span className="font-medium text-[#1a1a1a]">{formatRupiah(totalPrice)}</span>
-                                </div>
-                                {discount > 0 && (
-                                  <div className="flex justify-between text-[#16a34a]">
-                                    <span>Diskon</span>
-                                    <span className="font-medium">-{formatRupiah(discount)}</span>
-                                  </div>
-                                )}
-                                <div className="flex justify-between pt-1.5 border-t border-[#e8e8e6] font-semibold">
-                                  <span>Total</span>
-                                  <span>{formatRupiah(finalTotal)}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
                   );
                 })
               )}
@@ -1777,7 +1783,7 @@ export default function OverviewPage() {
                     status: 'CONFIRMED',
                     paymentStatus: 'UNPAID',
                     paymentType: null,
-                    visitorType: addDrawer === 'BOOKING' ? 'BOOKING' : 'WALK_IN',
+                    visitorType: 'WALK_IN',
                     addOns: [],
                     treatmentNotes: '',
                   };
