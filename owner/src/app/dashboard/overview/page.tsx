@@ -323,11 +323,11 @@ export default function OverviewPage() {
     }));
   }
 
-  const effectiveBookings = useMemo(() =>
-    [...todayBookings, ...manualBookings]
+  const effectiveBookings = useMemo(() => {
+    return [...todayBookings, ...manualBookings]
       .map(b => ({ ...b, status: bookingStatusMap[b.id] ?? b.status }))
-      .filter(b => !(b.visitorType === 'BOOKING' && b.paymentStatus === 'UNPAID')),
-  [todayBookings, manualBookings, bookingStatusMap]);
+      .filter(b => !(b.visitorType === 'BOOKING' && b.paymentStatus === 'UNPAID'));
+  }, [todayBookings, manualBookings, bookingStatusMap]);
 
   const filteredVisitors = useMemo(() => {
     let list = effectiveBookings;
@@ -351,136 +351,23 @@ export default function OverviewPage() {
     return list;
   }, [effectiveBookings, visitorTab, visitorSearch, sortOrder]);
 
-  const visitorCounts = useMemo(() => ({
-    ALL:       effectiveBookings.length,
-    BOOKING:   effectiveBookings.filter(b => b.visitorType === 'BOOKING' && b.paymentStatus !== 'UNPAID').length,
-    WALK_IN:   effectiveBookings.filter(b => b.visitorType === 'WALK_IN').length,
-    COMPLETED: effectiveBookings.filter(b => b.status === 'COMPLETED').length,
-  }), [effectiveBookings]);
+  const visitorCounts = useMemo(() => {
+    return {
+      ALL:       effectiveBookings.length,
+      BOOKING:   effectiveBookings.filter(b => b.visitorType === 'BOOKING' && b.paymentStatus !== 'UNPAID').length,
+      WALK_IN:   effectiveBookings.filter(b => b.visitorType === 'WALK_IN').length,
+      COMPLETED: effectiveBookings.filter(b => b.status === 'COMPLETED').length,
+    };
+  }, [effectiveBookings]);
 
-  const pendingConfirmCount = useMemo(() =>
-    effectiveBookings.filter(b => b.visitorType === 'BOOKING' && b.status === 'UPCOMING').length,
-  [effectiveBookings]);
+  const pendingConfirmCount = useMemo(() => {
+    return effectiveBookings.filter(b => b.visitorType === 'BOOKING' && b.status === 'UPCOMING').length;
+  }, [effectiveBookings]);
 
 
 
   return (
     <>
-    <style suppressHydrationWarning>{`
-      /* ═══════════════════════════════════════════════════════════════════ */
-      /* ADDITIVE RESPONSIVE DESIGN - Mobile & Tablet Optimizations         */
-      /* ═══════════════════════════════════════════════════════════════════ */
-
-      /* TABLET: 768px - 1023px ─────────────────────────────────────────── */
-      @media (max-width: 1023px) {
-        /* Payment grid — better spacing on tablet */
-        .payment-grid-tablet {
-          gap: 2.5rem !important;
-        }
-      }
-
-      /* MOBILE: up to 767px ────────────────────────────────────────────── */
-      @media (max-width: 767px) {
-        /* Expanded details — stack to single column on mobile */
-        .expanded-details-mobile {
-          grid-template-columns: 1fr !important;
-        }
-
-        /* Remove column separators on mobile */
-        .expanded-col-separator {
-          border-right: none !important;
-          border-bottom: 1px solid #f0f0f0 !important;
-        }
-
-        /* Padding cleanup on mobile — make more compact */
-        .expanded-details-mobile > div > div {
-          padding-bottom: 1rem !important;
-          padding-right: 0 !important;
-          padding-left: 0 !important;
-        }
-
-        /* Visitor row badges — better wrapping on mobile */
-        .visitor-row-badges {
-          flex-wrap: wrap !important;
-          gap: 0.5rem !important;
-        }
-
-        /* Visitor row — reduce font sizes for mobile */
-        .visitor-name-mobile {
-          font-size: 0.8125rem !important;
-        }
-
-        .visitor-service-mobile {
-          font-size: 0.75rem !important;
-        }
-
-        /* Tabs bar — better mobile spacing */
-        .visitor-tabs-mobile {
-          gap: 0.25rem !important;
-        }
-
-        /* Search bar — full width on mobile */
-        .search-bar-mobile {
-          flex: 1 !important;
-          width: auto !important;
-        }
-
-        /* Sort + Search — stack on mobile */
-        .visitor-header-controls {
-          flex-direction: column !important;
-          gap: 0.5rem !important;
-        }
-
-        .sort-button-mobile {
-          width: 100% !important;
-        }
-
-        /* Payment input section — full width layout on mobile */
-        .payment-section-mobile {
-          grid-template-columns: 1fr !important;
-        }
-
-        /* Card col-span reset for mobile */
-        .payment-status-card-mobile {
-          col-span: 1 !important;
-        }
-
-        .payment-input-card-mobile {
-          col-span: 1 !important;
-        }
-
-        /* Button groups — better mobile sizing */
-        .button-group-mobile {
-          gap: 0.5rem !important;
-        }
-
-        .button-group-mobile button {
-          font-size: 0.75rem !important;
-          padding: 0.5rem 0.75rem !important;
-          height: auto !important;
-        }
-
-        /* Greeting section — adjust on mobile */
-        .greeting-section-mobile {
-          flex-direction: column !important;
-          align-items: flex-start !important;
-        }
-
-        .greeting-text-mobile h1 {
-          font-size: 1.125rem !important;
-        }
-
-        /* Collapse some text on mobile */
-        .hide-on-mobile {
-          display: none !important;
-        }
-
-        /* Make dropdowns more touch-friendly */
-        .dropdown-item-mobile {
-          padding: 0.75rem !important;
-        }
-      }
-    `}</style>
     <div className="flex flex-col flex-1 overflow-y-auto" style={{ backgroundColor: '#fafaf8' }}>
       <div className="w-full px-4 py-5 sm:px-6 sm:py-7 md:px-8 md:py-10 flex flex-col gap-5 sm:gap-7 md:gap-10">
 
