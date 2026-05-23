@@ -837,7 +837,12 @@ export default function OverviewPage() {
                           </div>
                         </div>
                         <span className="text-[0.875rem] text-[#777] tabular-nums flex-shrink-0">{b.timeSlot}</span>
-                        {(b.status === 'UPCOMING' || b.status === 'CONFIRMED' || b.status === 'IN_PROGRESS') && (
+                        {b.status === 'CONFIRMED' ? (
+                          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" className="flex-shrink-0">
+                            <circle cx="8" cy="8" r="7.5" fill="#16a34a"/>
+                            <path d="M4 8l2.5 2.5 5-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        ) : (b.status === 'UPCOMING' || b.status === 'IN_PROGRESS') && (
                           <span className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.6875rem] font-semibold border" style={{ backgroundColor: sm.bg, color: sm.color, borderColor: `${sm.color}30` }}>
                             {b.status === 'IN_PROGRESS' && (
                               <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 animate-pulse" style={{ backgroundColor: sm.color }} />
