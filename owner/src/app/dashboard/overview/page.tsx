@@ -525,87 +525,66 @@ export default function OverviewPage() {
           </div>
           </div>
         </div>
-        {/* Stats row — Colorful cards with doodles */}
+        {/* Stats row — Colorful cards with abstract shapes */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          {/* Pendapatan - Light Teal/Green */}
-          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#D1EAE6' }}>
-            {/* Doodle background - stacked coins/bills */}
-            <svg className="absolute top-0 right-0 opacity-90" width="120" height="120" viewBox="0 0 120 120" fill="none">
-              {/* Stacked rounded rectangles (coins/bills) */}
-              <rect x="65" y="20" width="40" height="14" rx="7" stroke="#0F5A65" strokeWidth="3" fill="none"/>
-              <rect x="60" y="38" width="45" height="15" rx="7.5" stroke="#0F5A65" strokeWidth="3" fill="none" opacity="0.85"/>
-              <rect x="68" y="58" width="38" height="13" rx="6.5" stroke="#0F5A65" strokeWidth="3" fill="none" opacity="0.75"/>
-              <rect x="62" y="76" width="42" height="14" rx="7" stroke="#0F5A65" strokeWidth="3" fill="none" opacity="0.65"/>
-              {/* Accent lines for shine effect */}
-              <line x1="70" y1="26" x2="100" y2="26" stroke="#0F5A65" strokeWidth="1.5" opacity="0.6"/>
-              <line x1="68" y1="46" x2="105" y2="46" stroke="#0F5A65" strokeWidth="1.5" opacity="0.5"/>
+          {/* Pendapatan - Grayscale */}
+          <div className="relative overflow-hidden rounded-2xl px-3 sm:px-4 py-6 sm:py-7 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F1F2F3' }}>
+            {/* Abstract shapes - circles */}
+            <svg className="absolute right-4 bottom-3 opacity-80" width="70" height="70" viewBox="0 0 70 70" fill="none">
+              <circle cx="20" cy="20" r="12" fill="#054A57" opacity="0.6"/>
+              <circle cx="50" cy="30" r="16" fill="#054A57" opacity="0.75"/>
+              <circle cx="35" cy="55" r="14" fill="#054A57" opacity="0.85"/>
             </svg>
-            <div className="relative z-10 flex items-start justify-between mb-4">
-              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#2B7A87] font-medium uppercase tracking-wide opacity-85">Pendapatan</p>
+            <div className="relative z-10 flex items-start justify-between mb-[3rem]">
+              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#737373] font-medium uppercase tracking-wide opacity-85">Pendapatan</p>
             </div>
             <p className="relative z-10 text-[1.5rem] sm:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">{formatRupiah(stats.revenueToday)}</p>
           </div>
 
-          {/* Booking - Light Blue */}
-          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#D4EBFF' }}>
-            {/* Doodle background - diagonal lines/grid pattern */}
-            <svg className="absolute top-0 right-0 opacity-90" width="120" height="120" viewBox="0 0 120 120" fill="none">
-              {/* Diagonal lines (top-left to bottom-right) */}
-              <line x1="60" y1="20" x2="100" y2="60" stroke="#0041A6" strokeWidth="3" strokeLinecap="round"/>
-              <line x1="65" y1="15" x2="105" y2="55" stroke="#0041A6" strokeWidth="3" strokeLinecap="round" opacity="0.85"/>
-              <line x1="70" y1="20" x2="110" y2="60" stroke="#0041A6" strokeWidth="3" strokeLinecap="round" opacity="0.7"/>
-              {/* Diagonal lines (top-right to bottom-left) */}
-              <line x1="110" y1="25" x2="70" y2="65" stroke="#0041A6" strokeWidth="3" strokeLinecap="round" opacity="0.8"/>
-              <line x1="105" y1="20" x2="65" y2="60" stroke="#0041A6" strokeWidth="3" strokeLinecap="round" opacity="0.75"/>
-              {/* Additional diagonal lines for grid effect */}
-              <line x1="75" y1="70" x2="110" y2="105" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round" opacity="0.65"/>
-              <line x1="105" y1="75" x2="70" y2="110" stroke="#0041A6" strokeWidth="2.5" strokeLinecap="round" opacity="0.6"/>
+          {/* Booking - Grayscale */}
+          <div className="relative overflow-hidden rounded-2xl px-3 sm:px-4 py-6 sm:py-7 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F1F2F3' }}>
+            {/* Abstract shapes - squares */}
+            <svg className="absolute right-4 bottom-3 opacity-80" width="70" height="70" viewBox="0 0 70 70" fill="none">
+              <rect x="10" y="10" width="16" height="16" fill="#3A1F6B" opacity="0.6" rx="2"/>
+              <rect x="35" y="20" width="24" height="24" fill="#3A1F6B" opacity="0.75" rx="2"/>
+              <rect x="15" y="45" width="20" height="20" fill="#3A1F6B" opacity="0.85" rx="2"/>
             </svg>
-            <div className="relative z-10 flex items-start justify-between mb-4">
-              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#1B5BB5] font-medium uppercase tracking-wide opacity-85">Booking Hari Ini</p>
+            <div className="relative z-10 flex items-start justify-between mb-[3rem]">
+              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#737373] font-medium uppercase tracking-wide opacity-85">Booking Hari Ini</p>
             </div>
             <p className="relative z-10 text-[1.5rem] sm:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">{String(stats.bookingsToday)}</p>
           </div>
 
-          {/* Rata-rata - Light Coral */}
-          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#FFD9C4' }}>
-            {/* Doodle background - stars and sparkles */}
-            <svg className="absolute top-0 right-0 opacity-90" width="120" height="120" viewBox="0 0 120 120" fill="none">
-              {/* Large star */}
-              <path d="M85 15 L88 28 L101 30 L91 38 L94 51 L85 45 L76 51 L79 38 L69 30 L82 28 Z" stroke="#9B3600" strokeWidth="3" fill="none" strokeLinejoin="round"/>
-              {/* Medium star */}
-              <path d="M65 60 L67 70 L77 71 L69 77 L72 87 L65 81 L58 87 L61 77 L53 71 L63 70 Z" stroke="#9B3600" strokeWidth="3" fill="none" strokeLinejoin="round" opacity="0.85"/>
-              {/* Small star with sparkle lines */}
-              <path d="M100 70 L102 78 L110 79 L104 84 L107 92 L100 88 L93 92 L96 84 L90 79 L98 78 Z" stroke="#9B3600" strokeWidth="2.5" fill="none" strokeLinejoin="round" opacity="0.75"/>
-              {/* Sparkle lines around stars */}
-              <line x1="85" y1="5" x2="85" y2="15" stroke="#9B3600" strokeWidth="1.5" opacity="0.6"/>
-              <line x1="95" y1="10" x2="100" y2="20" stroke="#9B3600" strokeWidth="1.5" opacity="0.5"/>
-              <line x1="75" y1="10" x2="70" y2="20" stroke="#9B3600" strokeWidth="1.5" opacity="0.5"/>
-              <line x1="100" y1="60" x2="110" y2="60" stroke="#9B3600" strokeWidth="1.5" opacity="0.5"/>
+          {/* Rating - Grayscale */}
+          <div className="relative overflow-hidden rounded-2xl px-3 sm:px-4 py-6 sm:py-7 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F1F2F3' }}>
+            {/* Smooth wavy lines */}
+            <svg className="absolute right-4 bottom-3 opacity-80" width="70" height="70" viewBox="0 0 70 70" fill="none">
+              {/* Wave 1 - smooth sine curve */}
+              <path d="M10,25 Q20,15 30,25 T50,25 T70,25" stroke="#8B0E43" strokeWidth="2.5" opacity="0.65" strokeLinecap="round" fill="none"/>
+              {/* Wave 2 - smooth sine curve */}
+              <path d="M10,42 Q20,32 30,42 T50,42 T70,42" stroke="#8B0E43" strokeWidth="2.5" opacity="0.75" strokeLinecap="round" fill="none"/>
+              {/* Wave 3 - smooth sine curve */}
+              <path d="M10,60 Q20,50 30,60 T50,60 T70,60" stroke="#8B0E43" strokeWidth="2" opacity="0.85" strokeLinecap="round" fill="none"/>
             </svg>
-            <div className="relative z-10 flex items-start justify-between mb-4">
-              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#A83C36] font-medium uppercase tracking-wide opacity-85">Rata-rata Nilai</p>
+            <div className="relative z-10 flex items-start justify-between mb-[3rem]">
+              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#737373] font-medium uppercase tracking-wide opacity-85">Rating</p>
             </div>
-            <p className="relative z-10 text-[1.5rem] sm:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">{formatRupiah(stats.avgBookingValue)}</p>
+            <p className="relative z-10 text-[1.5rem] sm:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">{stats.avgRating}/5 ⭐</p>
           </div>
 
-          {/* Penyelesaian - Light Pink */}
-          <div className="relative overflow-hidden rounded-lg sm:rounded-2xl px-3 sm:px-5 py-4 sm:py-5 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F5D9ED' }}>
-            {/* Doodle background - flowing ribbons and swirls */}
-            <svg className="absolute top-0 right-0 opacity-90" width="120" height="120" viewBox="0 0 120 120" fill="none">
-              {/* Flowing ribbon curve 1 */}
-              <path d="M65 20 Q85 35 75 55 Q65 75 90 95" stroke="#7F1555" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-              {/* Flowing ribbon curve 2 */}
-              <path d="M95 15 Q80 40 100 60 Q110 80 85 100" stroke="#7F1555" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.8"/>
-              {/* Swirl curve 1 */}
-              <path d="M70 70 Q75 65 82 68 Q88 72 85 80" stroke="#7F1555" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.75"/>
-              {/* Swirl curve 2 */}
-              <path d="M105 40 Q100 45 105 52 Q112 55 110 62" stroke="#7F1555" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
-              {/* Small accent swirl */}
-              <path d="M75 30 Q78 25 82 28" stroke="#7F1555" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.6"/>
+          {/* Penyelesaian - Grayscale */}
+          <div className="relative overflow-hidden rounded-2xl px-3 sm:px-4 py-6 sm:py-7 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F1F2F3' }}>
+            {/* Zigzag lines */}
+            <svg className="absolute right-4 bottom-3 opacity-80" width="70" height="70" viewBox="0 0 70 70" fill="none">
+              {/* Zigzag line 1 - diagonal */}
+              <polyline points="50,10 58,20 50,30 58,40" stroke="#737373" strokeWidth="2.5" opacity="0.65" strokeLinecap="round" strokeLinejoin="round"/>
+              {/* Zigzag line 2 - steeper */}
+              <polyline points="20,25 30,35 20,45 30,55 20,65" stroke="#737373" strokeWidth="2.5" opacity="0.75" strokeLinecap="round" strokeLinejoin="round"/>
+              {/* Zigzag line 3 - shorter */}
+              <polyline points="50,50 60,60 50,70" stroke="#737373" strokeWidth="2" opacity="0.85" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            <div className="relative z-10 flex items-start justify-between mb-4">
-              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#A8348C] font-medium uppercase tracking-wide opacity-85">Penyelesaian</p>
+            <div className="relative z-10 flex items-start justify-between mb-[3rem]">
+              <p className="text-[0.65rem] sm:text-[0.75rem] text-[#737373] font-medium uppercase tracking-wide opacity-85">Penyelesaian</p>
             </div>
             <p className="relative z-10 text-[1.5rem] sm:text-[1.75rem] font-bold text-[#2a2a2a] leading-none">{stats.completionRate}%</p>
           </div>

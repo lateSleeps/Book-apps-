@@ -36,7 +36,7 @@ export interface DashboardStats {
   revenueDelta: number;
   bookingsToday: number;
   bookingsDelta: number;
-  avgBookingValue: number;
+  avgRating: number;
   completionRate: number;
   activeStylists: number;
   totalStylists: number;

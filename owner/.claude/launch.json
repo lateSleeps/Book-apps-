@@ -2,10 +2,11 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "salon-booking-customer",
+      "name": "owner-dashboard",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "port": 3000
+      "port": 3001,
+      "cwd": "/Users/faqihshalihanmuflihun/booking-apps/owner"
     }
   ]
 }

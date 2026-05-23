@@ -258,7 +258,7 @@ export function useDashboardData() {
     revenueDelta: 18,
     bookingsToday: 10,
     bookingsDelta: 2,
-    avgBookingValue: 187500,
+    avgRating: 4.8,
     completionRate: 33,
     activeStylists: 4,
     totalStylists: 4,
