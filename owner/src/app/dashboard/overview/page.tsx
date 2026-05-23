@@ -128,6 +128,7 @@ export default function OverviewPage() {
   const [declineReason, setDeclineReason] = useState('');
   const [proofZoom, setProofZoom] = useState<string | null>(null);
   const [visitorSearch, setVisitorSearch] = useState('');
+  const [mobileSelectedId, setMobileSelectedId] = useState<string | null>(null);
   const [addDrawer, setAddDrawer] = useState<'CLOSED' | 'WALK_IN' | 'BOOKING'>('CLOSED');
   const [addDropdownOpen, setAddDropdownOpen] = useState(false);
   const [walkInForm, setWalkInForm] = useState({ name: '', phone: '', serviceId: '', stylistId: '' });
@@ -606,8 +607,8 @@ export default function OverviewPage() {
         {/* Visitor list */}
         <div>
 
-          {/* Schedule */}
-          <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col">
+          {/* Schedule — Desktop view */}
+          <div className="hidden md:flex bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.06)] overflow-hidden flex-col">
             {/* Header */}
             <div className="px-6 pt-5 pb-0 flex items-center justify-between gap-4 visitor-header-controls">
               <h2 className="text-[1rem] font-semibold text-[#1a1a1a] shrink-0 hide-on-mobile">Pengunjung Hari Ini</h2>
@@ -1373,9 +1374,254 @@ export default function OverviewPage() {
 
           </div>
 
+          {/* Mobile Card View */}
+          <div className="md:hidden flex flex-col gap-3 p-3">
+            {/* Tabs for mobile */}
+            <div className="flex gap-1 overflow-x-auto -mx-3 px-3 pb-2">
+              {([
+                { key: 'ALL',       label: 'Semua' },
+                { key: 'BOOKING',   label: 'Booking' },
+                { key: 'WALK_IN',   label: 'Datang Langsung' },
+                { key: 'COMPLETED', label: 'Selesai' },
+              ] as { key: VisitorTab; label: string }[]).map(({ key, label }) => {
+                const active = visitorTab === key;
+                const isCompleted = key === 'COMPLETED';
+                return (
+                  <button
+                    key={key}
+                    onClick={() => { setVisitorTab(key); setMobileSelectedId(null); }}
+                    className={`h-7 px-2.5 rounded-lg text-[0.7rem] font-medium transition-all whitespace-nowrap flex-shrink-0 ${
+                      active
+                        ? isCompleted ? 'bg-[#16a34a] text-white' : 'bg-[#1a1a1a] text-white'
+                        : 'text-[#777] hover:text-[#444] hover:bg-[#f5f5f3]'
+                    }`}
+                  >
+                    {label} <span className="ml-1 text-[0.625rem]">{visitorCounts[key]}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Mobile cards */}
+            <div className="flex flex-col gap-2">
+              {filteredVisitors.length === 0 ? (
+                <div className="py-8 text-center">
+                  <p className="text-[0.875rem] text-[#555]">Tidak ada pengunjung</p>
+                </div>
+              ) : (
+                filteredVisitors.map(b => {
+                  const sm = {
+                    UPCOMING:    { color: '#d97706', bg: '#fffbeb', label: 'Perlu Konfirmasi' },
+                    CONFIRMED:   { color: '#2563eb', bg: '#eff6ff', label: 'Terkonfirmasi' },
+                    IN_PROGRESS: { color: '#16a34a', bg: '#f0fdf4', label: 'Berlangsung' },
+                    COMPLETED:   { color: '#9ca3af', bg: '#f9fafb', label: 'Selesai' },
+                    CANCELLED:   { color: '#ef4444', bg: '#fef2f2', label: 'Dibatalkan' },
+                    NO_SHOW:     { color: '#9ca3af', bg: '#f9fafb', label: 'Tidak Hadir' },
+                  }[b.status] ?? { color: '#9ca3af', bg: '#f9fafb', label: 'Tidak Hadir' };
+
+                  return (
+                    <button
+                      key={b.id}
+                      onClick={() => setMobileSelectedId(b.id)}
+                      className="bg-white border border-[#e8e8e6] rounded-2xl p-3.5 text-left hover:shadow-md transition-all active:bg-[#fafaf8]"
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Avatar */}
+                        <div className="relative flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center text-[0.8125rem] font-semibold" style={{ backgroundColor: avatarColor(b.customerName).bg, color: avatarColor(b.customerName).text }}>
+                            {b.customerName.charAt(0)}
+                          </div>
+                          {(b.status === 'UPCOMING' || b.status === 'CONFIRMED') && (
+                            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full ring-2 ring-white" style={{ backgroundColor: sm.color }}>
+                              {b.status === 'UPCOMING' && (
+                                <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><circle cx="4" cy="4" r="3.5" stroke="white" strokeWidth="1.1"/><path d="M4 2v2.2l1.2.8" stroke="white" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                              )}
+                              {b.status === 'CONFIRMED' && (
+                                <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l1.8 1.8 3.2-3.2" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-baseline gap-1.5 mb-1">
+                            <p className="text-[0.875rem] font-semibold text-[#1a1a1a] truncate">{b.customerName}</p>
+                            <span className="text-[0.65rem] text-[#999] flex-shrink-0">{b.timeSlot}</span>
+                          </div>
+                          <p className="text-[0.75rem] text-[#555] truncate mb-2">{b.serviceName}</p>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="flex-shrink-0 flex items-center gap-1 text-[0.65rem] font-medium" style={{
+                              color: b.paymentStatus === 'PAID' ? '#16a34a' : b.paymentStatus === 'DEPOSIT' ? '#a16207' : '#dc2626'
+                            }}>
+                              {b.paymentStatus === 'PAID' ? (
+                                <svg width="11" height="11" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="6" fill="currentColor"/><path d="M3.5 6.5l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                              ) : b.paymentStatus === 'DEPOSIT' ? (
+                                <svg width="11" height="11" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="6" fill="currentColor"/><path d="M6.5 3.5v3l2 1.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                              ) : (
+                                <svg width="11" height="11" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="6" fill="currentColor"/><path d="M4.5 4.5l4 4M8.5 4.5l-4 4" stroke="white" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                              )}
+                              {b.paymentStatus === 'PAID' ? 'Lunas' : b.paymentStatus === 'DEPOSIT' ? 'DP' : 'Belum bayar'}
+                            </span>
+                            <span className="text-[0.65rem] font-medium px-2 py-0.5 rounded-full flex-shrink-0" style={{ backgroundColor: sm.bg, color: sm.color }}>
+                              {sm.label}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Chevron */}
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#ccc" strokeWidth="1.5" strokeLinecap="round" className="flex-shrink-0 mt-1">
+                          <path d="M5.5 3l4.5 4-4.5 4"/>
+                        </svg>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
         </div>
 
       </div>
+
+      {/* Mobile Right-side Detail Panel */}
+      {mobileSelectedId && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 md:hidden bg-black/20 z-40 transition-opacity"
+            onClick={() => setMobileSelectedId(null)}
+          />
+
+          {/* Panel */}
+          <div className="fixed right-0 top-0 bottom-0 md:hidden w-full max-w-sm bg-white z-50 shadow-2xl overflow-y-auto transition-transform duration-300">
+            {(() => {
+              const b = filteredVisitors.find(v => v.id === mobileSelectedId);
+              if (!b) return null;
+
+              const sm = {
+                UPCOMING:    { color: '#d97706', bg: '#fffbeb', label: 'Perlu Konfirmasi' },
+                CONFIRMED:   { color: '#2563eb', bg: '#eff6ff', label: 'Terkonfirmasi' },
+                IN_PROGRESS: { color: '#16a34a', bg: '#f0fdf4', label: 'Berlangsung' },
+                COMPLETED:   { color: '#9ca3af', bg: '#f9fafb', label: 'Selesai' },
+                CANCELLED:   { color: '#ef4444', bg: '#fef2f2', label: 'Dibatalkan' },
+                NO_SHOW:     { color: '#9ca3af', bg: '#f9fafb', label: 'Tidak Hadir' },
+              }[b.status] ?? { color: '#9ca3af', bg: '#f9fafb', label: 'Tidak Hadir' };
+
+              const addOns = addOnsMap[b.id] ?? [];
+              const notes = notesMap[b.id] ?? '';
+              const currentService = serviceMap[b.id] ?? { serviceName: b.serviceName, price: b.price, categoryName: b.categoryName };
+              const additionalServices = additionalServicesMap[b.id] ?? [];
+              const totalPrice = currentService.price + additionalServices.reduce((s, sv) => s + sv.price, 0) + addOns.reduce((s, a) => s + a.price, 0);
+              const waLink = `https://wa.me/62${b.customerPhone.replace(/^0/, '')}`;
+              const promoData = promoMap[b.id];
+              const discount = promoData?.discount ?? 0;
+              const finalTotal = totalPrice - discount;
+
+              return (
+                <div className="h-full flex flex-col">
+                  {/* Header */}
+                  <div className="sticky top-0 bg-white border-b border-[#f0f0f0] px-4 py-4 flex items-center justify-between gap-3 z-10">
+                    <div className="min-w-0">
+                      <p className="text-[0.875rem] font-semibold text-[#1a1a1a] truncate">{b.customerName}</p>
+                      <p className="text-[0.75rem] text-[#555] truncate">{b.serviceName}</p>
+                    </div>
+                    <button
+                      onClick={() => setMobileSelectedId(null)}
+                      className="flex-shrink-0 w-8 h-8 flex items-center justify-center hover:bg-[#f5f5f3] rounded-lg transition-colors"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+                    </button>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+                    {/* Info Grid */}
+                    <div className="space-y-3 pb-3 border-b border-[#f0f0f0]">
+                      <div>
+                        <p className="text-[0.6875rem] text-[#555] uppercase tracking-wider mb-1">Waktu</p>
+                        <p className="text-[0.875rem] font-medium text-[#1a1a1a]">{b.timeSlot}</p>
+                      </div>
+                      <div>
+                        <p className="text-[0.6875rem] text-[#555] uppercase tracking-wider mb-1">Nomor HP</p>
+                        <p className="text-[0.875rem] font-medium text-[#1a1a1a] tabular-nums">{b.customerPhone}</p>
+                        <a
+                          href={waLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-2 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-[0.75rem] font-medium text-white text-center transition-opacity hover:opacity-85"
+                          style={{ backgroundColor: '#25d366' }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                          Chat WA
+                        </a>
+                      </div>
+                    </div>
+
+                    {/* Service Info */}
+                    <div className="space-y-3 pb-3 border-b border-[#f0f0f0]">
+                      <p className="text-[0.6875rem] text-[#555] uppercase tracking-wider">Layanan</p>
+                      <div>
+                        <p className="text-[0.875rem] font-medium text-[#1a1a1a]">{currentService.serviceName}</p>
+                        <p className="text-[0.75rem] text-[#777]">{formatRupiah(currentService.price)}</p>
+                      </div>
+                      {additionalServices.length > 0 && (
+                        <div>
+                          <p className="text-[0.75rem] font-medium text-[#555] mb-2">Layanan Tambahan:</p>
+                          <div className="space-y-1">
+                            {additionalServices.map((svc, idx) => (
+                              <div key={idx} className="flex justify-between text-[0.75rem]">
+                                <span className="text-[#555]">{svc.serviceName}</span>
+                                <span className="text-[#1a1a1a] font-medium">{formatRupiah(svc.price)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Payment Info */}
+                    <div className="space-y-3 pb-3 border-b border-[#f0f0f0]">
+                      <p className="text-[0.6875rem] text-[#555] uppercase tracking-wider">Pembayaran</p>
+                      <div className="bg-[#f9f9f7] rounded-lg p-3 space-y-2">
+                        <div className="flex justify-between text-[0.75rem]">
+                          <span className="text-[#555]">Total Harga</span>
+                          <span className="text-[#1a1a1a] font-medium">{formatRupiah(totalPrice)}</span>
+                        </div>
+                        {discount > 0 && (
+                          <div className="flex justify-between text-[0.75rem]">
+                            <span className="text-[#16a34a]">Diskon</span>
+                            <span className="text-[#16a34a] font-medium">−{formatRupiah(discount)}</span>
+                          </div>
+                        )}
+                        <div className="border-t border-[#e8e8e6] pt-2 flex justify-between text-[0.875rem]">
+                          <span className="font-medium text-[#1a1a1a]">Total Bayar</span>
+                          <span className="font-bold text-[#1a1a1a]">{formatRupiah(finalTotal)}</span>
+                        </div>
+                        <div className="flex justify-between text-[0.75rem] mt-2 pt-2 border-t border-[#e8e8e6]">
+                          <span className="text-[#555]">Status</span>
+                          <span className="font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: sm.bg, color: sm.color }}>
+                            {sm.label}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Notes */}
+                    {notes && (
+                      <div className="pb-3">
+                        <p className="text-[0.6875rem] text-[#555] uppercase tracking-wider mb-2">Catatan</p>
+                        <p className="text-[0.875rem] text-[#1a1a1a] bg-[#fafaf8] rounded-lg p-3">{notes}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </>
+      )}
     </div>
 
     {/* Confirmation Modal */}
