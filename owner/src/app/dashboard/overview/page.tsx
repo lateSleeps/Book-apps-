@@ -800,16 +800,11 @@ export default function OverviewPage() {
                         onClick={() => toggleExpand(b.id)}
                         className="flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-[#fafaf8] transition-colors text-sm sm:text-base"
                       >
-                        {/* Avatar with status icon overlay */}
+                        {/* Avatar */}
                         <div className="relative flex-shrink-0">
                           <div className="w-10 h-10 rounded-full flex items-center justify-center text-[0.8125rem] font-semibold" style={{ backgroundColor: avatarColor(b.customerName).bg, color: avatarColor(b.customerName).text }}>
                             {b.customerName.charAt(0)}
                           </div>
-                          {(b.status === 'UPCOMING' || b.status === 'CONFIRMED') && (
-                            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-white" style={{ backgroundColor: sm.color }}>
-                              {sm.icon}
-                            </div>
-                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[0.9375rem] font-medium text-[#1a1a1a] truncate">{b.customerName}</p>
