@@ -1434,7 +1434,7 @@ export default function OverviewPage() {
                           {(b.status === 'UPCOMING' || b.status === 'CONFIRMED') && (
                             <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full ring-2 ring-white" style={{ backgroundColor: sm.color }}>
                               {b.status === 'UPCOMING' && (
-                                <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><circle cx="4" cy="4" r="3.5" stroke="white" strokeWidth="1.1"/><path d="M4 4L4 1.5" stroke="white" strokeWidth="1.1" strokeLinecap="round"/><path d="M4 4L6.2 4" stroke="white" strokeWidth="0.8" strokeLinecap="round"/></svg>
+                                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="4" cy="4" r="3.5" stroke="white" strokeWidth="1.1"/><g><line x1="4" y1="4" x2="4" y2="1.8" stroke="white" strokeWidth="1.2" strokeLinecap="round"/></g></svg>
                               )}
                               {b.status === 'CONFIRMED' && (
                                 <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l1.8 1.8 3.2-3.2" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
