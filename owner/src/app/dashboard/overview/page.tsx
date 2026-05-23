@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useDashboardData } from '@/features/dashboard/hooks/use-dashboard-data';
 import { formatRupiah } from '@/shared/lib/format';
 import type { AddOn } from '@/features/dashboard/types/dashboard.types';
-import { PlusIcon, XMarkIcon, MagnifyingGlassIcon, CheckIcon, CheckCircleIcon, ArrowUpTrayIcon, ChevronDownIcon, UserIcon, CogIcon } from '@heroicons/react/24/solid';
+import { PlusIcon, XMarkIcon, MagnifyingGlassIcon, CheckIcon, CheckCircleIcon, UserIcon, CogIcon } from '@heroicons/react/24/solid';
 
 const DAYS_ID   = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -511,7 +511,7 @@ export default function OverviewPage() {
                     className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#f8f8f6] transition-colors"
                   >
                     <div className="w-7 h-7 rounded-lg bg-[#f0f0ee] flex items-center justify-center shrink-0">
-                      <UserIcon className="w-3.25 h-3.25 text-[#555]" />
+                      <UserIcon className="w-3.5 h-3.5 text-[#555]" />
                     </div>
                     <div>
                       <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Walk-in</p>
@@ -524,7 +524,7 @@ export default function OverviewPage() {
                     className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#f8f8f6] transition-colors"
                   >
                     <div className="w-7 h-7 rounded-lg bg-[#f0f0ee] flex items-center justify-center shrink-0">
-                      <CogIcon className="w-3.25 h-3.25 text-[#555]" />
+                      <CogIcon className="w-3.5 h-3.5 text-[#555]" />
                     </div>
                     <div>
                       <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Booking Online</p>
@@ -636,7 +636,7 @@ export default function OverviewPage() {
                 </button>
                 {/* Search bar */}
                 <div className="flex items-center gap-2 bg-[#f5f5f3] rounded-lg px-2 sm:px-3 h-7 sm:h-8 flex-1 sm:w-[14rem] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#ddd] transition-all search-bar-mobile">
-                  <MagnifyingGlassIcon className="w-3.25 h-3.25 text-[#aaa]" />
+                  <MagnifyingGlassIcon className="w-3.5 h-3.5 text-[#aaa]" />
                   <input
                     type="text"
                     placeholder="Cari pelanggan..."
@@ -839,7 +839,7 @@ export default function OverviewPage() {
                         </div>
                         <span className="text-[0.875rem] text-[#777] tabular-nums flex-shrink-0">{b.timeSlot}</span>
                         {b.status === 'CONFIRMED' ? (
-                          <CheckCircleIcon className="w-4.5 h-4.5" />
+                          <CheckCircleIcon className="w-[24px] h-[24px] text-[#16a34a]" />
                         ) : (b.status === 'UPCOMING' || b.status === 'IN_PROGRESS') && (
                           <span className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.6875rem] font-semibold border" style={{ backgroundColor: sm.bg, color: sm.color, borderColor: `${sm.color}30` }}>
                             {b.status === 'IN_PROGRESS' && (
@@ -920,7 +920,7 @@ export default function OverviewPage() {
                                       }}
                                       className="flex-1 h-9 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-[0.8125rem] font-semibold transition-colors flex items-center justify-center gap-1.5"
                                     >
-                                      <CheckIcon className="w-3.25 h-3.25 text-white" />
+                                      <CheckIcon className="w-3.5 h-3.5 text-white" />
                                       Konfirmasi
                                     </button>
                                     <button
