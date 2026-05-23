@@ -1375,9 +1375,9 @@ export default function OverviewPage() {
           </div>
 
           {/* Mobile Card View */}
-          <div className="md:hidden flex flex-col gap-3 p-3">
+          <div className="md:hidden flex flex-col gap-3">
             {/* Tabs for mobile */}
-            <div className="flex gap-1 overflow-x-auto -mx-3 px-3 pb-2">
+            <div className="flex gap-1 overflow-x-auto pb-2">
               {([
                 { key: 'ALL',       label: 'Semua' },
                 { key: 'BOOKING',   label: 'Booking' },
@@ -1434,7 +1434,7 @@ export default function OverviewPage() {
                           {(b.status === 'UPCOMING' || b.status === 'CONFIRMED') && (
                             <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full ring-2 ring-white" style={{ backgroundColor: sm.color }}>
                               {b.status === 'UPCOMING' && (
-                                <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><circle cx="4" cy="4" r="3.5" stroke="white" strokeWidth="1.1"/><path d="M4 2v2.2l1.2.8" stroke="white" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><circle cx="4" cy="4" r="3.5" stroke="white" strokeWidth="1.1"/><path d="M4 4v-2m0 2l0.8-0.6" stroke="white" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round"/></svg>
                               )}
                               {b.status === 'CONFIRMED' && (
                                 <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l1.8 1.8 3.2-3.2" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
