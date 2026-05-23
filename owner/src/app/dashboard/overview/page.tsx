@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useDashboardData } from '@/features/dashboard/hooks/use-dashboard-data';
 import { formatRupiah } from '@/shared/lib/format';
 import type { AddOn } from '@/features/dashboard/types/dashboard.types';
+import { PlusIcon, XMarkIcon, MagnifyingGlassIcon, CheckIcon, CheckCircleIcon, ArrowUpTrayIcon, ChevronDownIcon, UserIcon, CogIcon } from '@heroicons/react/24/solid';
 
 const DAYS_ID   = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -497,7 +498,7 @@ export default function OverviewPage() {
               onClick={() => setAddDropdownOpen(o => !o)}
               className="flex items-center justify-start gap-2 h-10 px-4 bg-[#1a1a1a] text-white text-[0.875rem] font-medium rounded-xl hover:bg-[#333] transition-colors w-auto"
             >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M8 3v10M3 8h10"/></svg>
+              <PlusIcon className="w-3.5 h-3.5" />
               <span>Tambah Pelanggan</span>
               <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${addDropdownOpen ? 'rotate-180' : ''}`}><path d="M4 6l4 4 4-4"/></svg>
             </button>
@@ -510,7 +511,7 @@ export default function OverviewPage() {
                     className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#f8f8f6] transition-colors"
                   >
                     <div className="w-7 h-7 rounded-lg bg-[#f0f0ee] flex items-center justify-center shrink-0">
-                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#555" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="5" r="2.5"/><path d="M3 14c0-3 2-5 5-5s5 2 5 5"/></svg>
+                      <UserIcon className="w-3.25 h-3.25 text-[#555]" />
                     </div>
                     <div>
                       <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Walk-in</p>
@@ -523,7 +524,7 @@ export default function OverviewPage() {
                     className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#f8f8f6] transition-colors"
                   >
                     <div className="w-7 h-7 rounded-lg bg-[#f0f0ee] flex items-center justify-center shrink-0">
-                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#555" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 7h6M5 10h4"/></svg>
+                      <CogIcon className="w-3.25 h-3.25 text-[#555]" />
                     </div>
                     <div>
                       <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Booking Online</p>
@@ -635,7 +636,7 @@ export default function OverviewPage() {
                 </button>
                 {/* Search bar */}
                 <div className="flex items-center gap-2 bg-[#f5f5f3] rounded-lg px-2 sm:px-3 h-7 sm:h-8 flex-1 sm:w-[14rem] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#ddd] transition-all search-bar-mobile">
-                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#aaa" strokeWidth="1.8" strokeLinecap="round"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+                  <MagnifyingGlassIcon className="w-3.25 h-3.25 text-[#aaa]" />
                   <input
                     type="text"
                     placeholder="Cari pelanggan..."
@@ -645,7 +646,7 @@ export default function OverviewPage() {
                   />
                   {visitorSearch && (
                     <button onClick={() => setVisitorSearch('')} className="text-[#bbb] hover:text-[#777] transition-colors">
-                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+                      <XMarkIcon className="w-3 h-3" />
                     </button>
                   )}
                 </div>
@@ -722,7 +723,7 @@ export default function OverviewPage() {
                         <p className="text-[0.9375rem] font-semibold text-[#1a1a1a] tabular-nums shrink-0">{formatRupiah(b.price)}</p>
                         {/* Check icon */}
                         <div className="w-6 h-6 rounded-full bg-[#dcfce7] flex items-center justify-center shrink-0">
-                          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8l3 3 7-7"/></svg>
+                          <CheckIcon className="w-3 h-3 text-[#16a34a]" />
                         </div>
                       </div>
                     ))}
@@ -838,10 +839,7 @@ export default function OverviewPage() {
                         </div>
                         <span className="text-[0.875rem] text-[#777] tabular-nums flex-shrink-0">{b.timeSlot}</span>
                         {b.status === 'CONFIRMED' ? (
-                          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" className="flex-shrink-0">
-                            <circle cx="8" cy="8" r="7.5" fill="#16a34a"/>
-                            <path d="M4 8l2.5 2.5 5-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
+                          <CheckCircleIcon className="w-4.5 h-4.5" />
                         ) : (b.status === 'UPCOMING' || b.status === 'IN_PROGRESS') && (
                           <span className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.6875rem] font-semibold border" style={{ backgroundColor: sm.bg, color: sm.color, borderColor: `${sm.color}30` }}>
                             {b.status === 'IN_PROGRESS' && (
@@ -893,7 +891,7 @@ export default function OverviewPage() {
                                     {/* Mock transfer receipt */}
                                     <div className="w-full h-[7rem] bg-gradient-to-br from-[#f0f4ff] to-[#e8f0fe] flex flex-col items-center justify-center gap-2">
                                       <div className="w-8 h-8 rounded-full bg-[#2563eb] flex items-center justify-center">
-                                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 10l4-4 3 3 5-6"/></svg>
+                                        <CheckIcon className="w-3.5 h-3.5 text-white" />
                                       </div>
                                       <div className="text-center">
                                         <p className="text-[0.6875rem] font-bold text-[#1e40af]">BCA Transfer</p>
@@ -903,7 +901,7 @@ export default function OverviewPage() {
                                     {/* Zoom hint overlay */}
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center">
                                       <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-full p-1.5">
-                                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><circle cx="7" cy="7" r="4"/><path d="M11 11l3 3"/><path d="M5.5 7h3M7 5.5v3"/></svg>
+                                        <MagnifyingGlassIcon className="w-3 h-3 text-white" />
                                       </div>
                                     </div>
                                   </button>
@@ -922,7 +920,7 @@ export default function OverviewPage() {
                                       }}
                                       className="flex-1 h-9 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-[0.8125rem] font-semibold transition-colors flex items-center justify-center gap-1.5"
                                     >
-                                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8l3 3 7-7"/></svg>
+                                      <CheckIcon className="w-3.25 h-3.25 text-white" />
                                       Konfirmasi
                                     </button>
                                     <button
