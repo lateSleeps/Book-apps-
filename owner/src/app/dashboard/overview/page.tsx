@@ -528,7 +528,7 @@ export default function OverviewPage() {
         {/* Stats row — Colorful cards with abstract shapes */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {/* Pendapatan - Grayscale */}
-          <div className="relative overflow-hidden rounded-2xl px-3 sm:px-4 py-6 sm:py-7 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F1F2F3' }}>
+          <div className="relative overflow-hidden rounded-2xl p-4 flex flex-col shadow backdrop-blur-sm" style={{ backgroundColor: '#F1F2F3' }}>
             {/* Abstract shapes - circles */}
             <svg className="absolute right-4 bottom-3 opacity-80" width="70" height="70" viewBox="0 0 70 70" fill="none">
               <circle cx="20" cy="20" r="12" fill="#054A57" opacity="0.6"/>
@@ -542,7 +542,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Booking - Grayscale */}
-          <div className="relative overflow-hidden rounded-2xl px-3 sm:px-4 py-6 sm:py-7 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F1F2F3' }}>
+          <div className="relative overflow-hidden rounded-2xl p-4 flex flex-col shadow backdrop-blur-sm" style={{ backgroundColor: '#F1F2F3' }}>
             {/* Abstract shapes - squares */}
             <svg className="absolute right-4 bottom-3 opacity-80" width="70" height="70" viewBox="0 0 70 70" fill="none">
               <rect x="10" y="10" width="16" height="16" fill="#3A1F6B" opacity="0.6" rx="2"/>
@@ -556,7 +556,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Rating - Grayscale */}
-          <div className="relative overflow-hidden rounded-2xl px-3 sm:px-4 py-6 sm:py-7 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F1F2F3' }}>
+          <div className="relative overflow-hidden rounded-2xl p-4 flex flex-col shadow backdrop-blur-sm" style={{ backgroundColor: '#F1F2F3' }}>
             {/* Smooth wavy lines */}
             <svg className="absolute right-4 bottom-3 opacity-80" width="70" height="70" viewBox="0 0 70 70" fill="none">
               {/* Wave 1 - smooth sine curve */}
@@ -573,7 +573,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Penyelesaian - Grayscale */}
-          <div className="relative overflow-hidden rounded-2xl px-3 sm:px-4 py-6 sm:py-7 md:py-8 flex flex-col shadow-sm" style={{ backgroundColor: '#F1F2F3' }}>
+          <div className="relative overflow-hidden rounded-2xl p-4 flex flex-col shadow backdrop-blur-sm" style={{ backgroundColor: '#F1F2F3' }}>
             {/* Zigzag lines */}
             <svg className="absolute right-4 bottom-3 opacity-80" width="70" height="70" viewBox="0 0 70 70" fill="none">
               {/* Zigzag line 1 - diagonal */}
