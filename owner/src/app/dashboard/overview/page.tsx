@@ -938,6 +938,13 @@ export default function OverviewPage() {
                                   </div>
                                 </div>
                               )}
+                              {/* Confirmed status button — full width green */}
+                              {b.status === 'CONFIRMED' && (
+                                <button className="w-full h-10 rounded-xl bg-[#16a34a] hover:bg-[#15803d] text-white text-[0.8125rem] font-semibold transition-colors flex items-center justify-center gap-1.5 mt-1">
+                                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8l3 3 7-7"/></svg>
+                                  Terkonfirmasi
+                                </button>
+                              )}
                             </div>
 
                             {/* Col 2: Layanan + Pembayaran */}
