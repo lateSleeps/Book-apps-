@@ -1,37 +1,65 @@
 'use client';
 
+import { PencilIcon, PhoneIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
-import { SettingsCard } from './shared/SettingsCard';
+
 import { RoleBadgeWithIcon } from '@/features/auth/components/RoleBadge';
 import { getAllMockUsers } from '@/features/auth/mocks/auth-mock';
-import { PlusIcon, PencilIcon, TrashIcon, PhoneIcon } from '@heroicons/react/24/outline';
+import type { User } from '@/features/auth/types/auth.types';
+
 import { RolePermissionMatrix } from './RolePermissionMatrix';
+import { UserManagementModal } from './UserManagementModal';
+import { SettingsCard } from './shared/SettingsCard';
 
 export function UsersAndRolesSection() {
   const [activeTab, setActiveTab] = useState<'users' | 'roles'>('users');
-  const [users] = useState(() => getAllMockUsers());
+  const [users, setUsers] = useState(() => getAllMockUsers());
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [selectedUser, setSelectedUser] = useState<User | undefined>();
 
   const handleAddUser = () => {
-    // TODO: Implement add user modal
-    alert('Fitur tambah pengguna akan segera hadir');
+    setModalMode('add');
+    setSelectedUser(undefined);
+    setIsModalOpen(true);
   };
 
   const handleEditUser = (userId: string) => {
-    // TODO: Implement edit user modal
-    alert(`Edit pengguna: ${userId}`);
+    const user = users.find((u) => u.id === userId);
+    if (user) {
+      setModalMode('edit');
+      setSelectedUser(user);
+      setIsModalOpen(true);
+    }
   };
 
   const handleDeleteUser = (userId: string, name: string) => {
-    if (confirm(`Hapus pengguna "${name}"?`)) {
-      // TODO: Implement delete user
-      alert(`Pengguna ${name} dihapus`);
+    if (confirm(`Hapus pengguna "${name}"? Aksi ini tidak dapat dibatalkan.`)) {
+      setUsers(users.filter((u) => u.id !== userId));
+    }
+  };
+
+  const handleSaveUser = (user: User) => {
+    if (modalMode === 'add') {
+      setUsers([...users, user]);
+    } else {
+      setUsers(users.map((u) => (u.id === user.id ? user : u)));
     }
   };
 
   return (
-    <div className="space-y-6">
-      {/* Tab Navigation */}
-      <div className="flex gap-4 border-b border-[#e8e8e6]">
+    <>
+      <UserManagementModal
+        isOpen={isModalOpen}
+        mode={modalMode}
+        user={selectedUser}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveUser}
+      />
+
+      <div className="space-y-6">
+        {/* Tab Navigation */}
+        <div className="flex gap-4 border-b border-[#e8e8e6]">
         <button
           onClick={() => setActiveTab('users')}
           className={`px-4 py-3 text-[13px] font-medium border-b-2 transition-colors ${
@@ -163,6 +191,7 @@ export function UsersAndRolesSection() {
 
       {/* Roles Tab */}
       {activeTab === 'roles' && <RolePermissionMatrix />}
-    </div>
+      </div>
+    </>
   );
 }
