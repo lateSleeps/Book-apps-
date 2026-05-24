@@ -119,15 +119,14 @@ export function ServicesSection() {
                         >
                           <div className="flex-1">
                             <p className="text-[13px] font-medium text-[#1a1a1a]">{service.name}</p>
-                            <div className="flex items-center gap-3 mt-1">
-                              <span className="text-[12px] text-[#999]">
-                                Rp {service.price.toLocaleString('id-ID')}
-                              </span>
-                              <span className="text-[12px] text-[#999]">•</span>
-                              <span className="text-[12px] text-[#999]">{service.duration} menit</span>
-                            </div>
+                            <p className="text-[12px] text-[#999] mt-0.5">
+                              Rp {service.price.toLocaleString('id-ID')}
+                            </p>
+                            {service.description && (
+                              <p className="text-[12px] text-[#666] mt-1.5 line-clamp-2">{service.description}</p>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-shrink-0 ml-3">
                             <button className="p-2 hover:bg-white rounded-lg transition-colors">
                               <PencilIcon className="w-4 h-4 text-[#666]" />
                             </button>
