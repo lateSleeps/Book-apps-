@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { RoleBadgeWithIcon } from '@/features/auth/components/RoleBadge';
 import { getAllMockUsers } from '@/features/auth/mocks/auth-mock';
 import type { User } from '@/features/auth/types/auth.types';
+import { useHasPermission } from '@/features/auth/hooks/useAuth';
+import { Permission } from '@/features/auth/types/permissions.types';
 
 import { RolePermissionMatrix } from './RolePermissionMatrix';
 import { UserManagementModal } from './UserManagementModal';
@@ -17,6 +19,24 @@ export function UsersAndRolesSection() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [selectedUser, setSelectedUser] = useState<User | undefined>();
+
+  // Permission check
+  const canManageUsers = useHasPermission(Permission.MANAGE_USERS);
+
+  // If user doesn't have permission, show access denied message
+  if (!canManageUsers) {
+    return (
+      <div className="space-y-6">
+        <SettingsCard title="Pengguna & Peran" description="Kelola pengguna salon">
+          <div className="text-center py-12">
+            <p className="text-[13px] text-red-600 font-medium">
+              Anda tidak memiliki izin untuk mengakses bagian ini. Hanya Pemilik yang dapat mengelola pengguna dan peran.
+            </p>
+          </div>
+        </SettingsCard>
+      </div>
+    );
+  }
 
   const handleAddUser = () => {
     setModalMode('add');
