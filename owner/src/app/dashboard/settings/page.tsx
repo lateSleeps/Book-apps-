@@ -7,6 +7,7 @@ import { ProfileSection } from '@/features/dashboard/components/settings/Profile
 import { ServicesSection } from '@/features/dashboard/components/settings/ServicesSection';
 import { TeamSection } from '@/features/dashboard/components/settings/TeamSection';
 import { AddOnsSection } from '@/features/dashboard/components/settings/AddOnsSection';
+import { UsersAndRolesSection } from '@/features/dashboard/components/settings/UsersAndRolesSection';
 import { OtherSettingsSection } from '@/features/dashboard/components/settings/OtherSettingsSection';
 
 export default function SettingsPage() {
@@ -24,6 +25,8 @@ export default function SettingsPage() {
         return <TeamSection />;
       case 'addons':
         return <AddOnsSection />;
+      case 'users-roles':
+        return <UsersAndRolesSection />;
       case 'other':
         return <OtherSettingsSection />;
       default:

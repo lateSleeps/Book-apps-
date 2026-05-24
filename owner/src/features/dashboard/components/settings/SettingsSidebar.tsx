@@ -1,6 +1,4 @@
 'use client';
-
-import { useState } from 'react';
 import {
   UserIcon,
   BuildingStorefrontIcon,
@@ -8,9 +6,17 @@ import {
   UserGroupIcon,
   GiftIcon,
   CogIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 
-export type SettingsSection = 'general' | 'profile' | 'services' | 'team' | 'addons' | 'other';
+export type SettingsSection =
+  | 'general'
+  | 'profile'
+  | 'services'
+  | 'team'
+  | 'addons'
+  | 'users-roles'
+  | 'other';
 
 interface SettingsSidebarProps {
   activeSection: SettingsSection;
@@ -47,6 +53,12 @@ const sections = [
     label: 'Produk Add-On',
     icon: GiftIcon,
     description: 'Produk tambahan',
+  },
+  {
+    id: 'users-roles' as const,
+    label: 'Pengguna & Peran',
+    icon: ShieldCheckIcon,
+    description: 'Kelola pengguna dan izin',
   },
   {
     id: 'other' as const,
