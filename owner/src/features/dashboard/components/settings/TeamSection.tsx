@@ -2,7 +2,7 @@
 
 import { useSalonSettings } from '@/features/dashboard/hooks/use-salon-settings';
 import { SettingsCard } from './shared/SettingsCard';
-import { PlusIcon, PencilIcon, TrashIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export function TeamSection() {
   const { settings, loading, error, deleteStaffMember } = useSalonSettings();
@@ -66,107 +66,114 @@ export function TeamSection() {
             <p className="text-[13px] text-[#999]">Belum ada staff terdaftar</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {staff.map((member) => {
-              const memberServices = services.filter(s => member.serviceIds.includes(s.id));
+          <div className="overflow-x-auto">
+            <table className="w-full text-[13px]">
+              <thead>
+                <tr className="border-b border-[#e8e8e6] bg-[#f9f9f7]">
+                  <th className="px-4 py-3 text-left font-semibold text-[#1a1a1a]">Nama</th>
+                  <th className="px-4 py-3 text-left font-semibold text-[#1a1a1a]">Peran</th>
+                  <th className="px-4 py-3 text-left font-semibold text-[#1a1a1a]">Kontak</th>
+                  <th className="px-4 py-3 text-left font-semibold text-[#1a1a1a]">Layanan</th>
+                  <th className="px-4 py-3 text-left font-semibold text-[#1a1a1a]">Status</th>
+                  <th className="px-4 py-3 text-left font-semibold text-[#1a1a1a]">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {staff.map((member) => {
+                  const memberServices = services.filter(s => member.serviceIds.includes(s.id));
 
-              return (
-                <div
-                  key={member.id}
-                  className="p-4 bg-[#f9f9f7] border border-[#e8e8e6] rounded-lg hover:border-[#ddd] transition-colors"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-start gap-3 flex-1">
-                      {/* Avatar */}
-                      <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-semibold text-[12px] flex-shrink-0"
-                        style={{ backgroundColor: member.color }}
-                      >
-                        {member.initials}
-                      </div>
-
-                      {/* Info */}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="text-[13px] font-semibold text-[#1a1a1a]">{member.name}</p>
-                          {member.status === 'ACTIVE' && (
-                            <span className="px-2 py-1 bg-green-100 rounded text-[11px] font-medium text-green-700 flex items-center gap-1">
-                              <CheckCircleIcon className="w-3 h-3" />
-                              Aktif
-                            </span>
-                          )}
-                          {member.status === 'INACTIVE' && (
-                            <span className="px-2 py-1 bg-gray-100 rounded text-[11px] font-medium text-gray-700">
-                              Nonaktif
-                            </span>
-                          )}
+                  return (
+                    <tr
+                      key={member.id}
+                      className="border-b border-[#e8e8e6] hover:bg-[#f9f9f7] transition-colors"
+                    >
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-semibold text-[11px] flex-shrink-0"
+                            style={{ backgroundColor: member.color }}
+                          >
+                            {member.initials}
+                          </div>
+                          <span className="font-medium text-[#1a1a1a]">{member.name}</span>
                         </div>
-                        <p className="text-[12px] text-[#999] mb-2">{getRoleLabel(member.role)}</p>
-
-                        {/* Contact & Services */}
-                        <div className="space-y-1 mb-2">
+                      </td>
+                      <td className="px-4 py-3 text-[#666]">
+                        {getRoleLabel(member.role)}
+                      </td>
+                      <td className="px-4 py-3 text-[#666]">
+                        <div className="space-y-0.5">
                           {member.phone && (
-                            <p className="text-[12px] text-[#666]">📱 {member.phone}</p>
+                            <p className="text-[12px]">{member.phone}</p>
                           )}
                           {member.email && (
-                            <p className="text-[12px] text-[#666]">📧 {member.email}</p>
-                          )}
-                          {memberServices.length > 0 && (
-                            <div className="pt-1">
-                              <p className="text-[11px] font-medium text-[#999] mb-1">Layanan:</p>
-                              <div className="flex flex-wrap gap-1">
-                                {memberServices.map((svc) => (
-                                  <span
-                                    key={svc.id}
-                                    className="px-2 py-0.5 bg-[#e8f5e9] text-[#16a34a] rounded text-[11px]"
-                                  >
-                                    {svc.name}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
+                            <p className="text-[12px]">{member.email}</p>
                           )}
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-2 ml-2">
-                      <button className="p-2 hover:bg-white rounded-lg transition-colors">
-                        <PencilIcon className="w-4 h-4 text-[#666]" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteStaff(member.id, member.name)}
-                        className="p-2 hover:bg-white rounded-lg transition-colors"
-                      >
-                        <TrashIcon className="w-4 h-4 text-red-500" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Availability Preview */}
-                  <div className="pl-13 text-[11px] text-[#999] bg-white rounded p-2 mt-3">
-                    <p className="font-medium mb-1">Jadwal Minggu Ini:</p>
-                    <div className="grid grid-cols-7 gap-1">
-                      {['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'].map((day, idx) => {
-                        const dayKey = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][idx] as keyof typeof member.availability;
-                        const slots = member.availability[dayKey];
-                        return (
-                          <div key={day} className="text-center">
-                            <p className="font-semibold">{day}</p>
-                            <p className="text-[10px]">
-                              {slots.length > 0 ? slots.length + ' slot' : '—'}
-                            </p>
+                      </td>
+                      <td className="px-4 py-3">
+                        {memberServices.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {memberServices.slice(0, 2).map((svc) => (
+                              <span
+                                key={svc.id}
+                                className="px-2 py-0.5 bg-[#e8f5e9] text-[#16a34a] rounded text-[11px]"
+                                title={svc.name}
+                              >
+                                {svc.name.length > 12 ? svc.name.substring(0, 12) + '...' : svc.name}
+                              </span>
+                            ))}
+                            {memberServices.length > 2 && (
+                              <span className="px-2 py-0.5 bg-[#f0f0ee] text-[#666] rounded text-[11px]">
+                                +{memberServices.length - 2}
+                              </span>
+                            )}
                           </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                        ) : (
+                          <span className="text-[#999]">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {member.status === 'ACTIVE' ? (
+                          <span className="px-2 py-1 bg-green-100 rounded text-[11px] font-medium text-green-700">
+                            Aktif
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-gray-100 rounded text-[11px] font-medium text-gray-700">
+                            Nonaktif
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1">
+                          <button
+                            className="p-2 hover:bg-white rounded-lg transition-colors"
+                            title="Edit staff"
+                          >
+                            <PencilIcon className="w-4 h-4 text-[#666]" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteStaff(member.id, member.name)}
+                            className="p-2 hover:bg-white rounded-lg transition-colors"
+                            title="Hapus staff"
+                          >
+                            <TrashIcon className="w-4 h-4 text-red-500" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
+
+        <div className="bg-[#f9f9f7] border border-[#e8e8e6] rounded-lg p-4 mt-6">
+          <p className="text-[12px] text-[#666]">
+            <span className="font-medium">Info:</span> Klik icon edit untuk mengatur jadwal dan availability. Setiap staff dapat mempunyai jadwal kerja yang berbeda sesuai dengan keahlian dan ketersediaan mereka.
+          </p>
+        </div>
       </SettingsCard>
     </div>
   );

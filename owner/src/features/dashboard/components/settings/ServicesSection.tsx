@@ -6,7 +6,7 @@ import { SettingsCard } from './shared/SettingsCard';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export function ServicesSection() {
-  const { settings, loading, error, addServiceCategory, deleteServiceCategory, addService, deleteService } = useSalonSettings();
+  const { settings, loading, error, deleteServiceCategory, deleteService } = useSalonSettings();
   const [expandedCategory, setExpandedCategory] = useState<string | null>(
     settings?.serviceCategories[0]?.id || null
   );
