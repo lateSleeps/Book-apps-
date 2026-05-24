@@ -5,12 +5,23 @@ import { SettingsCard } from './shared/SettingsCard';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export function AddOnsSection() {
-  const { settings, loading, deleteAddOn } = useSalonSettings();
+  const { settings, loading, error, deleteAddOn } = useSalonSettings();
+
+  if (error) {
+    return (
+      <SettingsCard title="Produk Add-On" description="Produk tambahan yang dapat ditambahkan ke layanan utama">
+        <div className="text-red-600 text-[13px] p-4 bg-red-50 rounded-lg">
+          <p>Error: {error}</p>
+        </div>
+      </SettingsCard>
+    );
+  }
 
   if (loading || !settings) {
     return (
-      <SettingsCard title="Produk Add-On">
+      <SettingsCard title="Produk Add-On" description="Produk tambahan yang dapat ditambahkan ke layanan utama">
         <div className="animate-pulse space-y-4">
+          <div className="h-10 bg-[#f0f0ee] rounded"></div>
           <div className="h-10 bg-[#f0f0ee] rounded"></div>
           <div className="h-10 bg-[#f0f0ee] rounded"></div>
         </div>

@@ -5,12 +5,24 @@ import { SettingsCard } from './shared/SettingsCard';
 import { FormField } from './shared/FormField';
 
 export function GeneralInfoSection() {
-  const { settings, loading } = useSalonSettings();
+  const { settings, loading, error } = useSalonSettings();
+
+  if (error) {
+    return (
+      <SettingsCard title="Informasi Umum" description="Detail dasar pemilik salon">
+        <div className="text-red-600 text-[13px] p-4 bg-red-50 rounded-lg">
+          <p>Error: {error}</p>
+        </div>
+      </SettingsCard>
+    );
+  }
 
   if (loading || !settings) {
     return (
-      <SettingsCard title="Informasi Umum">
+      <SettingsCard title="Informasi Umum" description="Detail dasar pemilik salon">
         <div className="animate-pulse space-y-4">
+          <div className="h-10 bg-[#f0f0ee] rounded"></div>
+          <div className="h-10 bg-[#f0f0ee] rounded"></div>
           <div className="h-10 bg-[#f0f0ee] rounded"></div>
           <div className="h-10 bg-[#f0f0ee] rounded"></div>
         </div>

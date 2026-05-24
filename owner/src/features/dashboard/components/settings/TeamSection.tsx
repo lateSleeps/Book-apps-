@@ -5,12 +5,23 @@ import { SettingsCard } from './shared/SettingsCard';
 import { PlusIcon, PencilIcon, TrashIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 export function TeamSection() {
-  const { settings, loading, deleteStaffMember } = useSalonSettings();
+  const { settings, loading, error, deleteStaffMember } = useSalonSettings();
+
+  if (error) {
+    return (
+      <SettingsCard title="Tim & Jadwal" description="Kelola staff, jadwal, dan availability mereka">
+        <div className="text-red-600 text-[13px] p-4 bg-red-50 rounded-lg">
+          <p>Error: {error}</p>
+        </div>
+      </SettingsCard>
+    );
+  }
 
   if (loading || !settings) {
     return (
-      <SettingsCard title="Tim & Jadwal">
+      <SettingsCard title="Tim & Jadwal" description="Kelola staff, jadwal, dan availability mereka">
         <div className="animate-pulse space-y-4">
+          <div className="h-10 bg-[#f0f0ee] rounded"></div>
           <div className="h-10 bg-[#f0f0ee] rounded"></div>
           <div className="h-10 bg-[#f0f0ee] rounded"></div>
         </div>
