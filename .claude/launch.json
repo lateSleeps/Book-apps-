@@ -2,18 +2,18 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "salon-booking-customer",
-      "runtimeExecutable": "sh",
-      "runtimeArgs": ["-c", "cd 'salon-booking-customer' && npm run dev"],
-      "port": 3000
-    },
-    {
       "name": "owner-app",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": ["run", "dev", "--", "--port", "3001"],
       "cwd": "owner",
-      "port": 3001,
-      "autoPort": true
+      "port": 3001
+    },
+    {
+      "name": "salon-booking-customer",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "3002"],
+      "cwd": "salon-booking-customer",
+      "port": 3002
     }
   ]
 }
