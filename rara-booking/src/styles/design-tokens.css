@@ -1,0 +1,67 @@
+/* Rara Beauty — Design Tokens as CSS Custom Properties */
+:root {
+  /* ── Accent ── */
+  --accent: #4a9b7f;
+  --accent-dark: #2d7a5f;
+  --accent-soft: #edf7f3;
+
+  /* ── Neutrals ── */
+  --label: #111110;
+  --label2: #605f5b;
+  --label3: #a09f9a;
+  --sep: #e8e7e3;
+  --surface: #ffffff;
+  --bg: #f7f7f5;
+
+  /* ── Pastels (service cards only) ── */
+  --c-peach: #fde8dc;
+  --c-blue: #ddedf8;
+  --c-mauve: #eddde9;
+  --c-yellow: #fef3c2;
+  --c-mint: #d8f3ec;
+  --c-lilac: #e8e2f8;
+
+  /* ── Pastel blob darks ── */
+  --c-peach-dark: #f5c4ab;
+  --c-blue-dark: #b8d6f0;
+  --c-mauve-dark: #d9bbd6;
+  --c-yellow-dark: #f5d98a;
+  --c-mint-dark: #a8e6d4;
+  --c-lilac-dark: #c8bef0;
+
+  /* ── Type Scale ── */
+  --t12: 12px;
+  --t14: 14px;
+  --t16: 16px;
+  --t18: 18px;
+  --t20: 20px;
+  --t24: 24px;
+  --t28: 28px;
+  --t32: 32px;
+
+  /* ── Spacing (4px base) ── */
+  --s4: 4px;
+  --s8: 8px;
+  --s12: 12px;
+  --s16: 16px;
+  --s20: 20px;
+  --s24: 24px;
+  --s32: 32px;
+  --s40: 40px;
+  --s48: 48px;
+
+  /* ── Border Radius ── */
+  --r8: 8px;
+  --r12: 12px;
+  --r16: 16px;
+  --r20: 20px;
+  --r24: 24px;
+  --rF: 9999px;
+
+  /* ── Font ── */
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Shadows ── */
+  --shadow-shell: 0 0 60px rgba(0, 0, 0, 0.12);
+  --shadow-button: 0 4px 16px rgba(17, 17, 16, 0.2);
+}

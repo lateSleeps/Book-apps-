@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "salon-booking-customer",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd 'salon-booking-customer' && npm run dev"],
+      "port": 3000
+    }
+  ]
+}
