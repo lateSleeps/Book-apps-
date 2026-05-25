@@ -1,0 +1,36 @@
+{
+  "name": "@rara/utils",
+  "version": "0.0.1",
+  "description": "Shared utilities for Rara Beauty monorepo",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./format": "./dist/format/index.js",
+    "./validation": "./dist/validation/index.js",
+    "./helpers": "./dist/helpers/index.js"
+  },
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@rara/types": "workspace:*",
+    "clsx": "^2.0.0",
+    "date-fns": "^2.30.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "@types/node": "^20.0.0"
+  }
+}

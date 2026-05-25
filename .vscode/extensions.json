@@ -1,0 +1,40 @@
+{
+  "recommendations": [
+    // Code Quality & Formatting
+    "esbenp.prettier-vscode",          // Prettier - Code formatter
+    "dbaeumer.vscode-eslint",          // ESLint
+    "ms-vscode.vscode-typescript-next", // TypeScript
+
+    // Framework & Language Support
+    "unifiedjs.vscode-mdx",            // MDX support
+    "bradlc.vscode-tailwindcss",       // Tailwind CSS IntelliSense
+    "prisma.prisma",                   // Prisma ORM support (for future)
+
+    // Git & Source Control
+    "eamodio.gitlens",                 // GitLens - Git supercharged
+    "donjayamanne.githistory",         // Git History
+    "mhutchie.git-graph",              // Git Graph
+
+    // Testing
+    "firsttris.vscode-jest-runner",    // Jest Runner
+    "vitest.explorer",                 // Vitest Explorer
+
+    // Development Tools
+    "ms-vscode.makefile-tools",        // Makefile Tools
+    "ms-vscode-remote.remote-containers", // Dev Containers
+    "github.copilot",                  // GitHub Copilot (optional)
+
+    // Documentation & Comments
+    "gruntfuggly.todo-tree",           // TODO Tree
+    "ms-vscode.makefile-tools",        // Better comments support
+    "stack-overflow.stack-overflow-viewer", // StackOverflow search
+
+    // Performance & Monitoring
+    "ms-vscode.vscode-typescript-nightly", // Optional nightly TypeScript
+    "dbaeumer.vscode-eslint",          // ESLint for code quality
+
+    // Monorepo & Workspace
+    "bradlc.vscode-tailwindcss",       // Tailwind support across workspace
+    "ms-vscode.vscode-typescript-next" // TypeScript path resolution support
+  ]
+}

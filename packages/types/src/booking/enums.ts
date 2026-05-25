@@ -1,0 +1,27 @@
+export enum ServiceFlow {
+  STANDARD = 'STANDARD',
+  EXPRESS = 'EXPRESS',
+  PREMIUM = 'PREMIUM',
+}
+
+export enum PromoType {
+  PERCENTAGE = 'PERCENTAGE',
+  FIXED_AMOUNT = 'FIXED_AMOUNT',
+  FREE_SERVICE = 'FREE_SERVICE',
+  BUY_ONE_GET_ONE = 'BUY_ONE_GET_ONE',
+}
+
+export enum BookingStatus {
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  CANCELLED = 'CANCELLED',
+  COMPLETED = 'COMPLETED',
+  NO_SHOW = 'NO_SHOW',
+}
+
+export enum PaymentStatus {
+  UNPAID = 'UNPAID',
+  PAID = 'PAID',
+  PARTIALLY_PAID = 'PARTIALLY_PAID',
+  REFUNDED = 'REFUNDED',
+}

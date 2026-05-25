@@ -1,0 +1,33 @@
+# Rara Beauty Monorepo - Code Owners
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for all files
+* @lateSleeps
+
+# Apps
+/apps/customer/ @lateSleeps
+/apps/owner/ @lateSleeps
+
+# Shared Packages
+/packages/types/ @lateSleeps
+/packages/utils/ @lateSleeps
+/packages/mock-data/ @lateSleeps
+/packages/hooks/ @lateSleeps
+/packages/config/ @lateSleeps
+
+# Root configuration
+/package.json @lateSleeps
+/pnpm-workspace.yaml @lateSleeps
+/tsconfig.base.json @lateSleeps
+/.eslintrc.js @lateSleeps
+/.prettierrc @lateSleeps
+/commitlint.config.js @lateSleeps
+/.husky/ @lateSleeps
+/.lintstagedrc.json @lateSleeps
+
+# GitHub workflows
+/.github/workflows/ @lateSleeps
+
+# Documentation
+/README.md @lateSleeps
+/CONTRIBUTING.md @lateSleeps
