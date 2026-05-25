@@ -4,15 +4,15 @@
     {
       "name": "owner-app",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "--port", "3001"],
+      "runtimeArgs": ["run", "dev"],
       "cwd": "owner",
       "port": 3001
     },
     {
-      "name": "salon-booking-customer",
+      "name": "customer-app-booking",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "--port", "3002"],
-      "cwd": "salon-booking-customer",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "rara-booking",
       "port": 3002
     }
   ]
