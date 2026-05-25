@@ -1,5 +1,5 @@
 {
-  "name": "rara-booking",
+  "name": "@rara-beauty/customer",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,8 @@
     "lint": "next lint",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "clsx": "2.1.1",

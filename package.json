@@ -1,0 +1,42 @@
+{
+  "name": "rara-beauty-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "pnpm": ">=9.1.4",
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel run dev",
+    "dev:owner": "pnpm -F owner run dev",
+    "dev:customer": "pnpm -F customer run dev",
+    "build": "pnpm run build:packages && pnpm -r run build",
+    "build:packages": "pnpm -F @rara/config run build && pnpm -F @rara/types run build && pnpm -F @rara/utils run build && pnpm -F @rara/mock-data run build && pnpm -F @rara/hooks run build",
+    "build:owner": "pnpm run build:packages && pnpm -F owner run build",
+    "build:customer": "pnpm run build:packages && pnpm -F customer run build",
+    "start": "pnpm -r run start",
+    "lint": "pnpm -r run lint",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "type-check": "pnpm -r run type-check",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "@vitejs/plugin-react": "^4.0.0"
+  }
+}

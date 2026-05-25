@@ -1,0 +1,21 @@
+{
+  "name": "@rara/config",
+  "version": "0.0.1",
+  "description": "Shared configs for TypeScript, ESLint, Vitest",
+  "private": true,
+  "scripts": {
+    "build": "echo 'Config package has no build step'"
+  },
+  "exports": {
+    "./tsconfig": "./tsconfig.base.json",
+    "./tsconfig-react": "./tsconfig.react.json",
+    "./eslint": "./eslint.base.js",
+    "./eslint-react": "./eslint.react.js",
+    "./vitest": "./vitest.base.ts"
+  },
+  "files": [
+    "*.json",
+    "*.js",
+    "*.ts"
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "allowJs": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "types": [
+      "vitest/globals"
+    ],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@rara/types": ["../../packages/types/src"],
+      "@rara/types/*": ["../../packages/types/src/*"],
+      "@rara/utils": ["../../packages/utils/src"],
+      "@rara/utils/*": ["../../packages/utils/src/*"],
+      "@rara/mock-data": ["../../packages/mock-data/src"],
+      "@rara/mock-data/*": ["../../packages/mock-data/src/*"],
+      "@rara/hooks": ["../../packages/hooks/src"],
+      "@rara/hooks/*": ["../../packages/hooks/src/*"],
+      "@/*": [
+        "./src/*"
+      ],
+      "@/features/*": [
+        "./src/features/*"
+      ],
+      "@/shared/*": [
+        "./src/shared/*"
+      ],
+      "@/config/*": [
+        "./src/config/*"
+      ],
+      "@/tests/*": [
+        "./tests/*"
+      ]
+    },
+    "isolatedModules": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "tests/**/*.ts",
+    "tests/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "jsx": "react-jsx",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@rara/types": ["packages/types/src"],
+      "@rara/types/*": ["packages/types/src/*"],
+      "@rara/utils": ["packages/utils/src"],
+      "@rara/utils/*": ["packages/utils/src/*"],
+      "@rara/mock-data": ["packages/mock-data/src"],
+      "@rara/mock-data/*": ["packages/mock-data/src/*"],
+      "@rara/hooks": ["packages/hooks/src"],
+      "@rara/hooks/*": ["packages/hooks/src/*"]
+    }
+  }
+}
