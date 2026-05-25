@@ -138,7 +138,10 @@
       "Bash(git config *)",
       "Bash(awk '{print \"   \" $NF}')",
       "Bash(git remote *)",
-      "Bash(ssh -T git@github.com)"
+      "Bash(ssh -T git@github.com)",
+      "Bash(cd \"/Users/faqihshalihanmuflihun/Books apps\" && mkdir -p apps packages/shared packages/ui packages/config .husky)",
+      "Bash(git mv *)",
+      "Bash(git rm *)"
     ]
   }
 }
