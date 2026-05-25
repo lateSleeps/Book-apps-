@@ -137,7 +137,8 @@
       "Bash(git init *)",
       "Bash(git config *)",
       "Bash(awk '{print \"   \" $NF}')",
-      "Bash(git remote *)"
+      "Bash(git remote *)",
+      "Bash(ssh -T git@github.com)"
     ]
   }
 }
