@@ -1,6 +1,6 @@
 module.exports = {
   root: true,
-  extends: ['next/core-web-vitals', '@typescript-eslint/recommended'],
+  extends: ['next/core-web-vitals', 'plugin:@typescript-eslint/recommended'],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'import'],
   rules: {
@@ -10,7 +10,7 @@ module.exports = {
       'error',
       {
         groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
-        alphabeticalOrder: true
+        alphabetize: { order: 'asc' }
       }
     ]
   },

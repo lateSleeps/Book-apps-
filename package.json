@@ -11,6 +11,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
+    "env:check": "node scripts/check-env.js",
     "dev": "pnpm -r --parallel run dev",
     "dev:owner": "pnpm -F owner run dev",
     "dev:customer": "pnpm -F customer run dev",
@@ -26,13 +27,14 @@
     "test:coverage": "vitest --coverage",
     "type-check": "pnpm -r run type-check",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "ci:local": "pnpm lint && pnpm type-check && pnpm test:coverage --run && pnpm build",
     "prepare": "husky install"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
     "@commitlint/config-conventional": "^19.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.0.0",
     "@vitest/ui": "^1.0.0",
     "eslint": "^8.0.0",

@@ -168,7 +168,14 @@
       "Bash(npx pnpm *)",
       "Bash(./node_modules/.bin/tsc --noEmit)",
       "Bash(./node_modules/.bin/tsc test-import.ts --noEmit --skipLibCheck)",
-      "Bash(./packages/types/node_modules/.bin/tsc apps/customer/test-import.ts --noEmit --skipLibCheck --baseUrl .)"
+      "Bash(./packages/types/node_modules/.bin/tsc apps/customer/test-import.ts --noEmit --skipLibCheck --baseUrl .)",
+      "Bash(node scripts/check-env.js)",
+      "Bash(pnpm db:push)",
+      "Bash(curl -fsSL https://get.pnpm.io/install.sh)",
+      "Bash(sh -)",
+      "Bash(command -v pnpm)",
+      "Bash(npx drizzle-kit *)",
+      "Bash(npm exec *)"
     ]
   }
 }

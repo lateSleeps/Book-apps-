@@ -1,0 +1,159 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'Which app to deploy (customer/owner/both)'
+        required: false
+        default: 'both'
+
+jobs:
+  build:
+    name: Build Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.1.4
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        run: pnpm build:packages
+
+      - name: Build apps
+        run: pnpm build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-build
+          path: |
+            apps/customer/.next
+            apps/owner/.next
+            packages/*/dist
+          retention-days: 1
+
+  deploy-customer:
+    name: Deploy Customer App
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' || inputs.app == 'customer' || inputs.app == 'both'
+    environment:
+      name: staging
+      url: https://customer-staging.vercel.app
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: staging-build
+
+      - name: Deploy Customer App to Vercel
+        uses: vercel/action@v4
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_CUSTOMER }}
+          environment: staging
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+        env:
+          VERCEL_ENV: staging
+
+      - name: Post deployment comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## 🚀 Staging Deployment\n\n**Customer App**: [https://customer-staging.vercel.app](https://customer-staging.vercel.app)'
+            });
+
+  deploy-owner:
+    name: Deploy Owner App
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' || inputs.app == 'owner' || inputs.app == 'both'
+    environment:
+      name: staging
+      url: https://owner-staging.vercel.app
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: staging-build
+
+      - name: Deploy Owner App to Vercel
+        uses: vercel/action@v4
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_OWNER }}
+          environment: staging
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+        env:
+          VERCEL_ENV: staging
+
+      - name: Post deployment comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## 🚀 Staging Deployment\n\n**Owner App**: [https://owner-staging.vercel.app](https://owner-staging.vercel.app)'
+            });
+
+  notify:
+    name: Notify Deployment
+    runs-on: ubuntu-latest
+    needs: [deploy-customer, deploy-owner]
+    if: always()
+    steps:
+      - name: Create deployment success comment
+        if: needs.deploy-customer.result == 'success' && needs.deploy-owner.result == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ **Staging deployment successful!** Both apps are now deployed.\n\n- [Customer](https://customer-staging.vercel.app)\n- [Owner](https://owner-staging.vercel.app)'
+            });
