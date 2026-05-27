@@ -1,12 +1,12 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { AuthProvider } from '@/features/auth/context/AuthContext';
+import { ReactNode } from 'react';
+import { TRPCProvider } from '@/lib/trpc-provider';
 
 interface ProvidersProps {
   children: ReactNode;
 }
 
 export function Providers({ children }: ProvidersProps) {
-  return <AuthProvider>{children}</AuthProvider>;
+  return <TRPCProvider>{children}</TRPCProvider>;
 }

@@ -2,13 +2,13 @@ import { supabase } from "@rara/database";
 import { z } from "zod";
 import { router, publicProcedure } from "../trpc";
 
-export const servicesRouter = router({
+export const stylistsRouter = router({
   getBySalon: publicProcedure
     .input(z.object({ salonId: z.string() }))
     .query(async ({ input }) => {
       const { data, error } = await supabase
-        .from("services")
-        .select("*, category:categories(*)")
+        .from("stylists")
+        .select("*, user:users(*)")
         .eq("salon_id", input.salonId)
         .eq("is_active", true);
 

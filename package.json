@@ -43,5 +43,12 @@
     "prettier": "^3.0.0",
     "prettier-plugin-tailwindcss": "0.6.5",
     "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^4.44.0",
+    "@trpc/client": "^10.45.4",
+    "@trpc/next": "^10.45.4",
+    "@trpc/react-query": "^10.45.4",
+    "@trpc/server": "^10.45.4"
   }
 }

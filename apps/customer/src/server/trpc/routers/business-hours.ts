@@ -2,15 +2,15 @@ import { supabase } from "@rara/database";
 import { z } from "zod";
 import { router, publicProcedure } from "../trpc";
 
-export const servicesRouter = router({
+export const businessHoursRouter = router({
   getBySalon: publicProcedure
     .input(z.object({ salonId: z.string() }))
     .query(async ({ input }) => {
       const { data, error } = await supabase
-        .from("services")
-        .select("*, category:categories(*)")
+        .from("business_hours")
+        .select("*")
         .eq("salon_id", input.salonId)
-        .eq("is_active", true);
+        .order("day_of_week", { ascending: true });
 
       if (error) throw error;
       return data || [];
