@@ -22,8 +22,7 @@ export const servicesRouter = router({
       `
       )
       .eq('salon_id', input.salonId)
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true });
+      .eq('is_active', true);
 
     console.log('[services.getBySalon] result:', {
       salonId: input.salonId,
