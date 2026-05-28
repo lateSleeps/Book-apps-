@@ -548,7 +548,7 @@ export function ServicesSection() {
 
     if (serviceModal.type === 'edit') {
       try {
-        await updateServiceMutation.mutateAsync({
+        const payload = {
           id: serviceModal.service.id,
           name: data.name,
           description: data.description,
@@ -557,7 +557,9 @@ export function ServicesSection() {
           price_type: data.price_type ?? 'fixed',
           requires_specialist: data.requires_specialist ?? false,
           service_questions: data.service_questions ?? [],
-        });
+        };
+        console.log('saving service:', payload);
+        await updateServiceMutation.mutateAsync(payload);
         await refetchServices();
         setToast({ type: 'success', message: 'Layanan berhasil disimpan' });
       } catch (err) {

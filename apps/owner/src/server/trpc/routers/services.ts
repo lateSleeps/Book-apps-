@@ -43,6 +43,7 @@ export const servicesRouter = router({
     )
     .mutation(async ({ input }) => {
       const { id, ...fields } = input;
+      console.log('[services.update] id:', id, 'fields:', fields);
       const { data, error } = await supabase
         .from('services')
         .update(fields)
@@ -51,7 +52,7 @@ export const servicesRouter = router({
         .single();
 
       if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
-
+      console.log('[services.update] saved row price_type:', data?.price_type);
       return data;
     }),
 });
