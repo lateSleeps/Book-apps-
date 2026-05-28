@@ -19,6 +19,14 @@ export interface ServiceCategory {
   description?: string;
 }
 
+export interface ServiceQuestion {
+  id: string;
+  question: string;
+  type: 'chips' | 'photo';
+  required: boolean;
+  options: string[];
+}
+
 export interface Service {
   id: string;
   name: string;
@@ -27,6 +35,8 @@ export interface Service {
   duration: number; // in minutes
   description?: string;
   isActive: boolean;
+  requires_specialist?: boolean;
+  service_questions?: ServiceQuestion[];
 }
 
 // Team/Staff
@@ -34,7 +44,7 @@ export type StaffRole = 'STYLIST' | 'THERAPIST' | 'BARBER' | 'NAIL_ARTIST' | 'MA
 
 export interface TimeSlot {
   start: string; // HH:mm format
-  end: string;   // HH:mm format
+  end: string; // HH:mm format
 }
 
 export interface DaySchedule {
@@ -46,7 +56,7 @@ export interface RecurringBreak {
   id: string;
   name: string;
   startTime: string; // HH:mm
-  endTime: string;   // HH:mm
+  endTime: string; // HH:mm
   daysOfWeek: number[]; // 0-6 (Sunday-Saturday)
 }
 
@@ -97,7 +107,7 @@ export interface ShiftTemplate {
   id: string;
   name: string;
   startTime: string; // HH:mm
-  endTime: string;   // HH:mm
+  endTime: string; // HH:mm
 }
 
 // Settings State Container
