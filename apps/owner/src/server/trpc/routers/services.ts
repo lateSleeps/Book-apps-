@@ -56,8 +56,8 @@ export const servicesRouter = router({
         id: z.string(),
         name: z.string().min(1),
         description: z.string().optional(),
-        base_price: z.number().min(0),
-        duration_minutes: z.number().min(1),
+        price: z.number().min(0),
+        duration: z.number().min(1),
         requires_specialist: z.boolean(),
         service_questions: z.array(serviceQuestionSchema),
       })

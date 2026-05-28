@@ -22,12 +22,9 @@ type RawService = {
   id: string;
   name: string;
   description?: string | null;
-  base_price?: number | null;
-  price?: number | null;
-  duration_minutes?: number | null;
-  duration?: number | null;
-  category_id?: string | null;
-  categoryId?: string | null;
+  price: number;
+  duration: number;
+  category_id: string;
   is_active: boolean;
   requires_specialist?: boolean | null;
   service_questions?: ServiceQuestion[] | null;
@@ -44,9 +41,9 @@ function mapRawService(raw: RawService): Service {
     id: raw.id,
     name: raw.name,
     description: raw.description ?? '',
-    price: raw.base_price ?? raw.price ?? 0,
-    duration: raw.duration_minutes ?? raw.duration ?? 60,
-    categoryId: raw.category_id ?? raw.categoryId ?? '',
+    price: raw.price,
+    duration: raw.duration,
+    categoryId: raw.category_id,
     isActive: raw.is_active,
     requires_specialist: raw.requires_specialist ?? false,
     service_questions: raw.service_questions ?? [],
@@ -487,7 +484,7 @@ export function ServicesSection() {
     const seen = new Set<string>();
     const cats: ServiceCategory[] = [];
     for (const raw of (rawServices ?? []) as RawService[]) {
-      const catId = raw.category?.id ?? raw.category_id ?? raw.categoryId;
+      const catId = raw.category?.id ?? raw.category_id;
       if (!catId || seen.has(catId)) continue;
       seen.add(catId);
       cats.push({
@@ -549,8 +546,8 @@ export function ServicesSection() {
           id: serviceModal.service.id,
           name: data.name,
           description: data.description,
-          base_price: data.price,
-          duration_minutes: data.duration,
+          price: data.price,
+          duration: data.duration,
           requires_specialist: data.requires_specialist ?? false,
           service_questions: data.service_questions ?? [],
         });
