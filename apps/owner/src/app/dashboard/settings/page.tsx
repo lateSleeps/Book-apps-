@@ -1,24 +1,46 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { SettingsSidebar, type SettingsSection } from '@/features/dashboard/components/settings/SettingsSidebar';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback } from 'react';
+import { AddOnsSection } from '@/features/dashboard/components/settings/AddOnsSection';
 import { GeneralInfoSection } from '@/features/dashboard/components/settings/GeneralInfoSection';
+import { OtherSettingsSection } from '@/features/dashboard/components/settings/OtherSettingsSection';
 import { ProfileSection } from '@/features/dashboard/components/settings/ProfileSection';
 import { ServicesSection } from '@/features/dashboard/components/settings/ServicesSection';
+import {
+  SettingsSidebar,
+  type SettingsSection,
+} from '@/features/dashboard/components/settings/SettingsSidebar';
 import { TeamSection } from '@/features/dashboard/components/settings/TeamSection';
-import { AddOnsSection } from '@/features/dashboard/components/settings/AddOnsSection';
 import { UsersAndRolesSection } from '@/features/dashboard/components/settings/UsersAndRolesSection';
-import { OtherSettingsSection } from '@/features/dashboard/components/settings/OtherSettingsSection';
 import { SettingsCard } from '@/features/dashboard/components/settings/shared/SettingsCard';
 
-export default function SettingsPage() {
-  const [activeSection, setActiveSection] = useState<SettingsSection>('general');
-  const [sectionError, setSectionError] = useState<string | null>(null);
+const VALID_SECTIONS: SettingsSection[] = [
+  'general',
+  'profile',
+  'services',
+  'team',
+  'addons',
+  'users-roles',
+  'other',
+];
 
-  const handleSectionChange = useCallback((section: SettingsSection) => {
-    setSectionError(null);
-    setActiveSection(section);
-  }, []);
+function parseSection(raw: string | null): SettingsSection {
+  if (raw && (VALID_SECTIONS as string[]).includes(raw)) return raw as SettingsSection;
+  return 'general';
+}
+
+export default function SettingsPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeSection = parseSection(searchParams?.get('tab') ?? null);
+
+  const handleSectionChange = useCallback(
+    (section: SettingsSection) => {
+      router.push(`/dashboard/settings?tab=${section}`);
+    },
+    [router]
+  );
 
   const renderSection = useCallback(() => {
     try {
@@ -42,11 +64,9 @@ export default function SettingsPage() {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      setSectionError(errorMessage);
-      console.error('Error rendering section:', error);
       return (
         <SettingsCard title="Error">
-          <div className="text-red-600 text-[13px]">
+          <div className="text-[13px] text-red-600">
             <p>Gagal memuat bagian pengaturan: {errorMessage}</p>
           </div>
         </SettingsCard>
@@ -55,29 +75,17 @@ export default function SettingsPage() {
   }, [activeSection]);
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden" style={{ backgroundColor: '#fafaf8' }}>
+    <div className="flex flex-1 flex-col overflow-hidden" style={{ backgroundColor: '#fafaf8' }}>
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto w-full px-8 py-10">
+        <div className="mx-auto w-full max-w-7xl px-8 py-10">
           <div className="mb-8">
-            <h1 className="text-[28px] font-semibold text-[#1a1a1a] tracking-tight">Pengaturan</h1>
-            <p className="text-[13px] text-[#aaa] mt-1">Konfigurasi salon kamu</p>
+            <h1 className="text-[28px] font-semibold tracking-tight text-[#1a1a1a]">Pengaturan</h1>
+            <p className="mt-1 text-[13px] text-[#aaa]">Konfigurasi salon kamu</p>
           </div>
 
-          <div className="flex gap-6 min-h-0">
-            {/* Sidebar */}
+          <div className="flex min-h-0 gap-6">
             <SettingsSidebar activeSection={activeSection} onSectionChange={handleSectionChange} />
-
-            {/* Main Content */}
-            <div className="flex-1 overflow-y-auto min-w-0">
-              {sectionError && (
-                <SettingsCard title="Error">
-                  <div className="text-red-600 text-[13px]">
-                    <p>Gagal memuat bagian pengaturan: {sectionError}</p>
-                  </div>
-                </SettingsCard>
-              )}
-              {renderSection()}
-            </div>
+            <div className="min-w-0 flex-1 overflow-y-auto">{renderSection()}</div>
           </div>
         </div>
       </div>
