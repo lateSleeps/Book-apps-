@@ -1,13 +1,5 @@
 "use client";
 
-import {
-  format,
-  addDays,
-  isToday,
-  isBefore,
-  startOfDay,
-  getDay,
-} from "date-fns";
 import { useState, useMemo } from "react";
 
 import { BottomCTA } from "@/features/booking/components/bottom-cta";
@@ -18,8 +10,6 @@ import { useToast } from "@/features/booking/hooks/use-toast";
 import { useSalon, useServices } from "@/hooks";
 import { cn } from "@/shared/lib/cn";
 import { formatRupiah } from "@/shared/lib/format";
-
-const DAY_LABELS = ["M", "S", "S", "R", "K", "J", "S"];
 
 type RawCategory = {
   id: string;
@@ -104,28 +94,6 @@ function lightenColor(hex: string): string {
   return hslToHex(h, Math.min(1, s * 2.5), 0.92);
 }
 
-function buildStrip() {
-  const today = startOfDay(new Date());
-  return Array.from({ length: 30 }, (_, i) => {
-    const date = addDays(today, i - 3);
-    const dow = getDay(date);
-    const isPast = isBefore(date, today);
-    const isClosed = dow === 0;
-    const isFull =
-      !isPast && !isClosed && !isToday(date) && [3, 7, 12, 18].includes(i);
-    return {
-      date,
-      isoString: format(date, "yyyy-MM-dd"),
-      dayNum: format(date, "dd"),
-      dayLabel: DAY_LABELS[dow] ?? "S",
-      isToday: isToday(date),
-      isPast,
-      isClosed,
-      isFull,
-    };
-  });
-}
-
 interface Props {
   slug: string;
   onNext: (needsDetail: boolean) => void;
@@ -136,15 +104,12 @@ export function StepServices({ slug, onNext }: Props) {
   const { services, isLoading: servicesLoading } = useServices(salonId ?? "");
 
   const {
-    date,
-    setDate,
     services: selectedServices,
     addService,
     removeService,
     totalPrice,
   } = useBookingStore();
 
-  const strip = useMemo(() => buildStrip(), []);
   const [sheetCategoryId, setSheetCategoryId] = useState<string | null>(null);
   const [sheetOpenCount, setSheetOpenCount] = useState(0);
   const { toast, hideToast } = useToast();
@@ -181,7 +146,7 @@ export function StepServices({ slug, onNext }: Props) {
     ? saturateColor(sheetGroup.category.color)
     : "#E4E5E7";
 
-  const canProceed = !!date && selectedServices.length > 0;
+  const canProceed = selectedServices.length > 0;
 
   function handleServiceSelect(svc: RawService) {
     const isSelected = selectedServices.some((s) => s.id === svc.id);
@@ -257,66 +222,6 @@ export function StepServices({ slug, onNext }: Props) {
                 <line x1="12" y1="2" x2="12" y2="15" />
               </svg>
             </button>
-          </div>
-        </div>
-
-        {/* Calendar */}
-        <div className="px-s16 pt-s4 pb-s12">
-          <div className="flex overflow-x-auto scrollbar-hide">
-            {strip.map((day) => {
-              const isSelected = date === day.isoString;
-              const disabled = day.isPast || day.isClosed || day.isFull;
-
-              return (
-                <button
-                  key={day.isoString}
-                  onClick={() => {
-                    if (!disabled) setDate(day.isoString);
-                  }}
-                  disabled={disabled}
-                  className={cn(
-                    "flex-shrink-0 flex flex-col items-center gap-[6px] w-[56px] py-s8",
-                    (day.isPast || day.isClosed) &&
-                      "opacity-30 cursor-not-allowed",
-                    day.isFull && "cursor-not-allowed",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "flex h-[24px] w-[24px] items-center justify-center rounded-full text-[12px] font-semibold transition-all",
-                      day.isToday ? "text-white" : "text-label3",
-                    )}
-                    style={
-                      day.isToday ? { backgroundColor: "#111110" } : undefined
-                    }
-                  >
-                    {day.dayLabel}
-                  </span>
-
-                  <div
-                    className={cn(
-                      "flex flex-col items-center gap-[16px] px-[6px] pt-[6px] pb-[8px] rounded-r24 transition-all duration-150",
-                      isSelected && "bg-sep",
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "flex h-[40px] w-[40px] items-center justify-center rounded-full text-[20px] font-semibold transition-all",
-                        isSelected ? "bg-accent text-white" : "text-label",
-                      )}
-                    >
-                      {day.dayNum}
-                    </span>
-                    <span
-                      className={cn(
-                        "h-[5px] w-[5px] rounded-full transition-all duration-200",
-                        isSelected && canProceed && "bg-accent",
-                      )}
-                    />
-                  </div>
-                </button>
-              );
-            })}
           </div>
         </div>
 
@@ -431,17 +336,12 @@ export function StepServices({ slug, onNext }: Props) {
 
       <BottomCTA
         label={
-          !date
-            ? "Pilih tanggal dulu"
-            : selectedServices.length === 0
-              ? "Pilih layanan"
-              : "Lanjutkan →"
+          selectedServices.length === 0 ? "Pilih layanan dulu" : "Lanjutkan →"
         }
         variant={canProceed ? "ready" : "default"}
         disabled={!canProceed}
         onClick={() => {
           const firstService = selectedServices[0];
-          console.log("[StepServices] onNext — firstService:", firstService);
           onNext(firstService?.requires_specialist === true);
         }}
       />

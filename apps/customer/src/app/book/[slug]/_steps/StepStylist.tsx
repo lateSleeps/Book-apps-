@@ -89,6 +89,7 @@ export function StepStylist({ slug, onNext, onBack }: Props) {
   } = useStylists(salonId ?? "");
 
   const { stylist, timeSlot, setStylist, setTimeSlot } = useBookingStore();
+  // timeSlot kept in store for StylistCards display but CTA only requires stylist
 
   const stylists: Stylist[] = useMemo(
     () => (rawStylists as RawStylist[]).map(mapStylist),
@@ -136,15 +137,9 @@ export function StepStylist({ slug, onNext, onBack }: Props) {
       </div>
 
       <BottomCTA
-        label={
-          stylist && timeSlot
-            ? "Lanjutkan →"
-            : stylist
-              ? "Pilih waktu dulu"
-              : "Pilih stylist dulu"
-        }
-        variant={stylist && timeSlot ? "ready" : "default"}
-        disabled={!stylist || !timeSlot}
+        label={stylist ? "Lanjutkan →" : "Pilih stylist dulu"}
+        variant={stylist ? "ready" : "default"}
+        disabled={!stylist}
         onClick={onNext}
       />
     </div>
