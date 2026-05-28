@@ -24,6 +24,7 @@ export const servicesRouter = router({
       console.log("[services.getBySalon] sample row:", {
         id: sample?.id,
         name: sample?.name,
+        price_type: (sample as Record<string, unknown>)?.price_type,
         requires_specialist: sample?.requires_specialist,
         service_questions: sample?.service_questions,
       });

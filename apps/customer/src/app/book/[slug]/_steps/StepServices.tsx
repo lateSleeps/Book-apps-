@@ -438,7 +438,16 @@ export function StepServices({ slug, onNext }: Props) {
         disabled={!canProceed}
         onClick={() => {
           const firstService = selectedServices[0];
-          onNext(firstService?.price_type === "starting_from");
+          const needsDetail = firstService?.price_type === "starting_from";
+          console.log("[StepServices] Lanjutkan:", {
+            id: firstService?.id,
+            name: firstService?.name,
+            price_type: firstService?.price_type,
+            requires_specialist: firstService?.requires_specialist,
+            service_questions: firstService?.service_questions,
+            needsDetail,
+          });
+          onNext(needsDetail);
         }}
       />
 
