@@ -462,8 +462,10 @@ export function ServicesSection() {
   const { addServiceCategory, updateServiceCategory, deleteServiceCategory } = useSalonSettings();
 
   // Real data sources
-  const { salons } = useSalons();
-  const salonId = salons[0]?.id ?? '';
+  const { salons, isLoading: salonsLoading } = useSalons();
+  const salonId = salons[0]?.id ?? '5cdb0848-1b43-44f6-be29-b2ead49ff65a';
+
+  console.log('[ServicesSection] salons:', salons, 'salonId:', salonId);
 
   const {
     data: rawServices,
@@ -471,6 +473,8 @@ export function ServicesSection() {
     error: servicesError,
     refetch: refetchServices,
   } = trpc.services.getBySalon.useQuery({ salonId }, { enabled: !!salonId });
+
+  console.log('[ServicesSection] query:', { rawServices, servicesLoading, servicesError });
 
   const updateServiceMutation = trpc.services.update.useMutation();
 
@@ -525,7 +529,7 @@ export function ServicesSection() {
     );
   }
 
-  if (servicesLoading || !salonId) {
+  if (salonsLoading || servicesLoading) {
     return (
       <SettingsCard title="Layanan & Kategori" description="Kelola layanan dan kategori">
         <div className="animate-pulse space-y-4">
