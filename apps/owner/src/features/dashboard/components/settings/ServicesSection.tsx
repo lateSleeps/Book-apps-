@@ -457,8 +457,6 @@ type CategoryModalState =
 type Toast = { type: 'success' | 'error'; message: string };
 
 export function ServicesSection() {
-  console.log('[ServicesSection] MOUNTED');
-
   // Keep useSalonSettings only for category CRUD (add/update/delete) — not for list data
   const { addServiceCategory, updateServiceCategory, deleteServiceCategory } = useSalonSettings();
 
