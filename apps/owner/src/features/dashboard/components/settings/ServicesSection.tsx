@@ -468,8 +468,10 @@ export function ServicesSection() {
 
   // Real data sources
   const { salons } = useSalons();
-  // Fallback to known salon ID until auth context provides it directly
-  const salonId = salons[0]?.id ?? '5cdb0848-1b43-44f6-be29-b2ead49ff65a';
+  const salonId =
+    salons.find((s: { id: string; slug?: string }) => s.slug === 'rara-beauty-jakarta')?.id ??
+    salons[0]?.id ??
+    '5cdb0848-1b43-44f6-be29-b2ead49ff65a';
 
   const {
     data: rawServices,
