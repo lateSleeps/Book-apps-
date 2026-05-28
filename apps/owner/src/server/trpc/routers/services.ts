@@ -13,6 +13,7 @@ const serviceQuestionSchema = z.object({
 
 export const servicesRouter = router({
   getBySalon: publicProcedure.input(z.object({ salonId: z.string() })).query(async ({ input }) => {
+    console.log('[getBySalon] querying with salonId:', input.salonId);
     const { data: rawData, error } = await supabase
       .from('services')
       .select(
