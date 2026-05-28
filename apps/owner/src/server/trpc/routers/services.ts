@@ -13,33 +13,27 @@ const serviceQuestionSchema = z.object({
 
 export const servicesRouter = router({
   getBySalon: publicProcedure.input(z.object({ salonId: z.string() })).query(async ({ input }) => {
-    // Step 1: bare query to confirm data exists
-    const { data: bare, error: bareError } = await supabase
+    const { data: rawData, error } = await supabase
       .from('services')
-      .select('*')
-      .eq('salon_id', input.salonId);
-
-    console.log('[services.getBySalon] bare query:', {
-      salonId: input.salonId,
-      count: bare?.length,
-      error: bareError?.message,
-      sample: bare?.[0],
-    });
-
-    // Step 2: full query with category join
-    const { data, error } = await supabase
-      .from('services')
-      .select('*, category:categories(*)')
+      .select(
+        `
+        *,
+        category:categories(id, name, icon, color)
+      `
+      )
       .eq('salon_id', input.salonId)
-      .eq('is_active', true);
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true });
 
-    console.log('[services.getBySalon] full query:', {
-      count: data?.length,
+    console.log('[services.getBySalon] result:', {
+      salonId: input.salonId,
+      count: rawData?.length,
       error: error?.message,
+      sample: rawData?.[0],
     });
 
-    if (error) throw error;
-    return data || [];
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    return rawData || [];
   }),
 
   update: publicProcedure
