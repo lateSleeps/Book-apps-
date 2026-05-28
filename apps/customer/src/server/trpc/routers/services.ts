@@ -19,6 +19,15 @@ export const servicesRouter = router({
           code: "INTERNAL_SERVER_ERROR",
           message: error.message,
         });
+
+      const sample = data?.[0];
+      console.log("[services.getBySalon] sample row:", {
+        id: sample?.id,
+        name: sample?.name,
+        requires_specialist: sample?.requires_specialist,
+        service_questions: sample?.service_questions,
+      });
+
       return data || [];
     }),
 });

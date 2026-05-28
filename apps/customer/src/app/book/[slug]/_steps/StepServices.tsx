@@ -153,6 +153,12 @@ export function StepServices({ slug, onNext }: Props) {
     if (isSelected) {
       removeService(svc.id);
     } else {
+      console.log("[StepServices] adding service:", {
+        id: svc.id,
+        name: svc.name,
+        requires_specialist: svc.requires_specialist,
+        service_questions: svc.service_questions,
+      });
       addService({
         id: svc.id,
         name: svc.name,
@@ -342,6 +348,13 @@ export function StepServices({ slug, onNext }: Props) {
         disabled={!canProceed}
         onClick={() => {
           const firstService = selectedServices[0];
+          console.log("[StepServices] Lanjutkan clicked:", {
+            id: firstService?.id,
+            name: firstService?.name,
+            requires_specialist: firstService?.requires_specialist,
+            service_questions: firstService?.service_questions,
+            needsDetail: firstService?.requires_specialist === true,
+          });
           onNext(firstService?.requires_specialist === true);
         }}
       />
