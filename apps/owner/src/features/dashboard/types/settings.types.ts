@@ -35,6 +35,7 @@ export interface Service {
   duration: number; // in minutes
   description?: string;
   isActive: boolean;
+  price_type?: 'fixed' | 'starting_from';
   requires_specialist?: boolean;
   service_questions?: ServiceQuestion[];
 }

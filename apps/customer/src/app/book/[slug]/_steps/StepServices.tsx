@@ -37,6 +37,7 @@ type RawService = {
   price: number;
   duration: number;
   category?: RawCategory;
+  price_type?: "fixed" | "starting_from";
   requires_specialist?: boolean;
   service_questions?: unknown[];
 };
@@ -185,18 +186,13 @@ export function StepServices({ slug, onNext }: Props) {
     if (isSelected) {
       removeService(svc.id);
     } else {
-      console.log("[StepServices] adding service:", {
-        id: svc.id,
-        name: svc.name,
-        requires_specialist: svc.requires_specialist,
-        service_questions: svc.service_questions,
-      });
       addService({
         id: svc.id,
         name: svc.name,
         description: svc.description,
         price: svc.price,
         duration: svc.duration,
+        price_type: svc.price_type,
         requires_specialist: svc.requires_specialist,
         service_questions:
           svc.service_questions as Service["service_questions"],
@@ -442,13 +438,7 @@ export function StepServices({ slug, onNext }: Props) {
         disabled={!canProceed}
         onClick={() => {
           const firstService = selectedServices[0];
-          console.log("[StepServices] Lanjutkan clicked:", {
-            id: firstService?.id,
-            name: firstService?.name,
-            requires_specialist: firstService?.requires_specialist,
-            needsDetail: firstService?.requires_specialist === true,
-          });
-          onNext(firstService?.requires_specialist === true);
+          onNext(firstService?.price_type === "starting_from");
         }}
       />
 
@@ -575,7 +565,9 @@ export function StepServices({ slug, onNext }: Props) {
 
                       <div className="mt-s16">
                         <p className="text-[11px] text-label3 font-medium">
-                          Mulai dari
+                          {svc.price_type === "starting_from"
+                            ? "Mulai dari"
+                            : "Harga"}
                         </p>
                         <p className="text-[14px] font-bold text-label mt-[2px]">
                           {formatRupiah(svc.price)}

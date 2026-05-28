@@ -26,6 +26,7 @@ type RawService = {
   duration: number;
   category_id: string;
   is_active: boolean;
+  price_type?: 'fixed' | 'starting_from' | null;
   requires_specialist?: boolean | null;
   service_questions?: ServiceQuestion[] | null;
   category?: {
@@ -45,6 +46,7 @@ function mapRawService(raw: RawService): Service {
     duration: raw.duration,
     categoryId: raw.category_id,
     isActive: raw.is_active,
+    price_type: raw.price_type ?? 'fixed',
     requires_specialist: raw.requires_specialist ?? false,
     service_questions: raw.service_questions ?? [],
   };
@@ -65,8 +67,8 @@ function ServiceModal({ service, categoryId, isSaving, onSave, onClose }: Servic
   const [description, setDescription] = useState(service?.description ?? '');
   const [price, setPrice] = useState(String(service?.price ?? ''));
   const [duration, setDuration] = useState(String(service?.duration ?? ''));
-  const [requiresSpecialist, setRequiresSpecialist] = useState(
-    service?.requires_specialist ?? false
+  const [priceType, setPriceType] = useState<'fixed' | 'starting_from'>(
+    service?.price_type ?? 'fixed'
   );
   const [questions, setQuestions] = useState<ServiceQuestion[]>(service?.service_questions ?? []);
 
@@ -117,8 +119,9 @@ function ServiceModal({ service, categoryId, isSaving, onSave, onClose }: Servic
       duration: Number(duration) || 0,
       categoryId,
       isActive: service?.isActive ?? true,
-      requires_specialist: requiresSpecialist,
-      service_questions: requiresSpecialist ? questions : [],
+      price_type: priceType,
+      requires_specialist: priceType === 'starting_from',
+      service_questions: priceType === 'starting_from' ? questions : [],
     });
   }
 
@@ -200,31 +203,36 @@ function ServiceModal({ service, categoryId, isSaving, onSave, onClose }: Servic
             </div>
           </div>
 
-          {/* Requires Specialist Toggle */}
-          <div className="flex items-center justify-between rounded-xl border border-[#e8e8e6] bg-[#fafaf8] p-3">
-            <div>
-              <p className="text-[13px] font-medium text-[#1a1a1a]">Butuh Detail Sebelum Booking</p>
-              <p className="mt-0.5 text-[12px] text-[#999]">
-                Tampilkan form pertanyaan ke pelanggan sebelum memilih stylist
-              </p>
+          {/* Price Type */}
+          <div>
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#999]">
+              Tipe Harga
+            </label>
+            <div className="flex overflow-hidden rounded-xl border border-[#e8e8e6] text-[13px] font-medium">
+              {(['fixed', 'starting_from'] as const).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setPriceType(t)}
+                  className={`flex-1 px-3 py-2.5 transition-colors ${
+                    priceType === t
+                      ? 'bg-[#1a1a1a] text-white'
+                      : 'bg-[#fafaf8] text-[#666] hover:bg-[#f0f0ee]'
+                  }`}
+                >
+                  {t === 'fixed' ? 'Harga Tetap' : 'Mulai Dari'}
+                </button>
+              ))}
             </div>
-            <button
-              type="button"
-              onClick={() => setRequiresSpecialist((v) => !v)}
-              className={`relative h-6 w-11 flex-shrink-0 rounded-full transition-colors duration-200 ${
-                requiresSpecialist ? 'bg-[#16a34a]' : 'bg-[#d1d5db]'
-              }`}
-            >
-              <span
-                className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${
-                  requiresSpecialist ? 'translate-x-5' : 'translate-x-0'
-                }`}
-              />
-            </button>
+            <p className="mt-1.5 text-[12px] text-[#999]">
+              {priceType === 'starting_from'
+                ? 'Harga bervariasi — pelanggan mengisi detail sebelum memilih stylist'
+                : 'Harga pasti — pelanggan langsung memilih stylist'}
+            </p>
           </div>
 
           {/* Service Questions */}
-          {requiresSpecialist && (
+          {priceType === 'starting_from' && (
             <div className="space-y-3">
               <p className="text-[11px] font-semibold uppercase tracking-widest text-[#999]">
                 Pertanyaan untuk Pelanggan
@@ -546,6 +554,7 @@ export function ServicesSection() {
           description: data.description,
           price: data.price,
           duration: data.duration,
+          price_type: data.price_type ?? 'fixed',
           requires_specialist: data.requires_specialist ?? false,
           service_questions: data.service_questions ?? [],
         });
@@ -708,15 +717,15 @@ export function ServicesSection() {
                                 <p className="text-[13px] font-medium text-[#1a1a1a]">
                                   {service.name}
                                 </p>
-                                {service.requires_specialist && (
+                                {service.price_type === 'starting_from' && (
                                   <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
-                                    Detail
+                                    Mulai Dari
                                   </span>
                                 )}
                               </div>
                               <p className="mt-0.5 text-[12px] text-[#999]">
-                                Rp {service.price.toLocaleString('id-ID')} · {service.duration}{' '}
-                                menit
+                                {service.price_type === 'starting_from' ? 'Mulai ' : ''}Rp{' '}
+                                {service.price.toLocaleString('id-ID')} · {service.duration} menit
                               </p>
                               {service.description && (
                                 <p className="mt-1.5 line-clamp-2 text-[12px] text-[#666]">

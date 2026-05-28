@@ -34,6 +34,7 @@ export const ServiceSchema = z.object({
   duration: z.number().positive(),
   categoryId: z.string().optional(),
   serviceFlow: ServiceFlowSchema.optional(),
+  price_type: z.enum(["fixed", "starting_from"]).optional().nullable(),
   requires_specialist: z.boolean().optional().nullable(),
   service_questions: z.array(ServiceQuestionSchema).optional().nullable(),
 });
