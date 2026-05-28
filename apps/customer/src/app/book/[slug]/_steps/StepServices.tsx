@@ -184,13 +184,20 @@ export function StepServices({ slug, onNext }: Props) {
   const canProceed = !!date && selectedServices.length > 0;
 
   function handleServiceSelect(svc: RawService) {
-    const isSelected = selectedServices.some(
-      (s: RawService) => s.id === svc.id,
-    );
+    const isSelected = selectedServices.some((s) => s.id === svc.id);
     if (isSelected) {
       removeService(svc.id);
     } else {
-      addService(svc as Parameters<typeof addService>[0]);
+      addService({
+        id: svc.id,
+        name: svc.name,
+        description: svc.description,
+        price: svc.price,
+        duration: svc.duration,
+        requires_specialist: svc.requires_specialist,
+        service_questions:
+          svc.service_questions as import("@/features/booking/types/booking.types").Service["service_questions"],
+      });
       setSheetCategoryId(null);
     }
   }
@@ -323,8 +330,8 @@ export function StepServices({ slug, onNext }: Props) {
         ) : (
           <div className="flex flex-col gap-s12 px-s16 pt-s12 pb-32">
             {groupEntries.map(({ category, services: catServices }) => {
-              const selectedInCat = catServices.find((s: RawService) =>
-                selectedServices.some((sel: RawService) => sel.id === s.id),
+              const selectedInCat = catServices.find((s) =>
+                selectedServices.some((sel) => sel.id === s.id),
               );
 
               return (
@@ -433,7 +440,8 @@ export function StepServices({ slug, onNext }: Props) {
         variant={canProceed ? "ready" : "default"}
         disabled={!canProceed}
         onClick={() => {
-          const firstService = selectedServices[0] as RawService | undefined;
+          const firstService = selectedServices[0];
+          console.log("[StepServices] onNext — firstService:", firstService);
           onNext(firstService?.requires_specialist === true);
         }}
       />
@@ -507,7 +515,7 @@ export function StepServices({ slug, onNext }: Props) {
               <div className="flex flex-col gap-s8">
                 {sheetServices.map((svc: RawService) => {
                   const isSelected = selectedServices.some(
-                    (sel: RawService) => sel.id === svc.id,
+                    (sel) => sel.id === svc.id,
                   );
                   return (
                     <button

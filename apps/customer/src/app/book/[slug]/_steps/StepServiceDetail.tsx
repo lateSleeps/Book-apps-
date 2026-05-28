@@ -53,6 +53,12 @@ export function StepServiceDetail({ onNext, onBack }: Props) {
   const questions: ServiceQuestion[] = Array.isArray(rawQuestions)
     ? rawQuestions
     : [];
+  console.log("[StepServiceDetail] service:", service);
+  console.log(
+    "[StepServiceDetail] requires_specialist:",
+    service?.requires_specialist,
+  );
+  console.log("[StepServiceDetail] service_questions:", rawQuestions);
 
   const [chipAnswers, setChipAnswers] = useState<ChipAnswers>({});
   const [photoAnswers, setPhotoAnswers] = useState<PhotoAnswers>({});

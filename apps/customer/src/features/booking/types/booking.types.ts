@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // ── Zod Schemas ────────────────────────────────────────────────────────────────
 
@@ -11,16 +11,31 @@ export const CategorySchema = z.object({
   icon: z.string(),
 });
 
-export const ServiceFlowSchema = z.enum(['STYLING_HAIR', 'STYLING_COLOUR', 'STYLING_NAIL', 'TREATMENT']);
+export const ServiceFlowSchema = z.enum([
+  "STYLING_HAIR",
+  "STYLING_COLOUR",
+  "STYLING_NAIL",
+  "TREATMENT",
+]);
+
+export const ServiceQuestionSchema = z.object({
+  id: z.string(),
+  question: z.string(),
+  type: z.enum(["chips", "photo"]),
+  required: z.boolean(),
+  options: z.array(z.string()),
+});
 
 export const ServiceSchema = z.object({
   id: z.string(),
-  categoryId: z.string(),
   name: z.string(),
-  description: z.string(),
-  price: z.number().positive(),
+  description: z.string().optional().nullable(),
+  price: z.number().nonnegative(),
   duration: z.number().positive(),
-  serviceFlow: ServiceFlowSchema,
+  categoryId: z.string().optional(),
+  serviceFlow: ServiceFlowSchema.optional(),
+  requires_specialist: z.boolean().optional().nullable(),
+  service_questions: z.array(ServiceQuestionSchema).optional().nullable(),
 });
 
 export const FormAnswersSchema = z.object({
@@ -49,7 +64,7 @@ export const StylistSchema = z.object({
 
 export const TimeSlotSchema = z.object({
   time: z.string(),
-  session: z.enum(['PAGI', 'SIANG', 'SORE']),
+  session: z.enum(["PAGI", "SIANG", "SORE"]),
   available: z.boolean(),
 });
 
@@ -68,12 +83,12 @@ export const SelectedAddonSchema = z.object({
   quantity: z.number().positive(),
 });
 
-export const BookingStatusSchema = z.enum(['DRAFT', 'PENDING', 'CONFIRMED']);
-export const PaymentTypeSchema = z.enum(['DEPOSIT', 'FULL']);
+export const BookingStatusSchema = z.enum(["DRAFT", "PENDING", "CONFIRMED"]);
+export const PaymentTypeSchema = z.enum(["DEPOSIT", "FULL"]);
 
 export const PromoCodeSchema = z.object({
   code: z.string(),
-  type: z.enum(['PERCENT', 'FIXED']),
+  type: z.enum(["PERCENT", "FIXED"]),
   value: z.number().positive(),
   minPurchase: z.number().nonnegative().optional(),
   maxDiscount: z.number().nonnegative().optional(),
