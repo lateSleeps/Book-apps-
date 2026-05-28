@@ -186,6 +186,10 @@ export function StepServices({ slug, onNext }: Props) {
     if (isSelected) {
       removeService(svc.id);
     } else {
+      console.log("selected service:", {
+        name: svc.name,
+        price_type: svc.price_type,
+      });
       addService({
         id: svc.id,
         name: svc.name,
