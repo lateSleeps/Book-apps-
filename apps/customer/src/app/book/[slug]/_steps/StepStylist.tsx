@@ -77,9 +77,10 @@ function mapStylist(raw: RawStylist, idx: number): Stylist {
 interface Props {
   slug: string;
   onNext: () => void;
+  onBack: () => void;
 }
 
-export function StepStylist({ slug, onNext }: Props) {
+export function StepStylist({ slug, onNext, onBack }: Props) {
   const { salonId, isLoading: salonLoading } = useSalon(slug);
   const {
     stylists: rawStylists,
@@ -113,7 +114,7 @@ export function StepStylist({ slug, onNext }: Props) {
   return (
     <div className="relative flex flex-col h-full overflow-hidden">
       <div className="flex-1 overflow-y-auto overflow-x-hidden">
-        <StepHeader title="Pilih Stylist" />
+        <StepHeader title="Pilih Stylist" onBack={onBack} />
 
         {stylists.length === 0 ? (
           <div className="py-16 text-center text-label3">

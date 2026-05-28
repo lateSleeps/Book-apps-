@@ -7,9 +7,10 @@ import { useBookingStore } from "@/features/booking/hooks/use-booking-store";
 
 interface Props {
   onNext: () => void;
+  onBack: () => void;
 }
 
-export function StepPayment({ onNext }: Props) {
+export function StepPayment({ onNext, onBack }: Props) {
   const { paymentType, proofImageUrl, confirmBooking } = useBookingStore();
 
   function handleSubmit() {
@@ -24,6 +25,7 @@ export function StepPayment({ onNext }: Props) {
       <StepHeader
         title="Pembayaran"
         subtitle="Pilih metode dan unggah bukti bayar"
+        onBack={onBack}
       />
       <div className="flex-1 overflow-y-auto">
         <div className="px-s16 py-s32">

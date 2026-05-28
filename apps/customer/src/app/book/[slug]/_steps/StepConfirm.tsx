@@ -63,7 +63,11 @@ export function StepConfirm({ onNext, onBack }: Props) {
         />
       )}
 
-      <StepHeader title="Ringkasan" subtitle="Periksa kembali pesanan kamu" />
+      <StepHeader
+        title="Ringkasan"
+        subtitle="Periksa kembali pesanan kamu"
+        onBack={onBack}
+      />
       <div className="flex-1 overflow-y-auto bg-bg">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">

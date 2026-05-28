@@ -35,9 +35,10 @@ function WajibBadge() {
 
 interface Props {
   onNext: () => void;
+  onBack: () => void;
 }
 
-export function StepServiceDetail({ onNext }: Props) {
+export function StepServiceDetail({ onNext, onBack }: Props) {
   const { services, setFormAnswers } = useBookingStore();
 
   const service = services[0] as
@@ -118,6 +119,7 @@ export function StepServiceDetail({ onNext }: Props) {
         <StepHeader
           title="Detail Potongan"
           subtitle="Bantu kami memahami preferensimu sebelum bertemu stylist."
+          onBack={onBack}
         />
 
         <div className="flex flex-col gap-6 px-4 pt-4 pb-32">

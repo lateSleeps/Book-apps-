@@ -36,9 +36,20 @@ export default function BookingPage() {
         />
       );
     case "service-detail":
-      return <StepServiceDetail onNext={() => setStep("stylist")} />;
+      return (
+        <StepServiceDetail
+          onNext={() => setStep("stylist")}
+          onBack={() => setStep("services")}
+        />
+      );
     case "stylist":
-      return <StepStylist slug={slug} onNext={() => setStep("confirm")} />;
+      return (
+        <StepStylist
+          slug={slug}
+          onNext={() => setStep("confirm")}
+          onBack={() => setStep("services")}
+        />
+      );
     case "confirm":
       return (
         <StepConfirm
@@ -49,7 +60,12 @@ export default function BookingPage() {
     case "contact":
       return <StepContact onNext={() => setStep("payment")} />;
     case "payment":
-      return <StepPayment onNext={() => setStep("ticket")} />;
+      return (
+        <StepPayment
+          onNext={() => setStep("ticket")}
+          onBack={() => setStep("contact")}
+        />
+      );
     case "ticket":
       return <StepTicket onDone={() => setStep("services")} />;
   }
