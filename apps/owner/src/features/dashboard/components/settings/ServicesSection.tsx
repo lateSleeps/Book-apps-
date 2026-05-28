@@ -15,7 +15,6 @@ import type {
   ServiceQuestion,
   ServiceCategory,
 } from '@/features/dashboard/types/settings.types';
-import { useSalons } from '@/hooks/useSalons';
 import { trpc } from '@/lib/trpc';
 
 // Shape returned by trpc.services.getBySalon
@@ -467,11 +466,7 @@ export function ServicesSection() {
   const { addServiceCategory, updateServiceCategory, deleteServiceCategory } = useSalonSettings();
 
   // Real data sources
-  const { salons } = useSalons();
-  const salonId =
-    salons.find((s: { id: string; slug?: string }) => s.slug === 'rara-beauty-jakarta')?.id ??
-    salons[0]?.id ??
-    '5cdb0848-1b43-44f6-be29-b2ead49ff65a';
+  const salonId = '5cdb0848-1b43-44f6-be29-b2ead49ff65a';
 
   const {
     data: rawServices,
