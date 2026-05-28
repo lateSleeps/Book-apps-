@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
 import { useState, useRef } from "react";
 import { BottomCTA } from "@/components/ui/BottomCTA";
 import { StepHeader } from "@/features/booking/components/step-header";
@@ -34,10 +33,11 @@ function WajibBadge() {
   );
 }
 
-export default function ServiceDetailPage() {
-  const { slug } = useParams<{ slug: string }>();
-  const router = useRouter();
+interface Props {
+  onNext: () => void;
+}
 
+export function StepServiceDetail({ onNext }: Props) {
   const { services, setFormAnswers } = useBookingStore();
 
   const service = services[0] as
@@ -52,13 +52,6 @@ export default function ServiceDetailPage() {
   const questions: ServiceQuestion[] = Array.isArray(rawQuestions)
     ? rawQuestions
     : [];
-
-  // Debug: remove once confirmed working
-  console.log("[service-detail] service:", service);
-  console.log("[service-detail] service_questions raw:", rawQuestions);
-  console.log("[service-detail] questions parsed:", questions);
-
-  const pageTitle = "Detail Potongan";
 
   const [chipAnswers, setChipAnswers] = useState<ChipAnswers>({});
   const [photoAnswers, setPhotoAnswers] = useState<PhotoAnswers>({});
@@ -108,7 +101,7 @@ export default function ServiceDetailPage() {
     try {
       localStorage.setItem("service_detail_answers", JSON.stringify(merged));
     } catch {}
-    router.push(`/book/${slug}/steps/stylist`);
+    onNext();
   }
 
   if (!service) {
@@ -123,7 +116,7 @@ export default function ServiceDetailPage() {
     <div className="relative flex flex-col h-full overflow-hidden">
       <div className="flex-1 overflow-y-auto overflow-x-hidden">
         <StepHeader
-          title={pageTitle}
+          title="Detail Potongan"
           subtitle="Bantu kami memahami preferensimu sebelum bertemu stylist."
         />
 
@@ -133,16 +126,11 @@ export default function ServiceDetailPage() {
               <p className="text-[13px] text-gray-400">
                 Tidak ada pertanyaan untuk layanan ini.
               </p>
-              <p className="text-[11px] text-gray-300 mt-1 font-mono break-all">
-                service id: {service?.id ?? "—"} · service_questions:{" "}
-                {JSON.stringify(rawQuestions)}
-              </p>
             </div>
           )}
 
           {questions.map((q) => (
             <div key={q.id} className="flex flex-col gap-3">
-              {/* Label row */}
               <div className="flex items-center gap-2">
                 <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400">
                   {q.question}
@@ -150,7 +138,6 @@ export default function ServiceDetailPage() {
                 {q.required ? <WajibBadge /> : <OpsionalBadge />}
               </div>
 
-              {/* Chips */}
               {q.type === "chips" && (
                 <div className="flex flex-wrap gap-2">
                   {q.options.map((opt) => {
@@ -173,7 +160,6 @@ export default function ServiceDetailPage() {
                 </div>
               )}
 
-              {/* Photo upload */}
               {q.type === "photo" && (
                 <div>
                   {photoAnswers[q.id] ? (
@@ -249,7 +235,6 @@ export default function ServiceDetailPage() {
             </div>
           ))}
 
-          {/* Catatan tambahan */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
               <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400">

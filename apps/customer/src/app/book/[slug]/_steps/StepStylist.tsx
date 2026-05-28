@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import {
   useBookingStore,
   StylistCards,
@@ -58,7 +57,6 @@ type RawStylist = {
   user?: { full_name?: string; role?: string };
 };
 
-/** Map tRPC stylist row → Stylist shape expected by StylistCard */
 function mapStylist(raw: RawStylist, idx: number): Stylist {
   const name =
     raw.name ?? raw.full_name ?? raw.user?.full_name ?? `Stylist ${idx + 1}`;
@@ -76,10 +74,12 @@ function mapStylist(raw: RawStylist, idx: number): Stylist {
   };
 }
 
-export default function StylistPage() {
-  const { slug } = useParams<{ slug: string }>();
-  const router = useRouter();
+interface Props {
+  slug: string;
+  onNext: () => void;
+}
 
+export function StepStylist({ slug, onNext }: Props) {
   const { salonId, isLoading: salonLoading } = useSalon(slug);
   const {
     stylists: rawStylists,
@@ -87,22 +87,12 @@ export default function StylistPage() {
     error,
   } = useStylists(salonId ?? "");
 
-  const { services, stylist, timeSlot, setStylist, setTimeSlot } =
-    useBookingStore();
-
-  // Debug — remove once confirmed
-  console.log("[stylist-page] rawStylists:", rawStylists);
+  const { stylist, timeSlot, setStylist, setTimeSlot } = useBookingStore();
 
   const stylists: Stylist[] = useMemo(
     () => (rawStylists as RawStylist[]).map(mapStylist),
     [rawStylists],
   );
-
-  useEffect(() => {
-    if (!services || services.length === 0) {
-      router.push(`/book/${slug}/steps/services`);
-    }
-  }, [services, router, slug]);
 
   if (salonLoading || stylistsLoading) {
     return (
@@ -154,7 +144,7 @@ export default function StylistPage() {
         }
         variant={stylist && timeSlot ? "ready" : "default"}
         disabled={!stylist || !timeSlot}
-        onClick={() => router.push(`/book/${slug}/steps/time`)}
+        onClick={onNext}
       />
     </div>
   );
