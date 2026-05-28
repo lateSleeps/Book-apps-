@@ -5,7 +5,6 @@ import { useState } from "react";
 
 import { StepConfirm } from "./_steps/StepConfirm";
 import { StepContact } from "./_steps/StepContact";
-import { StepDateTime } from "./_steps/StepDateTime";
 import { StepPayment } from "./_steps/StepPayment";
 import { StepServiceDetail } from "./_steps/StepServiceDetail";
 import { StepServices } from "./_steps/StepServices";
@@ -16,7 +15,6 @@ type Step =
   | "services"
   | "service-detail"
   | "stylist"
-  | "datetime"
   | "confirm"
   | "contact"
   | "payment"
@@ -48,22 +46,15 @@ export default function BookingPage() {
       return (
         <StepStylist
           slug={slug}
-          onNext={() => setStep("datetime")}
-          onBack={() => setStep("services")}
-        />
-      );
-    case "datetime":
-      return (
-        <StepDateTime
           onNext={() => setStep("confirm")}
-          onBack={() => setStep("stylist")}
+          onBack={() => setStep("services")}
         />
       );
     case "confirm":
       return (
         <StepConfirm
           onNext={() => setStep("contact")}
-          onBack={() => setStep("datetime")}
+          onBack={() => setStep("stylist")}
         />
       );
     case "contact":

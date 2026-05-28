@@ -137,9 +137,15 @@ export function StepStylist({ slug, onNext, onBack }: Props) {
       </div>
 
       <BottomCTA
-        label={stylist ? "Lanjutkan →" : "Pilih stylist dulu"}
-        variant={stylist ? "ready" : "default"}
-        disabled={!stylist}
+        label={
+          !stylist
+            ? "Pilih stylist dulu"
+            : !timeSlot
+              ? "Pilih waktu dulu"
+              : "Lanjutkan →"
+        }
+        variant={stylist && timeSlot ? "ready" : "default"}
+        disabled={!stylist || !timeSlot}
         onClick={onNext}
       />
     </div>
