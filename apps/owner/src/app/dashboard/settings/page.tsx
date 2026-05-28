@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback } from 'react';
+import { Suspense, useCallback } from 'react';
 import { AddOnsSection } from '@/features/dashboard/components/settings/AddOnsSection';
 import { GeneralInfoSection } from '@/features/dashboard/components/settings/GeneralInfoSection';
 import { OtherSettingsSection } from '@/features/dashboard/components/settings/OtherSettingsSection';
@@ -30,7 +30,7 @@ function parseSection(raw: string | null): SettingsSection {
   return 'general';
 }
 
-export default function SettingsPage() {
+function SettingsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeSection = parseSection(searchParams?.get('tab') ?? null);
@@ -90,5 +90,15 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense
+      fallback={<div className="animate-pulse p-8 text-[13px] text-[#999]">Loading...</div>}
+    >
+      <SettingsContent />
+    </Suspense>
   );
 }
