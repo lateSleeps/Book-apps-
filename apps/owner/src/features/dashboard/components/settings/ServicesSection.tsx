@@ -1,21 +1,29 @@
 'use client';
 
-import { PlusIcon, PencilIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { useState } from 'react';
+import {
+  CheckCircleIcon,
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
+import { useState, useEffect } from 'react';
 import { SettingsCard } from './shared/SettingsCard';
 import { useSalonSettings } from '@/features/dashboard/hooks/use-salon-settings';
 import type { Service, ServiceQuestion } from '@/features/dashboard/types/settings.types';
+import { trpc } from '@/lib/trpc';
 
 // ─── Service Edit Modal ───────────────────────────────────────────────────────
 
 interface ServiceModalProps {
   service: Service | null; // null = new service
   categoryId: string;
+  isSaving: boolean;
   onSave: (data: Omit<Service, 'id'>) => void;
   onClose: () => void;
 }
 
-function ServiceModal({ service, categoryId, onSave, onClose }: ServiceModalProps) {
+function ServiceModal({ service, categoryId, isSaving, onSave, onClose }: ServiceModalProps) {
   const [name, setName] = useState(service?.name ?? '');
   const [description, setDescription] = useState(service?.description ?? '');
   const [price, setPrice] = useState(String(service?.price ?? ''));
@@ -289,10 +297,14 @@ function ServiceModal({ service, categoryId, onSave, onClose }: ServiceModalProp
           </button>
           <button
             onClick={handleSave}
-            disabled={!canSave}
-            className="rounded-xl bg-[#1a1a1a] px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#333] disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={!canSave || isSaving}
+            className="flex min-w-[80px] items-center justify-center gap-2 rounded-xl bg-[#1a1a1a] px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#333] disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Simpan
+            {isSaving ? (
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            ) : (
+              'Simpan'
+            )}
           </button>
         </div>
       </div>
@@ -405,6 +417,8 @@ type CategoryModalState =
   | { type: 'edit'; category: { id: string; name: string; icon?: string; description?: string } }
   | { type: 'add' };
 
+type Toast = { type: 'success' | 'error'; message: string };
+
 export function ServicesSection() {
   const {
     settings,
@@ -418,11 +432,20 @@ export function ServicesSection() {
     deleteService,
   } = useSalonSettings();
 
+  const updateServiceMutation = trpc.services.update.useMutation();
+
   const [expandedCategory, setExpandedCategory] = useState<string | null>(
     settings?.serviceCategories[0]?.id ?? null
   );
   const [serviceModal, setServiceModal] = useState<ServiceModal | null>(null);
   const [categoryModal, setCategoryModal] = useState<CategoryModalState | null>(null);
+  const [toast, setToast] = useState<Toast | null>(null);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   if (error) {
     return (
@@ -450,8 +473,26 @@ export function ServicesSection() {
 
   const handleSaveService = async (data: Omit<Service, 'id'>) => {
     if (!serviceModal) return;
+
     if (serviceModal.type === 'edit') {
-      await updateService(serviceModal.service.id, data);
+      try {
+        await updateServiceMutation.mutateAsync({
+          id: serviceModal.service.id,
+          name: data.name,
+          description: data.description,
+          base_price: data.price,
+          duration_minutes: data.duration,
+          requires_specialist: data.requires_specialist ?? false,
+          service_questions: data.service_questions ?? [],
+        });
+        // Optimistic local update so the list reflects changes immediately
+        await updateService(serviceModal.service.id, data);
+        setToast({ type: 'success', message: 'Layanan berhasil disimpan' });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Gagal menyimpan layanan';
+        setToast({ type: 'error', message: msg });
+        return; // keep modal open on error
+      }
     } else {
       await addService(data);
     }
@@ -489,10 +530,23 @@ export function ServicesSection() {
 
   return (
     <>
+      {/* Toast */}
+      {toast && (
+        <div
+          className={`fixed bottom-6 right-6 z-[60] flex items-center gap-2.5 rounded-xl px-4 py-3 text-[13px] font-medium shadow-lg transition-all ${
+            toast.type === 'success' ? 'bg-[#16a34a] text-white' : 'bg-red-600 text-white'
+          }`}
+        >
+          {toast.type === 'success' && <CheckCircleIcon className="h-4 w-4 flex-shrink-0" />}
+          {toast.message}
+        </div>
+      )}
+
       {serviceModal && (
         <ServiceModal
           service={serviceModal.type === 'edit' ? serviceModal.service : null}
           categoryId={serviceModal.categoryId}
+          isSaving={updateServiceMutation.isLoading}
           onSave={handleSaveService}
           onClose={() => setServiceModal(null)}
         />
