@@ -7,11 +7,49 @@ import {
   TrashIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { SettingsCard } from './shared/SettingsCard';
 import { useSalonSettings } from '@/features/dashboard/hooks/use-salon-settings';
-import type { Service, ServiceQuestion } from '@/features/dashboard/types/settings.types';
+import type {
+  Service,
+  ServiceQuestion,
+  ServiceCategory,
+} from '@/features/dashboard/types/settings.types';
+import { useSalons } from '@/hooks/useSalons';
 import { trpc } from '@/lib/trpc';
+
+// Shape returned by trpc.services.getBySalon
+type RawService = {
+  id: string;
+  name: string;
+  description?: string | null;
+  base_price: number;
+  duration_minutes: number;
+  category_id: string;
+  is_active: boolean;
+  requires_specialist?: boolean | null;
+  service_questions?: ServiceQuestion[] | null;
+  category?: {
+    id: string;
+    name: string;
+    icon?: string | null;
+    description?: string | null;
+  } | null;
+};
+
+function mapRawService(raw: RawService): Service {
+  return {
+    id: raw.id,
+    name: raw.name,
+    description: raw.description ?? undefined,
+    price: raw.base_price,
+    duration: raw.duration_minutes,
+    categoryId: raw.category_id,
+    isActive: raw.is_active,
+    requires_specialist: raw.requires_specialist ?? false,
+    service_questions: raw.service_questions ?? [],
+  };
+}
 
 // ─── Service Edit Modal ───────────────────────────────────────────────────────
 
@@ -420,26 +458,56 @@ type CategoryModalState =
 type Toast = { type: 'success' | 'error'; message: string };
 
 export function ServicesSection() {
+  // Keep useSalonSettings only for category CRUD (add/update/delete) — not for list data
+  const { addServiceCategory, updateServiceCategory, deleteServiceCategory } = useSalonSettings();
+
+  // Real data sources
+  const { salons } = useSalons();
+  const salonId = salons[0]?.id ?? '';
+
   const {
-    settings,
-    loading,
-    error,
-    addServiceCategory,
-    updateServiceCategory,
-    deleteServiceCategory,
-    addService,
-    updateService,
-    deleteService,
-  } = useSalonSettings();
+    data: rawServices,
+    isLoading: servicesLoading,
+    error: servicesError,
+    refetch: refetchServices,
+  } = trpc.services.getBySalon.useQuery({ salonId }, { enabled: !!salonId });
 
   const updateServiceMutation = trpc.services.update.useMutation();
 
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(
-    settings?.serviceCategories[0]?.id ?? null
+  // Derive categories and mapped services from real data
+  const services: Service[] = useMemo(
+    () => ((rawServices ?? []) as RawService[]).map(mapRawService),
+    [rawServices]
   );
+
+  const serviceCategories: ServiceCategory[] = useMemo(() => {
+    const seen = new Set<string>();
+    const cats: ServiceCategory[] = [];
+    for (const raw of (rawServices ?? []) as RawService[]) {
+      if (raw.category && !seen.has(raw.category.id)) {
+        seen.add(raw.category.id);
+        cats.push({
+          id: raw.category.id,
+          name: raw.category.name,
+          icon: raw.category.icon ?? undefined,
+          description: raw.category.description ?? undefined,
+        });
+      }
+    }
+    return cats;
+  }, [rawServices]);
+
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [serviceModal, setServiceModal] = useState<ServiceModal | null>(null);
   const [categoryModal, setCategoryModal] = useState<CategoryModalState | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
+
+  // Auto-expand first category once data loads
+  useEffect(() => {
+    if (serviceCategories.length > 0 && !expandedCategory) {
+      setExpandedCategory(serviceCategories[0].id);
+    }
+  }, [serviceCategories, expandedCategory]);
 
   useEffect(() => {
     if (!toast) return;
@@ -447,17 +515,17 @@ export function ServicesSection() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  if (error) {
+  if (servicesError) {
     return (
       <SettingsCard title="Layanan & Kategori" description="Kelola layanan dan kategori">
         <div className="rounded-lg bg-red-50 p-4 text-[13px] text-red-600">
-          <p>Error: {error}</p>
+          <p>Error: {servicesError.message}</p>
         </div>
       </SettingsCard>
     );
   }
 
-  if (loading || !settings) {
+  if (servicesLoading || !salonId) {
     return (
       <SettingsCard title="Layanan & Kategori" description="Kelola layanan dan kategori">
         <div className="animate-pulse space-y-4">
@@ -468,8 +536,6 @@ export function ServicesSection() {
       </SettingsCard>
     );
   }
-
-  const { serviceCategories, services } = settings;
 
   const handleSaveService = async (data: Omit<Service, 'id'>) => {
     if (!serviceModal) return;
@@ -485,16 +551,13 @@ export function ServicesSection() {
           requires_specialist: data.requires_specialist ?? false,
           service_questions: data.service_questions ?? [],
         });
-        // Optimistic local update so the list reflects changes immediately
-        await updateService(serviceModal.service.id, data);
+        await refetchServices();
         setToast({ type: 'success', message: 'Layanan berhasil disimpan' });
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Gagal menyimpan layanan';
         setToast({ type: 'error', message: msg });
-        return; // keep modal open on error
+        return;
       }
-    } else {
-      await addService(data);
     }
     setServiceModal(null);
   };
@@ -522,9 +585,9 @@ export function ServicesSection() {
     }
   };
 
-  const handleDeleteService = (id: string) => {
+  const handleDeleteService = (_id: string) => {
     if (confirm('Hapus layanan ini?')) {
-      deleteService(id);
+      // TODO: wire delete mutation when ready
     }
   };
 
