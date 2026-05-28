@@ -1,4 +1,5 @@
 import { supabase } from "@rara/database";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { router, publicProcedure } from "../trpc";
 
@@ -42,7 +43,11 @@ export const bookingsRouter = router({
         ])
         .select();
 
-      if (error) throw error;
+      if (error)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message,
+        });
       return data?.[0] || null;
     }),
 });

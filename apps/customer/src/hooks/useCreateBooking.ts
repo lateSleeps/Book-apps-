@@ -5,7 +5,7 @@ export function useCreateBooking() {
 
   return {
     createBooking: mutation.mutate,
-    isLoading: mutation.isPending,
+    isLoading: mutation.isLoading,
     error: mutation.error?.message,
     booking: mutation.data,
   };

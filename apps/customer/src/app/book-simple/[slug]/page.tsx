@@ -9,7 +9,7 @@ interface BookingPageProps {
 export default function BookingPage({ params }: BookingPageProps) {
   // Real salon ID from Supabase
   const salon = {
-    id: "4d8de2a8-b965-4802-85f1-db9ae703da8e",
+    id: "5cdb0848-1b43-44f6-be29-b2ead49ff65a",
     name: "Rara Beauty Jakarta",
     slug: params.slug,
   };
