@@ -23,9 +23,12 @@ type RawService = {
   id: string;
   name: string;
   description?: string | null;
-  base_price: number;
-  duration_minutes: number;
-  category_id: string;
+  base_price?: number | null;
+  price?: number | null;
+  duration_minutes?: number | null;
+  duration?: number | null;
+  category_id?: string | null;
+  categoryId?: string | null;
   is_active: boolean;
   requires_specialist?: boolean | null;
   service_questions?: ServiceQuestion[] | null;
@@ -33,7 +36,7 @@ type RawService = {
     id: string;
     name: string;
     icon?: string | null;
-    description?: string | null;
+    color?: string | null;
   } | null;
 };
 
@@ -41,10 +44,10 @@ function mapRawService(raw: RawService): Service {
   return {
     id: raw.id,
     name: raw.name,
-    description: raw.description ?? undefined,
-    price: raw.base_price,
-    duration: raw.duration_minutes,
-    categoryId: raw.category_id,
+    description: raw.description ?? '',
+    price: raw.base_price ?? raw.price ?? 0,
+    duration: raw.duration_minutes ?? raw.duration ?? 60,
+    categoryId: raw.category_id ?? raw.categoryId ?? '',
     isActive: raw.is_active,
     requires_specialist: raw.requires_specialist ?? false,
     service_questions: raw.service_questions ?? [],
@@ -488,15 +491,15 @@ export function ServicesSection() {
     const seen = new Set<string>();
     const cats: ServiceCategory[] = [];
     for (const raw of (rawServices ?? []) as RawService[]) {
-      if (raw.category && !seen.has(raw.category.id)) {
-        seen.add(raw.category.id);
-        cats.push({
-          id: raw.category.id,
-          name: raw.category.name,
-          icon: raw.category.icon ?? undefined,
-          description: raw.category.description ?? undefined,
-        });
-      }
+      const catId = raw.category?.id ?? raw.category_id ?? raw.categoryId;
+      if (!catId || seen.has(catId)) continue;
+      seen.add(catId);
+      cats.push({
+        id: catId,
+        name: raw.category?.name ?? 'Uncategorized',
+        icon: raw.category?.icon ?? undefined,
+        description: undefined,
+      });
     }
     return cats;
   }, [rawServices]);
