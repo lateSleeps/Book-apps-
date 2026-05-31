@@ -148,10 +148,11 @@ const PROMO_CODES: Record<string, { type: 'percent' | 'fixed'; value: number }> 
 };
 
 export default function OverviewPage() {
-  const { todayBookings, stats, stylists } = useDashboardData();
+  const { upcomingBookings, allBookings, stats, stylists } = useDashboardData();
   const { salons, isLoading: salonsLoading, error: salonsError } = useSalons();
   const [greeting, setGreeting] = useState('');
   const [dateLabel, setDateLabel] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
   const [visitorTab, setVisitorTab] = useState<VisitorTab>('ALL');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [manualBookings, setManualBookings] = useState<
@@ -220,10 +221,21 @@ export default function OverviewPage() {
     setDateLabel(
       `${DAYS_ID[d.getDay()]}, ${d.getDate()} ${MONTHS_ID[d.getMonth()]} ${d.getFullYear()}`
     );
+
+    // Check if mobile on mount and on resize
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Barcode scanner
   const startBarcodeScanner = async () => {
+    // Guard: prevent multiple simultaneous scanners
+    if (scannerIntervalRef.current || barcodeScannerActive) {
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -339,10 +351,12 @@ export default function OverviewPage() {
   }, []);
 
   useEffect(() => {
+    if (!upcomingBookings || upcomingBookings.length === 0) return;
+
     const aMap: Record<string, AddOn[]> = {};
     const nMap: Record<string, string> = {};
     const sMap: Record<string, ServiceData> = {};
-    todayBookings.forEach((b) => {
+    upcomingBookings.forEach((b) => {
       aMap[b.id] = b.addOns ? [...b.addOns] : [];
       nMap[b.id] = b.treatmentNotes ?? '';
       sMap[b.id] = { serviceName: b.serviceName, price: b.price, categoryName: b.categoryName };
@@ -350,7 +364,7 @@ export default function OverviewPage() {
     setAddOnsMap(aMap);
     setNotesMap(nMap);
     setServiceMap(sMap);
-  }, [todayBookings]);
+  }, [upcomingBookings]);
 
   function toggleExpand(id: string) {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -424,10 +438,10 @@ export default function OverviewPage() {
 
   const effectiveBookings = useMemo(
     () =>
-      [...todayBookings, ...manualBookings]
+      [...upcomingBookings, ...manualBookings]
         .map((b) => ({ ...b, status: bookingStatusMap[b.id] ?? b.status }))
         .filter((b) => !(b.visitorType === 'BOOKING' && b.paymentStatus === 'UNPAID')),
-    [todayBookings, manualBookings, bookingStatusMap]
+    [upcomingBookings, manualBookings, bookingStatusMap]
   );
 
   const filteredVisitors = useMemo(() => {
@@ -620,52 +634,47 @@ export default function OverviewPage() {
                     <path d="M4 6l4 4 4-4" />
                   </svg>
                 </button>
+                {addDropdownOpen && isMobile && (
+                  <div className="fixed inset-0 z-30" onClick={() => setAddDropdownOpen(false)} />
+                )}
                 {addDropdownOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-30 sm:hidden"
-                      onClick={() => setAddDropdownOpen(false)}
-                    />
-                    <div className="absolute right-0 top-12 z-40 w-full max-w-xs overflow-hidden rounded-xl border border-[#efefed] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] sm:w-[13rem] sm:max-w-none">
-                      <button
-                        onClick={() => {
-                          setAddDrawer('WALK_IN');
-                          setAddDropdownOpen(false);
-                          setDrawerServiceOpen(false);
-                          setDrawerServiceSearch('');
-                        }}
-                        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f8f8f6]"
-                      >
-                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f0f0ee]">
-                          <UserIcon className="h-3.5 w-3.5 text-[#555]" />
-                        </div>
-                        <div>
-                          <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Walk-in</p>
-                          <p className="text-[0.75rem] text-[#777]">Datang langsung</p>
-                        </div>
-                      </button>
-                      <div className="mx-4 h-px bg-[#f5f5f3]" />
-                      <button
-                        onClick={() => {
-                          setAddDrawer('BOOKING');
-                          setAddDropdownOpen(false);
-                          setDrawerServiceOpen(false);
-                          setDrawerServiceSearch('');
-                        }}
-                        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f8f8f6]"
-                      >
-                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f0f0ee]">
-                          <CogIcon className="h-3.5 w-3.5 text-[#555]" />
-                        </div>
-                        <div>
-                          <p className="text-[0.875rem] font-medium text-[#1a1a1a]">
-                            Booking Online
-                          </p>
-                          <p className="text-[0.75rem] text-[#777]">Sudah punya kode booking</p>
-                        </div>
-                      </button>
-                    </div>
-                  </>
+                  <div className="absolute right-0 top-12 z-40 w-full max-w-xs overflow-hidden rounded-xl border border-[#efefed] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] sm:w-[13rem] sm:max-w-none">
+                    <button
+                      onClick={() => {
+                        setAddDrawer('WALK_IN');
+                        setAddDropdownOpen(false);
+                        setDrawerServiceOpen(false);
+                        setDrawerServiceSearch('');
+                      }}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f8f8f6]"
+                    >
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f0f0ee]">
+                        <UserIcon className="h-3.5 w-3.5 text-[#555]" />
+                      </div>
+                      <div>
+                        <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Walk-in</p>
+                        <p className="text-[0.75rem] text-[#777]">Datang langsung</p>
+                      </div>
+                    </button>
+                    <div className="mx-4 h-px bg-[#f5f5f3]" />
+                    <button
+                      onClick={() => {
+                        setAddDrawer('BOOKING');
+                        setAddDropdownOpen(false);
+                        setDrawerServiceOpen(false);
+                        setDrawerServiceSearch('');
+                      }}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f8f8f6]"
+                    >
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f0f0ee]">
+                        <CogIcon className="h-3.5 w-3.5 text-[#555]" />
+                      </div>
+                      <div>
+                        <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Booking Online</p>
+                        <p className="text-[0.75rem] text-[#777]">Sudah punya kode booking</p>
+                      </div>
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -719,7 +728,7 @@ export default function OverviewPage() {
               </svg>
               <div className="relative z-10 mb-[3rem] flex items-start justify-between">
                 <p className="text-[0.65rem] font-medium uppercase tracking-wide text-[#737373] opacity-85 sm:text-[0.75rem]">
-                  Booking Hari Ini
+                  Booking Mendatang
                 </p>
               </div>
               <p className="relative z-10 text-[1.5rem] font-bold leading-none text-[#2a2a2a] sm:text-[1.75rem]">
@@ -837,7 +846,7 @@ export default function OverviewPage() {
               {/* Header */}
               <div className="visitor-header-controls flex items-center justify-between gap-4 px-6 pb-0 pt-5">
                 <h2 className="hide-on-mobile shrink-0 text-[1rem] font-semibold text-[#1a1a1a]">
-                  Pengunjung Hari Ini
+                  Pengunjung Mendatang
                 </h2>
                 <div className="visitor-header-controls ml-auto flex items-center gap-2">
                   {/* Sort button */}
@@ -1338,7 +1347,9 @@ export default function OverviewPage() {
                                       {/* Tombol konfirmasi & decline */}
                                       <div className="flex gap-2">
                                         <button
-                                          onClick={() => {
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
                                             console.log('✅ Confirm button clicked');
                                             const timeSinceLastAction = Date.now() - lastActionTime;
                                             if (timeSinceLastAction < 200) {
@@ -1350,14 +1361,18 @@ export default function OverviewPage() {
                                               ...m,
                                               [b.id]: 'CONFIRMED',
                                             }));
+                                            setLastActionTime(Date.now());
+                                            // Do NOT close dropdown - keep expanded row open
                                           }}
-                                          className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#2563eb] text-[0.8125rem] font-semibold text-white transition-colors hover:bg-[#1d4ed8]"
+                                          className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#2563eb] text-[0.8125rem] font-semibold text-white transition-colors hover:bg-[#1d4ed8] disabled:cursor-not-allowed disabled:opacity-50"
                                         >
                                           <CheckIcon className="h-3.5 w-3.5 text-white" />
                                           Konfirmasi
                                         </button>
                                         <button
-                                          onClick={() => {
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
                                             setDeclineDialog({
                                               bookingId: b.id,
                                               customerName: b.customerName,
@@ -1949,6 +1964,48 @@ export default function OverviewPage() {
                                     })()}
                                   </div>
 
+                                  {/* Card: Bukti Pembayaran (Payment Proof) */}
+                                  {(b.paymentProofUrl ||
+                                    manualBookings.find((mb) => mb.id === b.id)
+                                      ?.paymentProofUrl) && (
+                                    <div className="payment-status-card-mobile col-span-1 flex flex-col gap-3 rounded-xl border border-[#efefed] bg-white px-4 py-4 sm:col-span-2 sm:px-5 sm:py-5 md:col-span-1">
+                                      <p className="text-[0.75rem] font-semibold uppercase tracking-wider text-[#555]">
+                                        Bukti Pembayaran
+                                      </p>
+                                      <button
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          setProofZoom(b.id);
+                                        }}
+                                        className="group relative block w-full overflow-hidden rounded-lg border border-[#e8e8e6] transition-colors hover:border-[#ccc]"
+                                      >
+                                        <img
+                                          src={
+                                            b.paymentProofUrl ||
+                                            manualBookings.find((mb) => mb.id === b.id)
+                                              ?.paymentProofUrl ||
+                                            ''
+                                          }
+                                          alt="Bukti pembayaran"
+                                          className="h-auto max-h-48 w-full object-cover"
+                                          onError={(e) => {
+                                            console.warn('Payment proof image failed to load:', e);
+                                          }}
+                                        />
+                                        {/* Zoom hint overlay */}
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/10">
+                                          <div className="rounded-full bg-black/50 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
+                                            <MagnifyingGlassIcon className="h-3 w-3 text-white" />
+                                          </div>
+                                        </div>
+                                      </button>
+                                      <p className="text-[0.6875rem] text-[#777]">
+                                        Klik untuk membuka ukuran penuh
+                                      </p>
+                                    </div>
+                                  )}
+
                                   {/* Card: Input pembayaran baru */}
                                   <div className="payment-input-card-mobile col-span-1 flex flex-col gap-2.5 rounded-xl border border-[#efefed] bg-white px-3 py-3 sm:col-span-2 sm:px-4 sm:py-3 md:col-span-2">
                                     <p className="text-[0.6875rem] font-medium uppercase tracking-wider text-[#555]">
@@ -2332,11 +2389,11 @@ export default function OverviewPage() {
         </div>
 
         {/* Mobile Right-side Detail Panel */}
-        {mobileSelectedId && (
+        {mobileSelectedId && isMobile && (
           <>
             {/* Backdrop */}
             <div
-              className="fixed inset-0 z-40 bg-black/20 transition-opacity md:hidden"
+              className="fixed inset-0 z-40 bg-black/20 transition-opacity"
               onClick={() => setMobileSelectedId(null)}
             />
 
@@ -2524,11 +2581,12 @@ export default function OverviewPage() {
 
       {/* Confirmation Modal */}
       {confirmDialog &&
+        isMobile &&
         (() => {
           const d = confirmDialog;
           const kembalian = d.method === 'CASH' ? d.amount - d.finalTotal : null;
           return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:hidden">
               {/* Backdrop */}
               <div
                 className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
@@ -2597,7 +2655,6 @@ export default function OverviewPage() {
                       const customerName = d.customerName;
                       const serviceName = d.serviceName;
                       setBookingStatusMap((m) => ({ ...m, [d.bookingId]: 'COMPLETED' }));
-                      setExpandedId(null);
                       setConfirmDialog(null);
                     }}
                     className="h-10 flex-1 rounded-xl bg-[#16a34a] text-[0.875rem] font-semibold text-white transition-colors hover:bg-[#15803d]"
@@ -2612,10 +2669,11 @@ export default function OverviewPage() {
 
       {/* Decline Dialog Modal */}
       {declineDialog &&
+        isMobile &&
         (() => {
           const d = declineDialog;
           return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:hidden">
               {/* Backdrop */}
               <div
                 className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
@@ -2718,104 +2776,93 @@ export default function OverviewPage() {
         })()}
 
       {/* Proof zoom modal */}
-      {proofZoom && (
-        <div
-          className="fixed inset-0 z-[70] flex items-center justify-center p-4"
-          onClick={() => setProofZoom(null)}
-        >
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-          <div
-            className="relative z-10 flex w-full flex-col items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="w-full max-w-[22rem] overflow-hidden rounded-2xl bg-white shadow-[0_32px_80px_rgba(0,0,0,0.4)] sm:w-[22rem]">
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-[#f0f0f0] px-5 py-4">
-                <div>
-                  <p className="text-[0.75rem] font-semibold uppercase tracking-wider text-[#777]">
-                    Bukti Transfer
-                  </p>
-                  <p className="mt-0.5 text-[0.9375rem] font-bold text-[#1a1a1a]">
-                    {effectiveBookings.find((b) => b.id === proofZoom)?.customerName}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setProofZoom(null)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-[#aaa] transition-colors hover:bg-[#f5f5f3] hover:text-[#444]"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <path d="M3 3l10 10M13 3L3 13" />
-                  </svg>
-                </button>
-              </div>
-              {/* Mock full receipt */}
-              <div className="flex flex-col items-center gap-4 bg-gradient-to-br from-[#eff6ff] to-[#dbeafe] px-6 py-8">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#2563eb] shadow-lg">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z" />
-                    <circle cx="12" cy="12" r="2" />
-                  </svg>
-                </div>
-                <div className="text-center">
-                  <p className="text-[0.75rem] font-medium uppercase tracking-wider text-[#3b82f6]">
-                    BCA — Transfer Berhasil
-                  </p>
-                  <p className="mt-1 text-[1.75rem] font-bold text-[#1e3a8a]">
-                    Rp{' '}
-                    {(effectiveBookings.find((b) => b.id === proofZoom)?.price ?? 0).toLocaleString(
-                      'id-ID'
-                    )}
-                  </p>
-                </div>
-                <div className="flex w-full flex-col gap-2 rounded-xl bg-white/60 px-4 py-3 text-[0.8125rem]">
-                  <div className="flex justify-between">
-                    <span className="text-[#555]">Ke rekening</span>
-                    <span className="font-semibold text-[#1a1a1a]">1234 5678 9012</span>
+      {proofZoom &&
+        isMobile &&
+        (() => {
+          const booking =
+            allBookings.find((b) => b.id === proofZoom) ??
+            manualBookings.find((b) => b.id === proofZoom);
+          console.log('[Overview] booking payment_proof_url:', booking?.paymentProofUrl);
+          return (
+            <div
+              className="fixed inset-0 z-[70] flex items-center justify-center p-4 md:hidden"
+              onClick={() => setProofZoom(null)}
+            >
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+              <div
+                className="relative z-10 flex w-full flex-col items-center gap-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="w-full max-w-[22rem] overflow-hidden rounded-2xl bg-white shadow-[0_32px_80px_rgba(0,0,0,0.4)] sm:w-[22rem]">
+                  {/* Header */}
+                  <div className="flex items-center justify-between border-b border-[#f0f0f0] px-5 py-4">
+                    <div>
+                      <p className="text-[0.75rem] font-semibold uppercase tracking-wider text-[#777]">
+                        Bukti Pembayaran
+                      </p>
+                      <p className="mt-0.5 text-[0.9375rem] font-bold text-[#1a1a1a]">
+                        {booking?.customerName}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setProofZoom(null)}
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-[#aaa] transition-colors hover:bg-[#f5f5f3] hover:text-[#444]"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                      >
+                        <path d="M3 3l10 10M13 3L3 13" />
+                      </svg>
+                    </button>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#555]">Atas nama</span>
-                    <span className="font-semibold text-[#1a1a1a]">Rara Beauty</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#555]">Tanggal</span>
-                    <span className="font-semibold text-[#1a1a1a]">
-                      {new Date().toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#555]">No. referensi</span>
-                    <span className="font-semibold text-[#1a1a1a]">
-                      TRF{Date.now().toString().slice(-8)}
-                    </span>
-                  </div>
+                  {/* Image display */}
+                  {booking?.paymentProofUrl ? (
+                    <div className="flex items-center justify-center bg-[#f5f5f5] p-4">
+                      <img
+                        src={booking.paymentProofUrl}
+                        alt="Bukti pembayaran"
+                        className="max-h-[60vh] max-w-full rounded-lg object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-4 bg-gradient-to-br from-[#eff6ff] to-[#dbeafe] px-6 py-8">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#2563eb] shadow-lg">
+                        <svg
+                          width="22"
+                          height="22"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z" />
+                          <circle cx="12" cy="12" r="2" />
+                        </svg>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-[0.75rem] font-medium uppercase tracking-wider text-[#3b82f6]">
+                          Transfer Berhasil
+                        </p>
+                        <p className="mt-1 text-[1.75rem] font-bold text-[#1e3a8a]">
+                          Rp {(booking?.price ?? 0).toLocaleString('id-ID')}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
+                <p className="text-[0.75rem] text-white/50">Klik di luar untuk menutup</p>
               </div>
             </div>
-            <p className="text-[0.75rem] text-white/50">Klik di luar untuk menutup</p>
-          </div>
-        </div>
-      )}
+          );
+        })()}
 
       {/* Left drawer — Add customer */}
       {addDrawer !== 'CLOSED' && (
@@ -3157,8 +3204,8 @@ export default function OverviewPage() {
       )}
 
       {/* Barcode Scanner Modal */}
-      {barcodeScannerActive && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80">
+      {barcodeScannerActive && isMobile && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 md:hidden">
           <div className="relative mx-4 w-full max-w-md">
             {/* Video feed */}
             <video
@@ -3232,7 +3279,7 @@ export default function OverviewPage() {
             <path d="M12 5v14M5 12h14" />
           </svg>
         </button>
-        {addDropdownOpen && (
+        {addDropdownOpen && isMobile && (
           <>
             <div className="fixed inset-0 z-30" onClick={() => setAddDropdownOpen(false)} />
             <div className="absolute bottom-20 right-0 z-40 w-[13rem] overflow-hidden rounded-xl border border-[#efefed] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
