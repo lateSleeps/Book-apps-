@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCodeSVG } from "qrcode.react";
 
 interface QRCodeDisplayProps {
   value: string;
@@ -9,12 +9,12 @@ interface QRCodeDisplayProps {
 export function QRCodeDisplay({ value }: QRCodeDisplayProps) {
   return (
     <div className="flex justify-center">
-      <div className="p-s16 bg-white rounded-r16 border border-sep shadow-sm">
+      <div className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
         <QRCodeSVG
           value={value}
-          size={280}
+          size={220}
           bgColor="#ffffff"
-          fgColor="#111110"
+          fgColor="#000000"
           level="M"
           includeMargin={false}
         />

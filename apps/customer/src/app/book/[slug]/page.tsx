@@ -62,6 +62,7 @@ export default function BookingPage() {
     case "payment":
       return (
         <StepPayment
+          slug={slug}
           onNext={() => setStep("ticket")}
           onBack={() => setStep("contact")}
         />

@@ -13,19 +13,43 @@ const serviceQuestionSchema = z.object({
 
 export const servicesRouter = router({
   getBySalon: publicProcedure.input(z.object({ salonId: z.string() })).query(async ({ input }) => {
+    console.log('[services.getBySalon] Querying with salonId:', input.salonId);
+
     const { data: rawData, error } = await supabase
       .from('services')
       .select(
         `
-        *,
-        category:categories(id, name, icon, color)
+        id,
+        name,
+        description,
+        price,
+        duration,
+        price_type,
+        requires_specialist,
+        is_active,
+        salon_id,
+        category_id,
+        categories(id, name, icon, color)
       `
       )
       .eq('salon_id', input.salonId)
       .eq('is_active', true);
 
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
-    return rawData || [];
+    if (error) {
+      console.error('[services.getBySalon] Error:', error);
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message });
+    }
+
+    console.log('[services.getBySalon] Found', rawData?.length || 0, 'services');
+
+    // Transform to match customer app expectations
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const transformed = (rawData || []).map((service: any) => ({
+      ...service,
+      category: service.categories,
+    }));
+
+    return transformed;
   }),
 
   update: publicProcedure

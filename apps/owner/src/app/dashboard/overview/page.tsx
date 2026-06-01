@@ -13,7 +13,11 @@ import Link from 'next/link';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { useDashboardData } from '@/features/dashboard/hooks/use-dashboard-data';
 import type { AddOn } from '@/features/dashboard/types/dashboard.types';
-import { useSalons } from '@/hooks/useSalons';
+import { useServices } from '@/hooks/useServices';
+import { useStylists } from '@/hooks/useStylists';
+import { trpc } from '@/lib/trpc';
+import { buildWAMessage } from '@/lib/wa-message';
+import type { WaBookingData } from '@/lib/wa-message';
 import { formatRupiah } from '@/shared/lib/format';
 
 const DAYS_ID = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -147,9 +151,28 @@ const PROMO_CODES: Record<string, { type: 'percent' | 'fixed'; value: number }> 
   MEMBER15: { type: 'percent', value: 15 },
 };
 
+const SALON_ID = '5cdb0848-1b43-44f6-be29-b2ead49ff65a';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyService = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyStylist = any;
+
 export default function OverviewPage() {
   const { upcomingBookings, allBookings, stats, stylists } = useDashboardData();
-  const { salons, isLoading: salonsLoading, error: salonsError } = useSalons();
+  const { services: realServices } = useServices(SALON_ID);
+  const { stylists: realStylists } = useStylists(SALON_ID);
+  const utils = trpc.useUtils();
+  const updateStatusMutation = trpc.bookings.updateStatus.useMutation({
+    onSuccess: () => {
+      utils.bookings.getBySalon.invalidate();
+    },
+  });
+  const createBookingMutation = trpc.bookings.create.useMutation({
+    onSuccess: () => {
+      utils.bookings.getBySalon.invalidate();
+    },
+  });
   const [greeting, setGreeting] = useState('');
   const [dateLabel, setDateLabel] = useState('');
   const [isMobile, setIsMobile] = useState(false);
@@ -212,8 +235,10 @@ export default function OverviewPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scannerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [drawerServiceOpen, setDrawerServiceOpen] = useState(false);
-  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC');
+  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
   const [lastActionTime, setLastActionTime] = useState<number>(0);
+  const [showWANotif, setShowWANotif] = useState(false);
+  const [waBookingData, setWaBookingData] = useState<WaBookingData | null>(null);
 
   useEffect(() => {
     setGreeting(getGreeting());
@@ -457,11 +482,10 @@ export default function OverviewPage() {
       );
     }
     list = [...list].sort((a, b) => {
-      const aIsNew = a.status === 'UPCOMING' ? 0 : 1;
-      const bIsNew = b.status === 'UPCOMING' ? 0 : 1;
-      if (aIsNew !== bIsNew) return aIsNew - bIsNew;
-      const cmp = a.timeSlot.localeCompare(b.timeSlot);
-      return sortOrder === 'ASC' ? cmp : -cmp;
+      const aTime = a.createdAt ?? '';
+      const bTime = b.createdAt ?? '';
+      const cmp = bTime.localeCompare(aTime);
+      return sortOrder === 'DESC' ? cmp : -cmp;
     });
     return list;
   }, [effectiveBookings, visitorTab, visitorSearch, sortOrder]);
@@ -480,8 +504,11 @@ export default function OverviewPage() {
 
   const pendingConfirmCount = useMemo(
     () =>
-      effectiveBookings.filter((b) => b.visitorType === 'BOOKING' && b.status === 'UPCOMING')
-        .length,
+      effectiveBookings.filter(
+        (b) =>
+          b.visitorType === 'BOOKING' &&
+          (b.status === 'UPCOMING' || b.status === 'pending' || b.status === 'PENDING')
+      ).length,
     [effectiveBookings]
   );
 
@@ -653,7 +680,7 @@ export default function OverviewPage() {
                       </div>
                       <div>
                         <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Walk-in</p>
-                        <p className="text-[0.75rem] text-[#777]">Datang langsung</p>
+                        <p className="text-[0.75rem] text-gray-500">Datang langsung</p>
                       </div>
                     </button>
                     <div className="mx-4 h-px bg-[#f5f5f3]" />
@@ -671,7 +698,7 @@ export default function OverviewPage() {
                       </div>
                       <div>
                         <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Booking Online</p>
-                        <p className="text-[0.75rem] text-[#777]">Sudah punya kode booking</p>
+                        <p className="text-[0.75rem] text-gray-500">Sudah punya kode booking</p>
                       </div>
                     </button>
                   </div>
@@ -699,7 +726,7 @@ export default function OverviewPage() {
                 <circle cx="35" cy="55" r="14" fill="#054A57" opacity="0.85" />
               </svg>
               <div className="relative z-10 mb-[3rem] flex items-start justify-between">
-                <p className="text-[0.65rem] font-medium uppercase tracking-wide text-[#737373] opacity-85 sm:text-[0.75rem]">
+                <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
                   Pendapatan
                 </p>
               </div>
@@ -727,7 +754,7 @@ export default function OverviewPage() {
                 <rect x="15" y="45" width="20" height="20" fill="#3A1F6B" opacity="0.85" rx="2" />
               </svg>
               <div className="relative z-10 mb-[3rem] flex items-start justify-between">
-                <p className="text-[0.65rem] font-medium uppercase tracking-wide text-[#737373] opacity-85 sm:text-[0.75rem]">
+                <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
                   Booking Mendatang
                 </p>
               </div>
@@ -778,9 +805,7 @@ export default function OverviewPage() {
                 />
               </svg>
               <div className="relative z-10 mb-[3rem] flex items-start justify-between">
-                <p className="text-[0.65rem] font-medium uppercase tracking-wide text-[#737373] opacity-85 sm:text-[0.75rem]">
-                  Rating
-                </p>
+                <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Rating</p>
               </div>
               <p className="relative z-10 text-[1.5rem] font-bold leading-none text-[#2a2a2a] sm:text-[1.75rem]">
                 {stats.avgRating}/5 ⭐
@@ -829,7 +854,7 @@ export default function OverviewPage() {
                 />
               </svg>
               <div className="relative z-10 mb-[3rem] flex items-start justify-between">
-                <p className="text-[0.65rem] font-medium uppercase tracking-wide text-[#737373] opacity-85 sm:text-[0.75rem]">
+                <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
                   Penyelesaian
                 </p>
               </div>
@@ -876,22 +901,22 @@ export default function OverviewPage() {
                         </>
                       )}
                     </svg>
-                    {sortOrder === 'ASC' ? 'Terlama' : 'Terbaru'}
+                    {sortOrder === 'DESC' ? 'Terbaru' : 'Terlama'}
                   </button>
                   {/* Search bar */}
                   <div className="search-bar-mobile flex h-7 flex-1 items-center gap-2 rounded-lg bg-[#f5f5f3] px-2 transition-all focus-within:bg-white focus-within:ring-1 focus-within:ring-[#ddd] sm:h-8 sm:w-[14rem] sm:px-3">
-                    <MagnifyingGlassIcon className="h-3.5 w-3.5 text-[#aaa]" />
+                    <MagnifyingGlassIcon className="h-3.5 w-3.5 text-gray-400" />
                     <input
                       type="text"
                       placeholder="Cari pelanggan..."
                       value={visitorSearch}
                       onChange={(e) => setVisitorSearch(e.target.value)}
-                      className="flex-1 bg-transparent text-[0.75rem] text-[#1a1a1a] placeholder:text-[#aaa] focus:outline-none sm:text-[0.8125rem]"
+                      className="flex-1 bg-transparent text-[0.75rem] text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none sm:text-[0.8125rem]"
                     />
                     {visitorSearch && (
                       <button
                         onClick={() => setVisitorSearch('')}
-                        className="text-[#bbb] transition-colors hover:text-[#777]"
+                        className="text-gray-400 transition-colors hover:text-gray-500"
                       >
                         <XMarkIcon className="h-3 w-3" />
                       </button>
@@ -922,12 +947,12 @@ export default function OverviewPage() {
                             ? isCompleted
                               ? 'bg-[#16a34a] text-white'
                               : 'bg-[#1a1a1a] text-white'
-                            : 'text-[#777] hover:bg-[#f5f5f3] hover:text-[#444]'
+                            : 'text-gray-500 hover:bg-[#f5f5f3] hover:text-[#444]'
                         }`}
                       >
                         {label}
                         <span
-                          className={`ml-1.5 text-[0.6875rem] ${active ? 'opacity-70' : 'text-[#aaa]'}`}
+                          className={`ml-1.5 text-[0.6875rem] ${active ? 'opacity-70' : 'text-gray-400'}`}
                         >
                           {visitorCounts[key]}
                         </span>
@@ -976,7 +1001,7 @@ export default function OverviewPage() {
                             </p>
                           </div>
                           {/* Time */}
-                          <span className="shrink-0 text-[0.875rem] tabular-nums text-[#777]">
+                          <span className="shrink-0 text-[0.875rem] tabular-nums text-gray-500">
                             {b.timeSlot}
                           </span>
                           {/* Payment badge */}
@@ -986,7 +1011,7 @@ export default function OverviewPage() {
                                 ? 'bg-[#dcfce7] text-[#16a34a]'
                                 : b.paymentStatus === 'DEPOSIT'
                                   ? 'bg-[#fef9c3] text-[#a16207]'
-                                  : 'bg-[#f5f5f5] text-[#777]'
+                                  : 'bg-[#f5f5f5] text-gray-500'
                             }`}
                           >
                             {b.paymentStatus === 'PAID'
@@ -1065,6 +1090,40 @@ export default function OverviewPage() {
                         { color: string; bg: string; label: string; icon: React.ReactNode }
                       > = {
                         UPCOMING: {
+                          color: '#d97706',
+                          bg: '#fffbeb',
+                          label: 'Perlu Konfirmasi',
+                          icon: (
+                            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                              <circle cx="4" cy="4" r="3.5" stroke="white" strokeWidth="1.1" />
+                              <path
+                                d="M4 2v2.2l1.2.8"
+                                stroke="white"
+                                strokeWidth="1.1"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          ),
+                        },
+                        pending: {
+                          color: '#d97706',
+                          bg: '#fffbeb',
+                          label: 'Perlu Konfirmasi',
+                          icon: (
+                            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                              <circle cx="4" cy="4" r="3.5" stroke="white" strokeWidth="1.1" />
+                              <path
+                                d="M4 2v2.2l1.2.8"
+                                stroke="white"
+                                strokeWidth="1.1"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          ),
+                        },
+                        PENDING: {
                           color: '#d97706',
                           bg: '#fffbeb',
                           label: 'Perlu Konfirmasi',
@@ -1224,13 +1283,16 @@ export default function OverviewPage() {
                                 </span>
                               </div>
                             </div>
-                            <span className="flex-shrink-0 text-[0.875rem] tabular-nums text-[#777]">
+                            <span className="flex-shrink-0 text-[0.875rem] tabular-nums text-gray-500">
                               {b.timeSlot}
                             </span>
                             {b.status === 'CONFIRMED' ? (
-                              <CheckCircleIcon className="h-[24px] w-[24px] text-[#16a34a]" />
+                              <CheckCircleIcon className="h-[24px] w-[24px] text-[#2563eb]" />
                             ) : (
-                              (b.status === 'UPCOMING' || b.status === 'IN_PROGRESS') && (
+                              (b.status === 'UPCOMING' ||
+                                b.status === 'IN_PROGRESS' ||
+                                b.status === 'pending' ||
+                                b.status === 'PENDING') && (
                                 <span
                                   className="flex flex-shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.6875rem] font-semibold"
                                   style={{
@@ -1309,113 +1371,143 @@ export default function OverviewPage() {
                                     Chat WA
                                   </a>
 
-                                  {/* Bukti transfer + tombol konfirmasi — hanya untuk UPCOMING */}
-                                  {b.status === 'UPCOMING' && (
+                                  {/* Bukti pembayaran — tampil untuk UPCOMING dan CONFIRMED */}
+                                  {(b.status === 'UPCOMING' ||
+                                    b.status === 'CONFIRMED' ||
+                                    b.status === 'pending' ||
+                                    b.status === 'PENDING' ||
+                                    b.status === 'COMPLETED' ||
+                                    b.status === 'completed' ||
+                                    b.status === 'IN_PROGRESS') && (
                                     <div
                                       className="mt-1 flex flex-col gap-2"
                                       onClick={(e) => e.stopPropagation()}
                                     >
                                       <p className="text-[0.6875rem] font-semibold uppercase tracking-wider text-[#555]">
-                                        Bukti Transfer
+                                        Bukti Pembayaran
                                       </p>
-                                      {/* Thumbnail bukti transfer */}
-                                      <button
-                                        onClick={() => setProofZoom(b.id)}
-                                        className="group relative w-full overflow-hidden rounded-xl border border-[#e8e8e6] transition-colors hover:border-[#ccc]"
-                                      >
-                                        {/* Mock transfer receipt */}
-                                        <div className="flex h-[7rem] w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#f0f4ff] to-[#e8f0fe]">
-                                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2563eb]">
-                                            <CheckIcon className="h-3.5 w-3.5 text-white" />
-                                          </div>
-                                          <div className="text-center">
-                                            <p className="text-[0.6875rem] font-bold text-[#1e40af]">
-                                              BCA Transfer
-                                            </p>
-                                            <p className="text-[0.625rem] text-[#3b82f6]">
-                                              Rp {b.price.toLocaleString('id-ID')}
-                                            </p>
-                                          </div>
-                                        </div>
-                                        {/* Zoom hint overlay */}
-                                        <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/10">
-                                          <div className="rounded-full bg-black/50 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
-                                            <MagnifyingGlassIcon className="h-3 w-3 text-white" />
-                                          </div>
-                                        </div>
-                                      </button>
-                                      {/* Tombol konfirmasi & decline */}
-                                      <div className="flex gap-2">
+                                      {/* Thumbnail bukti pembayaran — dari database */}
+                                      {b.paymentProofUrl ? (
                                         <button
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            console.log('✅ Confirm button clicked');
-                                            const timeSinceLastAction = Date.now() - lastActionTime;
-                                            if (timeSinceLastAction < 200) {
-                                              console.log('⏸️ Too soon, skipping');
-                                              return;
-                                            }
-                                            console.log('✅ Setting CONFIRMED status');
-                                            setBookingStatusMap((m) => ({
-                                              ...m,
-                                              [b.id]: 'CONFIRMED',
-                                            }));
-                                            setLastActionTime(Date.now());
-                                            // Do NOT close dropdown - keep expanded row open
-                                          }}
-                                          className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#2563eb] text-[0.8125rem] font-semibold text-white transition-colors hover:bg-[#1d4ed8] disabled:cursor-not-allowed disabled:opacity-50"
+                                          onClick={() => setProofZoom(b.id)}
+                                          className="group relative w-full overflow-hidden rounded-xl border border-[#e8e8e6] transition-colors hover:border-[#ccc]"
                                         >
-                                          <CheckIcon className="h-3.5 w-3.5 text-white" />
-                                          Konfirmasi
+                                          <img
+                                            src={b.paymentProofUrl}
+                                            alt="Bukti pembayaran"
+                                            className="h-[7rem] w-full object-cover"
+                                          />
+                                          <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/10">
+                                            <div className="rounded-full bg-black/50 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
+                                              <MagnifyingGlassIcon className="h-3 w-3 text-white" />
+                                            </div>
+                                          </div>
                                         </button>
-                                        <button
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            setDeclineDialog({
-                                              bookingId: b.id,
-                                              customerName: b.customerName,
-                                              reason: '',
-                                            });
-                                            setDeclineReason('');
-                                          }}
-                                          className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl border border-[#e0e0e0] bg-[#f5f5f3] text-[0.8125rem] font-semibold text-[#ef4444] transition-colors hover:bg-[#efefed]"
-                                        >
+                                      ) : (
+                                        <div className="flex h-[7rem] w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#e0e0e0] bg-[#fafafa]">
                                           <svg
-                                            width="13"
-                                            height="13"
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="#ccc"
+                                            strokeWidth="1.5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          >
+                                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                                            <circle cx="8.5" cy="8.5" r="1.5" />
+                                            <path d="M21 15l-5-5L5 21" />
+                                          </svg>
+                                          <p className="text-[0.6875rem] text-gray-400">
+                                            Belum ada bukti pembayaran
+                                          </p>
+                                        </div>
+                                      )}
+
+                                      {/* Tombol konfirmasi & decline — hanya saat UPCOMING */}
+                                      {(b.status === 'UPCOMING' ||
+                                        b.status === 'pending' ||
+                                        b.status === 'PENDING') && (
+                                        <div className="flex gap-2">
+                                          <button
+                                            onClick={async (e) => {
+                                              e.preventDefault();
+                                              e.stopPropagation();
+                                              const id = b.id;
+                                              setBookingStatusMap((m) => ({
+                                                ...m,
+                                                [id]: 'CONFIRMED',
+                                              }));
+                                              setExpandedId(id);
+                                              await updateStatusMutation.mutateAsync({
+                                                bookingId: id,
+                                                status: 'CONFIRMED',
+                                              });
+                                              setWaBookingData({
+                                                customerName: b.customerName,
+                                                customerPhone: b.customerPhone,
+                                                serviceName: b.serviceName,
+                                                date: b.date,
+                                                timeSlot: b.timeSlot,
+                                                bookingCode: b.bookingCode,
+                                              });
+                                              setShowWANotif(true);
+                                            }}
+                                            className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#2563eb] text-[0.8125rem] font-semibold text-white transition-colors hover:bg-[#1d4ed8]"
+                                          >
+                                            <CheckIcon className="h-3.5 w-3.5 text-white" />
+                                            Konfirmasi
+                                          </button>
+                                          <button
+                                            onClick={(e) => {
+                                              e.preventDefault();
+                                              e.stopPropagation();
+                                              setDeclineDialog({
+                                                bookingId: b.id,
+                                                customerName: b.customerName,
+                                                reason: '',
+                                              });
+                                              setDeclineReason('');
+                                            }}
+                                            className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl border border-[#e0e0e0] bg-[#f5f5f3] text-[0.8125rem] font-semibold text-[#ef4444] transition-colors hover:bg-[#efefed]"
+                                          >
+                                            <svg
+                                              width="13"
+                                              height="13"
+                                              viewBox="0 0 16 16"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              strokeWidth="2.5"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            >
+                                              <path d="M3 3l10 10M13 3L3 13" />
+                                            </svg>
+                                            Tolak
+                                          </button>
+                                        </div>
+                                      )}
+
+                                      {/* Status confirmed — tampil di bawah gambar */}
+                                      {b.status === 'CONFIRMED' && (
+                                        <div className="flex h-9 w-full items-center justify-center gap-1.5 rounded-xl bg-[#2563eb] text-[0.8125rem] font-semibold text-white">
+                                          <svg
+                                            width="14"
+                                            height="14"
                                             viewBox="0 0 16 16"
                                             fill="none"
-                                            stroke="currentColor"
+                                            stroke="white"
                                             strokeWidth="2.5"
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
                                           >
-                                            <path d="M3 3l10 10M13 3L3 13" />
+                                            <path d="M3 8l3 3 7-7" />
                                           </svg>
-                                          Tolak
-                                        </button>
-                                      </div>
+                                          Terkonfirmasi
+                                        </div>
+                                      )}
                                     </div>
-                                  )}
-                                  {/* Confirmed status button — full width green */}
-                                  {b.status === 'CONFIRMED' && (
-                                    <button className="mt-1 flex h-10 w-full items-center justify-center gap-1.5 rounded-xl bg-[#16a34a] text-[0.8125rem] font-semibold text-white transition-colors hover:bg-[#15803d]">
-                                      <svg
-                                        width="14"
-                                        height="14"
-                                        viewBox="0 0 16 16"
-                                        fill="none"
-                                        stroke="white"
-                                        strokeWidth="2.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                      >
-                                        <path d="M3 8l3 3 7-7" />
-                                      </svg>
-                                      Terkonfirmasi
-                                    </button>
                                   )}
                                 </div>
 
@@ -1541,7 +1633,7 @@ export default function OverviewPage() {
                                           </div>
                                           <button
                                             onClick={() => setEditServiceId(b.id)}
-                                            className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#f0f0ee] text-[#999] transition-colors hover:bg-[#e2e2df] hover:text-[#444]"
+                                            className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#f0f0ee] text-gray-500 transition-colors hover:bg-[#e2e2df] hover:text-[#444]"
                                           >
                                             <svg
                                               width="14"
@@ -1725,7 +1817,7 @@ export default function OverviewPage() {
                                       Product Add-on
                                     </p>
                                     {addOns.length === 0 && (
-                                      <p className="mb-1 text-[0.875rem] text-[#777]">
+                                      <p className="mb-1 text-[0.875rem] text-gray-500">
                                         Belum ada add-on
                                       </p>
                                     )}
@@ -1903,7 +1995,7 @@ export default function OverviewPage() {
                                             ? 'bg-[#dcfce7] text-[#16a34a]'
                                             : b.paymentStatus === 'DEPOSIT'
                                               ? 'bg-[#fef9c3] text-[#a16207]'
-                                              : 'bg-[#f5f5f5] text-[#777]'
+                                              : 'bg-[#f5f5f5] text-gray-500'
                                         }`}
                                       >
                                         {b.paymentStatus === 'PAID'
@@ -1944,7 +2036,7 @@ export default function OverviewPage() {
                                               <p className="text-[1rem] font-bold text-[#1a1a1a]">
                                                 {formatRupiah(paid)}
                                               </p>
-                                              <p className="mt-0.5 text-[0.75rem] text-[#777]">
+                                              <p className="mt-0.5 text-[0.75rem] text-gray-500">
                                                 terbayar · {pct}%
                                               </p>
                                             </div>
@@ -1953,7 +2045,7 @@ export default function OverviewPage() {
                                                 <p className="text-[1rem] font-semibold text-[#444]">
                                                   {formatRupiah(finalTotal - paid)}
                                                 </p>
-                                                <p className="mt-0.5 text-[0.75rem] text-[#777]">
+                                                <p className="mt-0.5 text-[0.75rem] text-gray-500">
                                                   sisa
                                                 </p>
                                               </div>
@@ -1963,48 +2055,6 @@ export default function OverviewPage() {
                                       );
                                     })()}
                                   </div>
-
-                                  {/* Card: Bukti Pembayaran (Payment Proof) */}
-                                  {(b.paymentProofUrl ||
-                                    manualBookings.find((mb) => mb.id === b.id)
-                                      ?.paymentProofUrl) && (
-                                    <div className="payment-status-card-mobile col-span-1 flex flex-col gap-3 rounded-xl border border-[#efefed] bg-white px-4 py-4 sm:col-span-2 sm:px-5 sm:py-5 md:col-span-1">
-                                      <p className="text-[0.75rem] font-semibold uppercase tracking-wider text-[#555]">
-                                        Bukti Pembayaran
-                                      </p>
-                                      <button
-                                        onClick={(e) => {
-                                          e.preventDefault();
-                                          e.stopPropagation();
-                                          setProofZoom(b.id);
-                                        }}
-                                        className="group relative block w-full overflow-hidden rounded-lg border border-[#e8e8e6] transition-colors hover:border-[#ccc]"
-                                      >
-                                        <img
-                                          src={
-                                            b.paymentProofUrl ||
-                                            manualBookings.find((mb) => mb.id === b.id)
-                                              ?.paymentProofUrl ||
-                                            ''
-                                          }
-                                          alt="Bukti pembayaran"
-                                          className="h-auto max-h-48 w-full object-cover"
-                                          onError={(e) => {
-                                            console.warn('Payment proof image failed to load:', e);
-                                          }}
-                                        />
-                                        {/* Zoom hint overlay */}
-                                        <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/10">
-                                          <div className="rounded-full bg-black/50 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
-                                            <MagnifyingGlassIcon className="h-3 w-3 text-white" />
-                                          </div>
-                                        </div>
-                                      </button>
-                                      <p className="text-[0.6875rem] text-[#777]">
-                                        Klik untuk membuka ukuran penuh
-                                      </p>
-                                    </div>
-                                  )}
 
                                   {/* Card: Input pembayaran baru */}
                                   <div className="payment-input-card-mobile col-span-1 flex flex-col gap-2.5 rounded-xl border border-[#efefed] bg-white px-3 py-3 sm:col-span-2 sm:px-4 sm:py-3 md:col-span-2">
@@ -2035,7 +2085,7 @@ export default function OverviewPage() {
                                     </div>
                                     {/* Nominal input */}
                                     <div className="flex h-9 items-center gap-2 rounded-lg bg-[#f8f8f6] px-3 transition-all focus-within:ring-1 focus-within:ring-[#ddd]">
-                                      <span className="shrink-0 text-[0.875rem] text-[#777]">
+                                      <span className="shrink-0 text-[0.875rem] text-gray-500">
                                         {(paymentMethodMap[b.id] ?? 'CASH') === 'CASH'
                                           ? 'Uang diterima  Rp'
                                           : 'Nominal  Rp'}
@@ -2065,7 +2115,7 @@ export default function OverviewPage() {
                                         return (
                                           <div className="flex items-center gap-3 rounded-lg bg-[#f8f8f6] px-3 py-2">
                                             <div className="flex-1">
-                                              <p className="text-[0.6875rem] uppercase tracking-wide text-[#777]">
+                                              <p className="text-[0.6875rem] uppercase tracking-wide text-gray-500">
                                                 Tagihan
                                               </p>
                                               <p className="text-[0.9375rem] font-semibold text-[#1a1a1a]">
@@ -2074,7 +2124,7 @@ export default function OverviewPage() {
                                             </div>
                                             <div className="h-8 w-px bg-[#ebebeb]" />
                                             <div className="flex-1 text-right">
-                                              <p className="text-[0.6875rem] uppercase tracking-wide text-[#777]">
+                                              <p className="text-[0.6875rem] uppercase tracking-wide text-gray-500">
                                                 Kembalian
                                               </p>
                                               <p
@@ -2200,7 +2250,7 @@ export default function OverviewPage() {
                                   {/* Total */}
                                   <div className="shrink-0 text-right">
                                     {discount > 0 && (
-                                      <p className="text-[0.75rem] text-[#bbb] line-through">
+                                      <p className="text-[0.75rem] text-gray-400 line-through">
                                         {formatRupiah(totalPrice)}
                                       </p>
                                     )}
@@ -2246,7 +2296,7 @@ export default function OverviewPage() {
                           ? isCompleted
                             ? 'bg-[#16a34a] text-white'
                             : 'bg-[#1a1a1a] text-white'
-                          : 'text-[#777] hover:bg-[#f5f5f3] hover:text-[#444]'
+                          : 'text-gray-500 hover:bg-[#f5f5f3] hover:text-[#444]'
                       }`}
                     >
                       {label} <span className="ml-1 text-[0.625rem]">{visitorCounts[key]}</span>
@@ -2298,7 +2348,7 @@ export default function OverviewPage() {
                               <p className="truncate text-[0.875rem] font-semibold text-[#1a1a1a]">
                                 {b.customerName}
                               </p>
-                              <span className="flex-shrink-0 text-[0.65rem] text-[#999]">
+                              <span className="flex-shrink-0 text-[0.65rem] text-gray-500">
                                 {b.timeSlot}
                               </span>
                             </div>
@@ -2498,7 +2548,7 @@ export default function OverviewPage() {
                           <p className="text-[0.875rem] font-medium text-[#1a1a1a]">
                             {currentService.serviceName}
                           </p>
-                          <p className="text-[0.75rem] text-[#777]">
+                          <p className="text-[0.75rem] text-gray-500">
                             {formatRupiah(currentService.price)}
                           </p>
                         </div>
@@ -2596,7 +2646,7 @@ export default function OverviewPage() {
               <div className="relative flex w-full max-w-[22rem] flex-col gap-5 rounded-2xl bg-white p-4 shadow-[0_24px_64px_rgba(0,0,0,0.18)] sm:w-[22rem] sm:p-6">
                 {/* Header */}
                 <div>
-                  <p className="mb-1 text-[0.6875rem] font-medium uppercase tracking-wider text-[#777]">
+                  <p className="mb-1 text-[0.6875rem] font-medium uppercase tracking-wider text-gray-500">
                     Konfirmasi Pembayaran
                   </p>
                   <p className="text-[1.125rem] font-bold text-[#1a1a1a]">{d.customerName}</p>
@@ -2604,19 +2654,19 @@ export default function OverviewPage() {
                 {/* Detail rows */}
                 <div className="flex flex-col gap-3 rounded-xl bg-[#f8f8f6] px-4 py-3.5">
                   <div className="flex items-baseline justify-between">
-                    <span className="text-[0.8125rem] text-[#777]">Tagihan</span>
+                    <span className="text-[0.8125rem] text-gray-500">Tagihan</span>
                     <span className="text-[0.9375rem] font-semibold text-[#1a1a1a]">
                       {formatRupiah(d.finalTotal)}
                     </span>
                   </div>
                   <div className="flex items-baseline justify-between">
-                    <span className="text-[0.8125rem] text-[#777]">Metode</span>
+                    <span className="text-[0.8125rem] text-gray-500">Metode</span>
                     <span className="text-[0.8125rem] font-medium text-[#1a1a1a]">{d.method}</span>
                   </div>
                   {d.method === 'CASH' && (
                     <>
                       <div className="flex items-baseline justify-between">
-                        <span className="text-[0.8125rem] text-[#777]">Uang diterima</span>
+                        <span className="text-[0.8125rem] text-gray-500">Uang diterima</span>
                         <span className="text-[0.8125rem] font-medium text-[#1a1a1a]">
                           {formatRupiah(d.amount)}
                         </span>
@@ -2669,7 +2719,6 @@ export default function OverviewPage() {
 
       {/* Decline Dialog Modal */}
       {declineDialog &&
-        isMobile &&
         (() => {
           const d = declineDialog;
           return (
@@ -2684,14 +2733,14 @@ export default function OverviewPage() {
                 {/* Header with close button */}
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-wider text-[#777]">
+                    <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-wider text-gray-500">
                       Tolak Booking
                     </p>
                     <p className="text-[1.125rem] font-bold text-[#1a1a1a]">{d.customerName}</p>
                   </div>
                   <button
                     onClick={() => setDeclineDialog(null)}
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#aaa] transition-colors hover:bg-[#f5f5f3] hover:text-[#444]"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-[#f5f5f3] hover:text-[#444]"
                   >
                     <svg
                       width="14"
@@ -2730,27 +2779,23 @@ export default function OverviewPage() {
                     Batal
                   </button>
                   <button
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       e.stopPropagation();
-                      if (!declineReason.trim() || !d.customerName) {
-                        return;
-                      }
-                      const customerName = d.customerName;
+                      if (!d.customerName) return;
                       const bookingId = d.bookingId;
-
-                      console.log('🚫 Decline button clicked for:', customerName);
-
-                      // Record this action time
+                      const stylistName =
+                        allBookings.find((b) => b.id === bookingId)?.stylistName ?? 'Stylist';
                       setLastActionTime(Date.now());
-
-                      // Close all dialogs
                       setConfirmDialog(null);
                       setDeclineDialog(null);
-                      setExpandedId(null);
                       setDeclineReason('');
-
-                      // Update booking status
                       setBookingStatusMap((m) => ({ ...m, [bookingId]: 'CANCELLED' }));
+                      setExpandedId(bookingId);
+                      await updateStatusMutation.mutateAsync({
+                        bookingId,
+                        status: 'CANCELLED',
+                        cancellationReason: `Maaf, stylist ${stylistName} sudah memiliki booking lain pada jam tersebut.`,
+                      });
                     }}
                     disabled={!declineReason.trim()}
                     className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#ef4444] text-[0.875rem] font-semibold text-white transition-colors hover:bg-[#dc2626] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#ef4444]"
@@ -2777,15 +2822,14 @@ export default function OverviewPage() {
 
       {/* Proof zoom modal */}
       {proofZoom &&
-        isMobile &&
         (() => {
           const booking =
             allBookings.find((b) => b.id === proofZoom) ??
             manualBookings.find((b) => b.id === proofZoom);
-          console.log('[Overview] booking payment_proof_url:', booking?.paymentProofUrl);
+          const proofUrl = booking?.paymentProofUrl;
           return (
             <div
-              className="fixed inset-0 z-[70] flex items-center justify-center p-4 md:hidden"
+              className="fixed inset-0 z-[70] flex items-center justify-center p-4"
               onClick={() => setProofZoom(null)}
             >
               <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
@@ -2797,7 +2841,7 @@ export default function OverviewPage() {
                   {/* Header */}
                   <div className="flex items-center justify-between border-b border-[#f0f0f0] px-5 py-4">
                     <div>
-                      <p className="text-[0.75rem] font-semibold uppercase tracking-wider text-[#777]">
+                      <p className="text-[0.75rem] font-semibold uppercase tracking-wider text-gray-500">
                         Bukti Pembayaran
                       </p>
                       <p className="mt-0.5 text-[0.9375rem] font-bold text-[#1a1a1a]">
@@ -2806,7 +2850,7 @@ export default function OverviewPage() {
                     </div>
                     <button
                       onClick={() => setProofZoom(null)}
-                      className="flex h-8 w-8 items-center justify-center rounded-full text-[#aaa] transition-colors hover:bg-[#f5f5f3] hover:text-[#444]"
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-[#f5f5f3] hover:text-[#444]"
                     >
                       <svg
                         width="14"
@@ -2822,10 +2866,10 @@ export default function OverviewPage() {
                     </button>
                   </div>
                   {/* Image display */}
-                  {booking?.paymentProofUrl ? (
+                  {proofUrl ? (
                     <div className="flex items-center justify-center bg-[#f5f5f5] p-4">
                       <img
-                        src={booking.paymentProofUrl}
+                        src={proofUrl}
                         alt="Bukti pembayaran"
                         className="max-h-[60vh] max-w-full rounded-lg object-contain"
                       />
@@ -2877,7 +2921,7 @@ export default function OverviewPage() {
             {/* Header */}
             <div className="flex items-center justify-between border-b border-[#f0f0f0] px-4 pb-4 pt-4 sm:px-6 sm:pt-6">
               <div>
-                <p className="mb-0.5 text-[0.6875rem] font-medium uppercase tracking-wider text-[#777]">
+                <p className="mb-0.5 text-[0.6875rem] font-medium uppercase tracking-wider text-gray-500">
                   Tambah Kunjungan
                 </p>
                 <h3 className="text-[1.0625rem] font-bold text-[#1a1a1a]">
@@ -2886,7 +2930,7 @@ export default function OverviewPage() {
               </div>
               <button
                 onClick={() => setAddDrawer('CLOSED')}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-[#aaa] transition-colors hover:bg-[#f5f5f3] hover:text-[#444]"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-[#f5f5f3] hover:text-[#444]"
               >
                 <svg
                   width="14"
@@ -2949,7 +2993,9 @@ export default function OverviewPage() {
                       >
                         <span className={walkInForm.serviceId ? 'text-[#1a1a1a]' : 'text-[#ccc]'}>
                           {walkInForm.serviceId
-                            ? MOCK_SERVICES.find((s) => s.id === walkInForm.serviceId)?.name
+                            ? (realServices as AnyService[]).find(
+                                (s: AnyService) => s.id === walkInForm.serviceId
+                              )?.name
                             : 'Pilih layanan...'}
                         </span>
                         <svg
@@ -3013,11 +3059,13 @@ export default function OverviewPage() {
                           <div className="max-h-[14rem] overflow-y-auto">
                             {(() => {
                               const q = drawerServiceSearch.toLowerCase();
-                              const filtered = MOCK_SERVICES.filter(
-                                (s) =>
+                              const filtered = (realServices as AnyService[]).filter(
+                                (s: AnyService) =>
                                   !q ||
                                   s.name.toLowerCase().includes(q) ||
-                                  s.categoryName.toLowerCase().includes(q)
+                                  (s.categoryName ?? s.category?.name ?? '')
+                                    .toLowerCase()
+                                    .includes(q)
                               );
                               if (filtered.length === 0)
                                 return (
@@ -3025,9 +3073,10 @@ export default function OverviewPage() {
                                     Layanan tidak ditemukan
                                   </p>
                                 );
-                              const grouped = filtered.reduce<Record<string, typeof MOCK_SERVICES>>(
+                              const grouped = filtered.reduce<Record<string, AnyService[]>>(
                                 (acc, s) => {
-                                  (acc[s.categoryName] = acc[s.categoryName] ?? []).push(s);
+                                  const cat = s.categoryName ?? s.category?.name ?? 'Lainnya';
+                                  (acc[cat] = acc[cat] ?? []).push(s);
                                   return acc;
                                 },
                                 {}
@@ -3070,23 +3119,32 @@ export default function OverviewPage() {
                       Stylist / Terapis <span className="text-[#ef4444]">*</span>
                     </label>
                     <div className="grid grid-cols-2 gap-2">
-                      {stylists.map((s) => (
-                        <button
-                          key={s.id}
-                          onClick={() => setWalkInForm((f) => ({ ...f, stylistId: s.id }))}
-                          className={`flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition-colors ${walkInForm.stylistId === s.id ? 'border-[#1a1a1a] bg-[#f8f8f6]' : 'border-[#e8e8e8] hover:border-[#bbb]'}`}
-                        >
-                          <div
-                            className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[0.6875rem] font-bold"
-                            style={{ backgroundColor: s.color }}
+                      {(realStylists as AnyStylist[]).map((s: AnyService) => {
+                        const name = s.user?.full_name ?? s.name ?? 'Stylist';
+                        const initials = name
+                          .split(' ')
+                          .map((n: string) => n[0])
+                          .join('')
+                          .toUpperCase()
+                          .slice(0, 2);
+                        return (
+                          <button
+                            key={s.id}
+                            onClick={() => setWalkInForm((f) => ({ ...f, stylistId: s.id }))}
+                            className={`flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition-colors ${walkInForm.stylistId === s.id ? 'border-[#1a1a1a] bg-[#f8f8f6]' : 'border-[#e8e8e8] hover:border-[#bbb]'}`}
                           >
-                            {s.initials}
-                          </div>
-                          <span className="text-[0.8125rem] font-medium leading-tight text-[#1a1a1a]">
-                            {s.name.split(' ')[0]}
-                          </span>
-                        </button>
-                      ))}
+                            <div
+                              className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[0.6875rem] font-bold"
+                              style={{ backgroundColor: '#c8ede2' }}
+                            >
+                              {initials}
+                            </div>
+                            <span className="text-[0.8125rem] font-medium leading-tight text-[#1a1a1a]">
+                              {name.split(' ')[0]}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 </>
@@ -3120,7 +3178,7 @@ export default function OverviewPage() {
                     </label>
                     <button
                       onClick={startBarcodeScanner}
-                      className="flex h-32 flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-[#e0e0e0] text-[#aaa] transition-colors hover:border-[#bbb] hover:bg-[#fafaf8] hover:text-[#777]"
+                      className="flex h-32 flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-[#e0e0e0] text-gray-400 transition-colors hover:border-[#bbb] hover:bg-[#fafaf8] hover:text-gray-500"
                     >
                       <svg
                         width="32"
@@ -3148,48 +3206,37 @@ export default function OverviewPage() {
               <div className="border-t border-[#f0f0f0] px-4 py-3 sm:px-6 sm:py-4">
                 <button
                   disabled={!walkInForm.name || !walkInForm.serviceId || !walkInForm.stylistId}
-                  onClick={() => {
-                    const svc = MOCK_SERVICES.find((s) => s.id === walkInForm.serviceId);
-                    const stylist = stylists.find((s) => s.id === walkInForm.stylistId);
+                  onClick={async () => {
+                    const svc = (realServices as AnyService[]).find(
+                      (s: AnyService) => s.id === walkInForm.serviceId
+                    );
+                    const stylist = (realStylists as AnyStylist[]).find(
+                      (s: AnyService) => s.id === walkInForm.stylistId
+                    );
+                    if (!svc || !stylist) return;
+
                     const now = new Date();
                     const timeSlot = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-                    const newId = `manual-${Date.now()}`;
-                    const newBooking: import('@/features/dashboard/types/dashboard.types').DashboardBooking =
-                      {
-                        id: newId,
-                        bookingCode: `RB-MANUAL-${Date.now()}`,
+                    const totalMin = now.getHours() * 60 + now.getMinutes() + (svc.duration || 60);
+                    const endTime = `${String(Math.floor(totalMin / 60) % 24).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`;
+
+                    try {
+                      await createBookingMutation.mutateAsync({
+                        salonId: SALON_ID,
+                        serviceId: svc.id,
+                        stylistId: stylist.id,
+                        bookingDate: now.toISOString().slice(0, 10),
+                        startTime: timeSlot,
+                        endTime,
                         customerName: walkInForm.name,
-                        customerPhone: walkInForm.phone || '',
-                        serviceName: svc?.name ?? '',
-                        categoryName: svc?.categoryName ?? '',
-                        stylistName: stylist?.name ?? '',
-                        stylistInitials: stylist?.initials ?? '',
-                        stylistColor: stylist?.color ?? '#eee',
-                        date: now.toISOString().slice(0, 10),
-                        timeSlot,
-                        duration: svc?.duration ?? 30,
-                        price: svc?.price ?? 0,
-                        status: 'CONFIRMED',
-                        paymentStatus: 'UNPAID',
-                        paymentType: null,
-                        visitorType: 'WALK_IN',
-                        addOns: [],
-                        treatmentNotes: '',
-                      };
-                    setManualBookings((prev) => [...prev, newBooking]);
-                    setAddOnsMap((prev) => ({ ...prev, [newId]: [] }));
-                    setNotesMap((prev) => ({ ...prev, [newId]: '' }));
-                    setServiceMap((prev) => ({
-                      ...prev,
-                      [newId]: {
-                        serviceName: svc?.name ?? '',
-                        price: svc?.price ?? 0,
-                        categoryName: svc?.categoryName ?? '',
-                      },
-                    }));
-                    setAdditionalServicesMap((prev) => ({ ...prev, [newId]: [] }));
-                    const cName = walkInForm.name;
-                    const svcName = svc?.name ?? '';
+                        customerPhone: walkInForm.phone || '-',
+                        notes: 'Walk-in',
+                        paymentStatus: 'lunas',
+                      });
+                    } catch (e) {
+                      console.error('Failed to create walk-in booking:', e);
+                    }
+
                     setWalkInForm({ name: '', phone: '', serviceId: '', stylistId: '' });
                     setAddDrawer('CLOSED');
                   }}
@@ -3309,7 +3356,7 @@ export default function OverviewPage() {
                 </div>
                 <div>
                   <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Walk-in</p>
-                  <p className="text-[0.75rem] text-[#777]">Datang langsung</p>
+                  <p className="text-[0.75rem] text-gray-500">Datang langsung</p>
                 </div>
               </button>
               <div className="mx-4 h-px bg-[#f5f5f3]" />
@@ -3339,7 +3386,7 @@ export default function OverviewPage() {
                 </div>
                 <div>
                   <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Booking Online</p>
-                  <p className="text-[0.75rem] text-[#777]">Sudah punya kode booking</p>
+                  <p className="text-[0.75rem] text-gray-500">Sudah punya kode booking</p>
                 </div>
               </button>
             </div>
@@ -3347,21 +3394,67 @@ export default function OverviewPage() {
         )}
       </div>
 
-      {/* Salons debug panel */}
-      <div className="fixed bottom-4 right-4 z-50 w-full max-w-sm">
-        <details className="overflow-hidden rounded-xl border border-[#e0e0e0] bg-white shadow-lg">
-          <summary className="cursor-pointer bg-[#f5f5f3] px-4 py-2 font-mono text-[0.75rem] text-[#555]">
-            {salonsLoading
-              ? '⏳ Loading salons...'
-              : salonsError
-                ? `❌ ${salonsError}`
-                : `✅ Salons (${salons.length})`}
-          </summary>
-          <pre className="max-h-48 overflow-auto bg-[#fafaf8] p-3 font-mono text-[0.65rem] text-[#333]">
-            {JSON.stringify(salons, null, 2)}
-          </pre>
-        </details>
-      </div>
+      {showWANotif && waBookingData && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30">
+          <div className="mx-4 flex max-w-sm flex-col gap-4 rounded-2xl bg-white p-6 shadow-[0_20px_60px_rgba(0,0,0,0.15)]">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#dcfce7]">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="#16a34a"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M3 8l3 3 7-7" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#111827]">Booking dikonfirmasi!</p>
+                <p className="mt-0.5 text-xs text-[#6b7280]">
+                  Beritahu {waBookingData.customerName} via WhatsApp?
+                </p>
+              </div>
+            </div>
+            <div className="rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] p-3">
+              <p className="mb-1.5 text-xs font-medium text-[#166534]">Preview pesan:</p>
+              <p className="whitespace-pre-line text-xs leading-relaxed text-[#166534]">{`Halo ${waBookingData.customerName}! 🌸
+
+Booking kamu di *Rara Beauty Jakarta* telah *dikonfirmasi*! ✅
+
+📋 ${waBookingData.serviceName} · ${waBookingData.date} · ${waBookingData.timeSlot}
+
+⏰ Mohon datang 10 menit sebelum sesi. Toleransi max 15 menit.
+
+🔍 Cek booking: localhost:3002/check-booking`}</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <a
+                href={buildWAMessage(waBookingData)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setShowWANotif(false)}
+                className="flex h-10 w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white transition-colors"
+                style={{ backgroundColor: '#25d366' }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
+                Kirim via WhatsApp
+              </a>
+              <button
+                onClick={() => setShowWANotif(false)}
+                className="h-10 w-full rounded-xl border border-[#e5e7eb] text-sm font-medium text-[#6b7280] transition-colors hover:bg-[#f9fafb]"
+              >
+                Lewati
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -111,6 +111,7 @@ export const BookingStateSchema = z.object({
   formAnswers: FormAnswersSchema.nullable(),
   customerName: z.string().nullable(),
   customerPhone: z.string().nullable(),
+  customerEmail: z.string().nullable(),
   promoCode: PromoCodeSchema.nullable(),
   discountAmount: z.number().nonnegative(),
 });

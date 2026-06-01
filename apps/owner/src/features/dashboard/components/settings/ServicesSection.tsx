@@ -147,7 +147,7 @@ function ServiceModal({ service, categoryId, isSaving, onSave, onClose }: Servic
         <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
           {/* Name */}
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#999]">
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-gray-500">
               Nama Layanan
             </label>
             <input
@@ -155,28 +155,28 @@ function ServiceModal({ service, categoryId, isSaving, onSave, onClose }: Servic
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Contoh: Haircut & Blow Dry"
-              className="w-full rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-[#bbb] focus:border-[#1a1a1a] focus:outline-none"
+              className="w-full rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-gray-400 focus:border-[#1a1a1a] focus:outline-none"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#999]">
-              Deskripsi <span className="font-normal normal-case text-[#bbb]">(opsional)</span>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-gray-500">
+              Deskripsi <span className="font-normal normal-case text-gray-400">(opsional)</span>
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
               placeholder="Deskripsi singkat layanan..."
-              className="w-full resize-none rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-[#bbb] focus:border-[#1a1a1a] focus:outline-none"
+              className="w-full resize-none rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-gray-400 focus:border-[#1a1a1a] focus:outline-none"
             />
           </div>
 
           {/* Price + Duration */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#999]">
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-gray-500">
                 Harga (Rp)
               </label>
               <input
@@ -185,11 +185,11 @@ function ServiceModal({ service, categoryId, isSaving, onSave, onClose }: Servic
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="150000"
-                className="w-full rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-[#bbb] focus:border-[#1a1a1a] focus:outline-none"
+                className="w-full rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-gray-400 focus:border-[#1a1a1a] focus:outline-none"
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#999]">
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-gray-500">
                 Durasi (menit)
               </label>
               <input
@@ -198,14 +198,14 @@ function ServiceModal({ service, categoryId, isSaving, onSave, onClose }: Servic
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 placeholder="60"
-                className="w-full rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-[#bbb] focus:border-[#1a1a1a] focus:outline-none"
+                className="w-full rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-gray-400 focus:border-[#1a1a1a] focus:outline-none"
               />
             </div>
           </div>
 
           {/* Price Type */}
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#999]">
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-gray-500">
               Tipe Harga
             </label>
             <div className="flex overflow-hidden rounded-xl border border-[#e8e8e6] text-[13px] font-medium">
@@ -224,7 +224,7 @@ function ServiceModal({ service, categoryId, isSaving, onSave, onClose }: Servic
                 </button>
               ))}
             </div>
-            <p className="mt-1.5 text-[12px] text-[#999]">
+            <p className="mt-1.5 text-xs text-gray-500">
               {priceType === 'starting_from'
                 ? 'Harga bervariasi — pelanggan mengisi detail sebelum memilih stylist'
                 : 'Harga pasti — pelanggan langsung memilih stylist'}
@@ -234,7 +234,7 @@ function ServiceModal({ service, categoryId, isSaving, onSave, onClose }: Servic
           {/* Service Questions */}
           {priceType === 'starting_from' && (
             <div className="space-y-3">
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-[#999]">
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">
                 Pertanyaan untuk Pelanggan
               </p>
 
@@ -249,7 +249,7 @@ function ServiceModal({ service, categoryId, isSaving, onSave, onClose }: Servic
                       value={q.question}
                       onChange={(e) => updateQuestion(q.id, { question: e.target.value })}
                       placeholder={`Pertanyaan ${qi + 1}`}
-                      className="flex-1 rounded-lg border border-[#e8e8e6] bg-white px-3 py-2 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-[#bbb] focus:border-[#1a1a1a] focus:outline-none"
+                      className="flex-1 rounded-lg border border-[#e8e8e6] bg-white px-3 py-2 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-gray-400 focus:border-[#1a1a1a] focus:outline-none"
                     />
                     <button
                       onClick={() => removeQuestion(q.id)}
@@ -300,11 +300,11 @@ function ServiceModal({ service, categoryId, isSaving, onSave, onClose }: Servic
                             value={opt}
                             onChange={(e) => updateOption(q.id, oi, e.target.value)}
                             placeholder={`Opsi ${oi + 1}`}
-                            className="flex-1 rounded-lg border border-[#e8e8e6] bg-white px-3 py-1.5 text-[12px] text-[#1a1a1a] transition-colors placeholder:text-[#bbb] focus:border-[#1a1a1a] focus:outline-none"
+                            className="flex-1 rounded-lg border border-[#e8e8e6] bg-white px-3 py-1.5 text-[12px] text-[#1a1a1a] transition-colors placeholder:text-gray-400 focus:border-[#1a1a1a] focus:outline-none"
                           />
                           <button
                             onClick={() => removeOption(q.id, oi)}
-                            className="p-1 text-[#bbb] transition-colors hover:text-red-400"
+                            className="p-1 text-gray-400 transition-colors hover:text-red-400"
                           >
                             <XMarkIcon className="h-4 w-4" />
                           </button>
@@ -387,7 +387,7 @@ function CategoryModal({ category, onSave, onClose }: CategoryModalProps) {
 
         <div className="space-y-4 px-6 py-5">
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#999]">
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-gray-500">
               Nama Kategori
             </label>
             <input
@@ -395,12 +395,12 @@ function CategoryModal({ category, onSave, onClose }: CategoryModalProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Contoh: Rambut"
-              className="w-full rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-[#bbb] focus:border-[#1a1a1a] focus:outline-none"
+              className="w-full rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-gray-400 focus:border-[#1a1a1a] focus:outline-none"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#999]">
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-gray-500">
                 Ikon (emoji)
               </label>
               <input
@@ -408,11 +408,11 @@ function CategoryModal({ category, onSave, onClose }: CategoryModalProps) {
                 value={icon}
                 onChange={(e) => setIcon(e.target.value)}
                 placeholder="✂️"
-                className="w-full rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-[#bbb] focus:border-[#1a1a1a] focus:outline-none"
+                className="w-full rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-gray-400 focus:border-[#1a1a1a] focus:outline-none"
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#999]">
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-gray-500">
                 Deskripsi
               </label>
               <input
@@ -420,7 +420,7 @@ function CategoryModal({ category, onSave, onClose }: CategoryModalProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Opsional"
-                className="w-full rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-[#bbb] focus:border-[#1a1a1a] focus:outline-none"
+                className="w-full rounded-xl border border-[#e8e8e6] bg-[#fafaf8] px-3 py-2.5 text-[13px] text-[#1a1a1a] transition-colors placeholder:text-gray-400 focus:border-[#1a1a1a] focus:outline-none"
               />
             </div>
           </div>
@@ -645,7 +645,7 @@ export function ServicesSection() {
                   <div>
                     <p className="text-[13px] font-medium text-[#1a1a1a]">{category.name}</p>
                     {category.description && (
-                      <p className="text-[12px] text-[#999]">{category.description}</p>
+                      <p className="text-xs text-gray-500">{category.description}</p>
                     )}
                   </div>
                 </div>
@@ -696,7 +696,7 @@ export function ServicesSection() {
                       <span className="text-xl">{category.icon || '✨'}</span>
                       <div className="text-left">
                         <p className="text-[13px] font-semibold text-[#1a1a1a]">{category.name}</p>
-                        <p className="text-[12px] text-[#999]">{categoryServices.length} layanan</p>
+                        <p className="text-xs text-gray-500">{categoryServices.length} layanan</p>
                       </div>
                     </div>
                     <div className="text-[#666]">{isExpanded ? '−' : '+'}</div>
@@ -705,7 +705,7 @@ export function ServicesSection() {
                   {isExpanded && (
                     <div className="space-y-3 bg-white p-4">
                       {categoryServices.length === 0 ? (
-                        <p className="py-4 text-center text-[12px] text-[#999]">
+                        <p className="py-4 text-center text-xs text-gray-500">
                           Belum ada layanan di kategori ini
                         </p>
                       ) : (
@@ -725,7 +725,7 @@ export function ServicesSection() {
                                   </span>
                                 )}
                               </div>
-                              <p className="mt-0.5 text-[12px] text-[#999]">
+                              <p className="mt-0.5 text-xs text-gray-500">
                                 {service.price_type === 'starting_from' ? 'Mulai ' : ''}Rp{' '}
                                 {service.price.toLocaleString('id-ID')} · {service.duration} menit
                               </p>

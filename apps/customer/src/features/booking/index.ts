@@ -3,7 +3,6 @@ export { BookingSummary } from "./components/booking-summary";
 export { BottomCTA } from "./components/bottom-cta";
 export { CalendarView } from "./components/calendar-view";
 export { CategoryGrid } from "./components/category-grid";
-export { DigitalTicket } from "./components/digital-ticket";
 export { NavigationButtons } from "./components/navigation-buttons";
 export { PaymentOptions } from "./components/payment-options";
 export { ProductUpsell } from "./components/product-upsell";

@@ -104,6 +104,7 @@ export function StepServiceDetail({ onNext, onBack }: Props) {
       if (q.type === "chips") merged[q.id] = chipAnswers[q.id] ?? [];
       if (q.type === "photo") merged[q.id] = photoAnswers[q.id] ?? "";
     });
+    console.log("[StepServiceDetail] Saving form answers:", merged);
     setFormAnswers(merged as Parameters<typeof setFormAnswers>[0]);
     try {
       localStorage.setItem("service_detail_answers", JSON.stringify(merged));

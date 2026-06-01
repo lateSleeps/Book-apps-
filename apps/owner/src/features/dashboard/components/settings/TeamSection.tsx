@@ -93,19 +93,31 @@ export function TeamSection() {
 
         {stylists.length === 0 ? (
           <div className="py-12 text-center">
-            <p className="text-[13px] text-[#999]">Belum ada staff terdaftar</p>
+            <p className="text-sm text-gray-500">Belum ada staff terdaftar</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-[13px]">
+            <table className="w-full">
               <thead>
                 <tr className="border-b border-[#e8e8e6] bg-[#f9f9f7]">
-                  <th className="px-4 py-3 text-left font-semibold text-[#1a1a1a]">Nama</th>
-                  <th className="px-4 py-3 text-left font-semibold text-[#1a1a1a]">Peran</th>
-                  <th className="px-4 py-3 text-left font-semibold text-[#1a1a1a]">Kontak</th>
-                  <th className="px-4 py-3 text-left font-semibold text-[#1a1a1a]">Spesialisasi</th>
-                  <th className="px-4 py-3 text-left font-semibold text-[#1a1a1a]">Status</th>
-                  <th className="px-4 py-3 text-left font-semibold text-[#1a1a1a]">Aksi</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                    Nama
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                    Peran
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                    Kontak
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                    Spesialisasi
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
+                    Aksi
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -131,7 +143,7 @@ export function TeamSection() {
                           <div>
                             <p className="font-medium text-[#1a1a1a]">{name}</p>
                             {stylist.bio && (
-                              <p className="line-clamp-1 text-[11px] text-[#999]">{stylist.bio}</p>
+                              <p className="line-clamp-1 text-xs text-gray-500">{stylist.bio}</p>
                             )}
                           </div>
                         </div>
@@ -148,7 +160,7 @@ export function TeamSection() {
                             <p className="text-[12px]">{stylist.user.email}</p>
                           )}
                           {!stylist.user?.phone && !stylist.user?.email && (
-                            <span className="text-[#bbb]">—</span>
+                            <span className="text-gray-500">—</span>
                           )}
                         </div>
                       </td>
@@ -170,7 +182,7 @@ export function TeamSection() {
                             )}
                           </div>
                         ) : (
-                          <span className="text-[#bbb]">—</span>
+                          <span className="text-gray-500">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3">

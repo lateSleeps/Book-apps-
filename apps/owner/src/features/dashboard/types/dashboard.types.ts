@@ -1,4 +1,10 @@
-export type BookingStatus = 'UPCOMING' | 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
+export type BookingStatus =
+  | 'UPCOMING'
+  | 'CONFIRMED'
+  | 'IN_PROGRESS'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'NO_SHOW';
 export type PaymentStatus = 'UNPAID' | 'DEPOSIT' | 'PAID';
 export type VisitorType = 'BOOKING' | 'WALK_IN';
 
@@ -6,6 +12,15 @@ export interface AddOn {
   id: string;
   name: string;
   price: number;
+  quantity?: number;
+}
+
+export interface ServiceQuestion {
+  id: string;
+  question: string;
+  type: 'chips' | 'photo';
+  required: boolean;
+  options: string[];
 }
 
 export interface DashboardBooking {
@@ -13,6 +28,7 @@ export interface DashboardBooking {
   bookingCode: string;
   customerName: string;
   customerPhone: string;
+  customerEmail?: string;
   serviceName: string;
   categoryName: string;
   stylistName: string;
@@ -20,15 +36,18 @@ export interface DashboardBooking {
   stylistColor: string;
   date: string;
   timeSlot: string;
+  endTime: string;
+  createdAt?: string;
   duration: number;
   price: number;
   status: BookingStatus;
-  paymentStatus: PaymentStatus;
-  paymentType: 'DEPOSIT' | 'FULL' | null;
   visitorType: VisitorType;
   addOns?: AddOn[];
-  treatmentNotes?: string;
   notes?: string;
+  paymentProofUrl?: string;
+  paymentStatus?: 'dp' | 'lunas' | 'pending';
+  promoCode?: string;
+  serviceQuestions?: ServiceQuestion[];
 }
 
 export interface DashboardStats {

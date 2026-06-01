@@ -175,7 +175,27 @@
       "Bash(sh -)",
       "Bash(command -v pnpm)",
       "Bash(npx drizzle-kit *)",
-      "Bash(npm exec *)"
+      "Bash(npm exec *)",
+      "Bash(git diff *)",
+      "Bash(pnpm add *)",
+      "Bash(pnpm -F customer build)",
+      "Bash(pnpm dev:owner)",
+      "Bash(pnpm -F owner run dev --port 3001)",
+      "Bash(pnpm -F owner run build)",
+      "Bash(pnpm -F owner run dev)",
+      "Bash(curl -s http://localhost:3001/dashboard/bookings)",
+      "Bash(pkill -9 -f \"next dev\")",
+      "Bash(node /tmp/check-supabase.js)",
+      "Bash(pnpm -F customer run dev)",
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
+      "Bash(npx tsx *)",
+      "Bash(node seed-bookings.js)",
+      "Bash(pnpm exec *)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://mezitgxxjbujitpanmnr.supabase.co\" NEXT_PUBLIC_SUPABASE_ANON_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1leml0Z3h4amJ1aml0cGFubW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2ODg1ODAsImV4cCI6MjA5NTI2NDU4MH0.Fh4V3CdpeEDajuaM7iZW_W-4AEmM9aJQcJDr6m_djos\" pnpm install @supabase/supabase-js -w)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://mezitgxxjbujitpanmnr.supabase.co\" NEXT_PUBLIC_SUPABASE_ANON_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1leml0Z3h4amJ1aml0cGFubW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2ODg1ODAsImV4cCI6MjA5NTI2NDU4MH0.Fh4V3CdpeEDajuaM7iZW_W-4AEmM9aJQcJDr6m_djos\" node seed-bookings.js)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://mezitgxxjbujitpanmnr.supabase.co\" NEXT_PUBLIC_SUPABASE_ANON_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1leml0Z3h4amJ1aml0cGFubW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2ODg1ODAsImV4cCI6MjA5NTI2NDU4MH0.Fh4V3CdpeEDajuaM7iZW_W-4AEmM9aJQcJDr6m_djos\" node check-data.js)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://mezitgxxjbujitpanmnr.supabase.co\" NEXT_PUBLIC_SUPABASE_ANON_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1leml0Z3h4amJ1aml0cGFubW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2ODg1ODAsImV4cCI6MjA5NTI2NDU4MH0.Fh4V3CdpeEDajuaM7iZW_W-4AEmM9aJQcJDr6m_djos\" node seed-complete.js)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://mezitgxxjbujitpanmnr.supabase.co\" SUPABASE_SERVICE_ROLE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1leml0Z3h4amJ1aml0cGFubW5yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTY4ODU4MCwiZXhwIjoyMDk1MjY0NTgwfQ.MK-Y35W2pbmY6t_ZYQ2gGHxrtrsgpYdpVvOA9IhK1Tg\" node seed-with-service-role.js)"
     ]
   }
 }

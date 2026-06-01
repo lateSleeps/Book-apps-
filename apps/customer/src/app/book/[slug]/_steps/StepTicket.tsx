@@ -1,9 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
 import { BottomCTA } from "@/features/booking/components/bottom-cta";
-import { DigitalTicket } from "@/features/booking/components/digital-ticket";
-import { ErrorAlert } from "@/features/booking/components/error-alert";
 import { useBookingStore } from "@/features/booking/hooks/use-booking-store";
 
 interface Props {
@@ -11,299 +8,126 @@ interface Props {
 }
 
 export function StepTicket({ onDone }: Props) {
-  const { reset, bookingCode, pin, date, timeSlot } = useBookingStore();
-  const [showFarewell, setShowFarewell] = useState(false);
-  const [downloadError, setDownloadError] = useState<string | null>(null);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const ticketRef = useRef<HTMLDivElement>(null);
+  const { reset, stylist, timeSlot, date } = useBookingStore();
 
-  const displayCode = bookingCode || "RB-0522-7228";
-  const displayPin = pin || "7228";
-  const displayDate = date || "2026-05-23";
-  const displayTimeSlot = timeSlot || "12:00";
-  const formattedDate = displayDate
-    ? new Date(displayDate).toLocaleDateString("id-ID", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : "-";
-
-  async function downloadTicket() {
-    setIsDownloading(true);
-    setDownloadError(null);
-
-    try {
-      if (typeof document === "undefined") {
-        throw new Error("Browser tidak mendukung unduhan file");
-      }
-
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Canvas tidak dapat diinisialisasi");
-
-      const width = 400 * 2;
-      const height = 600 * 2;
-      canvas.width = width;
-      canvas.height = height;
-
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, width, height);
-
-      const drawText = (
-        text: string,
-        x: number,
-        y: number,
-        fontSize: number,
-        fontWeight: string = "normal",
-        align: string = "left",
-      ) => {
-        ctx.font = `${fontWeight} ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto`;
-        ctx.fillStyle = "#000000";
-        ctx.textAlign = align as CanvasTextAlign;
-        ctx.fillText(text, x, y);
-      };
-
-      let yPos = 60;
-      drawText("🎉", width / 2, yPos, 80, "normal", "center");
-      yPos += 100;
-      drawText("Terima kasih!", width / 2, yPos, 40, "bold", "center");
-      yPos += 50;
-
-      ctx.font = '24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
-      ctx.fillStyle = "#999999";
-      ctx.textAlign = "center";
-      ctx.fillText("QR Code", width / 2, yPos);
-      yPos += 60;
-
-      ctx.strokeStyle = "#cccccc";
-      ctx.lineWidth = 2;
-      const qrSize = 120;
-      ctx.strokeRect((width - qrSize) / 2, yPos, qrSize, qrSize);
-      ctx.fillStyle = "#f5f5f5";
-      ctx.fillRect((width - qrSize) / 2, yPos, qrSize, qrSize);
-      yPos += qrSize + 40;
-
-      ctx.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
-      ctx.fillStyle = "#999999";
-      ctx.textAlign = "center";
-      ctx.fillText("atau PIN", width / 2, yPos);
-      yPos += 40;
-
-      drawText(displayPin, width / 2, yPos, 56, "bold", "center");
-      yPos += 80;
-
-      ctx.strokeStyle = "#eeeeee";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(40, yPos);
-      ctx.lineTo(width - 40, yPos);
-      ctx.stroke();
-      yPos += 40;
-
-      ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
-      ctx.fillStyle = "#999999";
-      ctx.textAlign = "left";
-      ctx.fillText("BOOKING ID", 40, yPos);
-      yPos += 28;
-
-      ctx.font =
-        'bold 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
-      ctx.fillStyle = "#000000";
-      ctx.fillText(displayCode, 40, yPos);
-      yPos += 50;
-
-      ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
-      ctx.fillStyle = "#999999";
-      ctx.fillText("TANGGAL & WAKTU", 40, yPos);
-      yPos += 28;
-
-      ctx.font =
-        'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
-      ctx.fillStyle = "#000000";
-      ctx.fillText(`${formattedDate} · ${displayTimeSlot}`, 40, yPos);
-
-      return new Promise<boolean>((resolve) => {
-        canvas.toBlob((blob) => {
-          try {
-            if (!blob) throw new Error("Gagal membuat file. Coba lagi.");
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `ticket-${bookingCode || "booking"}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            setTimeout(() => URL.revokeObjectURL(url), 100);
-            setIsDownloading(false);
-            resolve(true);
-          } catch (err) {
-            const error =
-              err instanceof Error ? err.message : "Gagal mengunduh tiket";
-            setDownloadError(error);
-            setIsDownloading(false);
-            resolve(false);
-          }
-        }, "image/png");
-      });
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Gagal membuat tiket. Coba lagi.";
-      setDownloadError(message);
-      setIsDownloading(false);
-      return false;
-    }
-  }
-
-  async function handleDone() {
-    const success = await downloadTicket();
-    if (success) {
-      setTimeout(() => setShowFarewell(true), 1000);
-    }
-  }
-
-  function handleFarewellClose() {
+  function handleDone() {
     reset();
     onDone();
   }
 
-  return (
-    <div className="flex flex-col h-full overflow-hidden bg-bg-ticket">
-      {downloadError && (
-        <ErrorAlert
-          message={downloadError}
-          onDismiss={() => setDownloadError(null)}
-          actionLabel="Coba Lagi"
-          onAction={async () => {
-            setDownloadError(null);
-            await downloadTicket();
-          }}
-        />
-      )}
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString("id-ID", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
+  return (
+    <div className="flex flex-col h-full overflow-hidden bg-bg">
       <div className="flex-1 overflow-y-auto">
-        <div className="px-s20 pt-s32 pb-s32" ref={ticketRef}>
-          <DigitalTicket />
+        <div className="flex flex-col items-center px-s20 pt-s48 pb-s32 text-center gap-6">
+          {/* Icon */}
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#f0fdf4]">
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#16a34a"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          </div>
+
+          {/* Title */}
+          <div className="flex flex-col gap-2">
+            <h1 className="text-[28px] font-bold text-label leading-tight">
+              Bukti pembayaran diterima!
+            </h1>
+            <p className="text-[15px] text-label2 leading-relaxed">
+              Booking kamu sedang menunggu konfirmasi dari salon.
+            </p>
+          </div>
+
+          {/* Info card */}
+          <div className="w-full rounded-2xl border border-sep bg-surface p-5 text-left flex flex-col gap-3">
+            {date && (
+              <div className="flex justify-between text-[14px]">
+                <span className="text-label3">Tanggal</span>
+                <span className="font-medium text-label">
+                  {formatDate(date)}
+                </span>
+              </div>
+            )}
+            {timeSlot && (
+              <div className="flex justify-between text-[14px]">
+                <span className="text-label3">Waktu</span>
+                <span className="font-medium text-label">{timeSlot}</span>
+              </div>
+            )}
+            {stylist && (
+              <div className="flex justify-between text-[14px]">
+                <span className="text-label3">Stylist</span>
+                <span className="font-medium text-label">{stylist.name}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Timeline */}
+          <div className="w-full rounded-2xl bg-[#fffbeb] border border-[#fde68a] p-5 text-left flex flex-col gap-3">
+            <p className="text-[13px] font-semibold text-[#92400e] uppercase tracking-wide">
+              Selanjutnya
+            </p>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f59e0b] text-white text-[10px] font-bold">
+                  1
+                </div>
+                <p className="text-[13px] text-[#78350f] leading-snug">
+                  Salon akan mengkonfirmasi booking kamu dalam{" "}
+                  <strong>maksimal 1 jam</strong>. Jika tidak ada respons,
+                  booking otomatis dikonfirmasi.
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f59e0b] text-white text-[10px] font-bold">
+                  2
+                </div>
+                <p className="text-[13px] text-[#78350f] leading-snug">
+                  Cek status booking kamu di halaman{" "}
+                  <strong>Cek Booking</strong> menggunakan nomor HP dan PIN dari
+                  tiket.
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f59e0b] text-white text-[10px] font-bold">
+                  3
+                </div>
+                <p className="text-[13px] text-[#78350f] leading-snug">
+                  Jika terkonfirmasi, tiket QR code kamu akan tersedia di
+                  halaman Cek Booking.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA ke check booking */}
+          <a
+            href="/check-booking"
+            className="w-full rounded-2xl border border-sep bg-surface py-4 text-center text-[14px] font-semibold text-label transition-all hover:bg-sep active:scale-[0.98]"
+          >
+            Cek Status Booking →
+          </a>
         </div>
       </div>
 
-      <BottomCTA
-        label={isDownloading ? "Mengunduh..." : "Selesai"}
-        variant={isDownloading ? "default" : "ready"}
-        disabled={isDownloading}
-        onClick={handleDone}
-      />
-
-      {showFarewell && (
-        <>
-          <div
-            className="absolute inset-0 z-40 bg-black/40 backdrop-blur-[3px] animate-fadeIn"
-            onClick={handleFarewellClose}
-          />
-          <div className="absolute bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-[32px] bg-white px-s24 pt-s32 pb-[max(env(safe-area-inset-bottom),32px)] animate-sheetUp overflow-hidden relative">
-            <svg
-              className="absolute top-0 left-0 w-[160px] h-[170px]"
-              viewBox="0 0 130 140"
-              style={{ pointerEvents: "none" }}
-            >
-              <circle cx="20" cy="25" r="6" fill="#FBBF24" opacity="0.7" />
-              <circle cx="30" cy="20" r="5" fill="#FBBF24" opacity="0.6" />
-              <circle cx="25" cy="35" r="5" fill="#FBBF24" opacity="0.6" />
-              <circle cx="35" cy="30" r="4" fill="#FBBF24" opacity="0.5" />
-              <path
-                d="M 50 50 Q 60 45 70 50 T 90 50"
-                stroke="#EC4899"
-                strokeWidth="2.5"
-                fill="none"
-                strokeLinecap="round"
-                opacity="0.5"
-              />
-              <circle cx="15" cy="80" r="5" fill="#4ADE80" opacity="0.6" />
-              <circle cx="25" cy="85" r="4" fill="#4ADE80" opacity="0.5" />
-              <circle cx="20" cy="95" r="4.5" fill="#4ADE80" opacity="0.5" />
-              <circle cx="35" cy="90" r="3.5" fill="#4ADE80" opacity="0.4" />
-              <circle cx="70" cy="110" r="3" fill="#A78BFA" opacity="0.6" />
-            </svg>
-
-            <svg
-              className="absolute top-0 right-0 w-[130px] h-[130px]"
-              viewBox="0 0 100 100"
-              style={{ pointerEvents: "none" }}
-            >
-              <circle cx="80" cy="15" r="7" fill="#FB923C" opacity="0.6" />
-              <circle cx="60" cy="20" r="5" fill="#FB923C" opacity="0.5" />
-              <circle cx="85" cy="50" r="4" fill="#60A5FA" opacity="0.5" />
-              <circle cx="70" cy="55" r="3" fill="#60A5FA" opacity="0.4" />
-            </svg>
-
-            <svg
-              className="absolute bottom-0 right-0 w-[120px] h-[130px]"
-              viewBox="0 0 120 130"
-              style={{ pointerEvents: "none" }}
-            >
-              <path
-                d="M 20 40 Q 30 30 40 40 T 60 40 T 80 40 T 100 40"
-                stroke="#60A5FA"
-                strokeWidth="3"
-                fill="none"
-                strokeLinecap="round"
-                opacity="0.4"
-              />
-              <path
-                d="M 20 70 Q 30 60 40 70 T 60 70 T 80 70 T 100 70"
-                stroke="#60A5FA"
-                strokeWidth="2.5"
-                fill="none"
-                strokeLinecap="round"
-                opacity="0.3"
-              />
-              <circle cx="15" cy="100" r="8" fill="#FB923C" opacity="0.5" />
-              <circle cx="90" cy="110" r="6" fill="#FB923C" opacity="0.4" />
-              <circle cx="55" cy="120" r="5" fill="#FB923C" opacity="0.4" />
-            </svg>
-
-            <svg
-              className="absolute bottom-0 left-0 w-[100px] h-[110px]"
-              viewBox="0 0 100 110"
-              style={{ pointerEvents: "none" }}
-            >
-              <circle cx="20" cy="20" r="5" fill="#F472B6" opacity="0.5" />
-              <path
-                d="M 30 50 Q 40 45 50 50 T 70 50"
-                stroke="#4ADE80"
-                strokeWidth="2"
-                fill="none"
-                strokeLinecap="round"
-                opacity="0.4"
-              />
-              <circle cx="15" cy="80" r="3.5" fill="#FBBF24" opacity="0.5" />
-              <circle cx="70" cy="90" r="4" fill="#FBBF24" opacity="0.4" />
-            </svg>
-
-            <div className="text-center mb-[24px] relative z-10">
-              <div className="text-[72px] mb-[16px]">🙏🏼</div>
-              <h2 className="text-[32px] font-bold text-gray-900 leading-tight mb-[16px]">
-                Terima kasih atas reservasinya.
-              </h2>
-              <p className="text-gray-600 text-[14px] leading-relaxed">
-                Kedatangan tepat waktu sangat kami apresiasi, keterlambatan 15
-                menit masih bisa ditoleransi. Perubahan jadwal maksimal H-1 dan
-                2 kali. Pembatalan sepihak membuat DP tidak dapat di-refund.
-              </p>
-            </div>
-
-            <button
-              onClick={handleFarewellClose}
-              className="mt-[28px] w-full rounded-[12px] bg-gray-900 text-white py-[14px] px-[16px] text-[16px] font-semibold transition-all active:scale-[0.98] shadow-lg hover:bg-gray-800 relative z-10"
-            >
-              Tutup
-            </button>
-          </div>
-        </>
-      )}
+      <BottomCTA label="Selesai" variant="ready" onClick={handleDone} />
     </div>
   );
 }

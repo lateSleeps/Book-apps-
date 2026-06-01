@@ -50,7 +50,7 @@ export function StepContact({ onNext }: Props) {
   const canProceed = name.trim().length >= 2 && phone.trim().length >= 8;
 
   function handleContinue() {
-    setContact(name.trim(), phone.trim());
+    setContact(name.trim(), phone.trim(), "");
     setShowAddons(true);
   }
 

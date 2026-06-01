@@ -8,7 +8,7 @@ import {
   isToday,
   startOfDay,
 } from "date-fns";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import { BottomCTA } from "@/features/booking/components/bottom-cta";
 import { SelectedServicesIndicator } from "@/features/booking/components/selected-services-indicator";
@@ -130,7 +130,12 @@ interface Props {
 }
 
 export function StepServices({ slug, onNext }: Props) {
-  const { salonId, salon, isLoading: salonLoading } = useSalon(slug);
+  const {
+    salonId,
+    salon,
+    isLoading: salonLoading,
+    error: salonError,
+  } = useSalon(slug);
   const { services, isLoading: servicesLoading } = useServices(salonId ?? "");
 
   const {
@@ -140,7 +145,13 @@ export function StepServices({ slug, onNext }: Props) {
     addService,
     removeService,
     totalPrice,
+    reset,
   } = useBookingStore();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    reset();
+  }, []);
 
   const strip = useMemo(() => buildStrip(), []);
   const [sheetCategoryId, setSheetCategoryId] = useState<string | null>(null);
@@ -240,26 +251,47 @@ export function StepServices({ slug, onNext }: Props) {
             <h1 className="text-ts-hero font-bold text-label leading-none">
               {greeting}.
             </h1>
-            <button
-              onClick={handleShare}
-              aria-label="Bagikan"
-              className="flex h-9 w-9 items-center justify-center rounded-rF border border-sep bg-surface text-label2 transition-all hover:bg-sep active:scale-95"
-            >
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            <div className="flex items-center gap-2">
+              <a
+                href="/check-booking"
+                className="flex h-9 items-center gap-1.5 rounded-rF border border-sep bg-surface px-3 text-[12px] font-medium text-label2 transition-all hover:bg-sep active:scale-95"
               >
-                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                <polyline points="16 6 12 2 8 6" />
-                <line x1="12" y1="2" x2="12" y2="15" />
-              </svg>
-            </button>
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 11l3 3L22 4" />
+                  <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                </svg>
+                Cek Booking
+              </a>
+              <button
+                onClick={handleShare}
+                aria-label="Bagikan"
+                className="flex h-9 w-9 items-center justify-center rounded-rF border border-sep bg-surface text-label2 transition-all hover:bg-sep active:scale-95"
+              >
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                  <polyline points="16 6 12 2 8 6" />
+                  <line x1="12" y1="2" x2="12" y2="15" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -324,7 +356,18 @@ export function StepServices({ slug, onNext }: Props) {
         <div className="h-px bg-sep mx-s20 mb-s4" />
 
         {/* Category cards */}
-        {isLoading ? (
+        {salonError ? (
+          <div className="flex justify-center py-16">
+            <div className="text-center">
+              <p className="text-label2 font-semibold text-red-500 mb-2">
+                Salon tidak ditemukan
+              </p>
+              <p className="text-label3 text-label3">
+                Salon dengan nama &quot;{slug}&quot; tidak tersedia.
+              </p>
+            </div>
+          </div>
+        ) : isLoading ? (
           <div className="flex justify-center py-16">
             <div className="text-label2">Loading...</div>
           </div>

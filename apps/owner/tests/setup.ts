@@ -9,7 +9,7 @@ vi.mock('next/navigation', () => ({
     back: vi.fn(),
     prefetch: vi.fn(),
   }),
-  usePathname: () => '/book/rara-beauty',
+  usePathname: () => '/book/rara-beauty-jakarta',
   useSearchParams: () => new URLSearchParams(),
 }));
 
