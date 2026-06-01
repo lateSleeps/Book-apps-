@@ -45,7 +45,7 @@ export interface DashboardBooking {
   addOns?: AddOn[];
   notes?: string;
   paymentProofUrl?: string;
-  paymentStatus?: 'dp' | 'lunas' | 'pending';
+  paymentStatus?: 'PAID' | 'DEPOSIT' | 'UNPAID';
   promoCode?: string;
   serviceQuestions?: ServiceQuestion[];
 }

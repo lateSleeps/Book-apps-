@@ -78,7 +78,7 @@ export const bookingsRouter = router({
         promoCode: booking.promo_code,
         addOns: booking.addons ? (Array.isArray(booking.addons) ? booking.addons : []) : undefined,
         serviceQuestions: booking.services?.service_questions || [],
-        visitorType: 'BOOKING' as const,
+        visitorType: (booking.notes === 'Walk-in' ? 'WALK_IN' : 'BOOKING') as 'WALK_IN' | 'BOOKING',
         createdAt: booking.created_at,
       };
     });
@@ -97,12 +97,14 @@ export const bookingsRouter = router({
         endTime: z.string(),
         customerName: z.string(),
         customerPhone: z.string(),
-        customerEmail: z.string(),
+        customerEmail: z.string().optional().default(''),
         notes: z.string().optional(),
+        paymentStatus: z.enum(['dp', 'lunas', 'pending']).optional(),
       })
     )
     .mutation(async ({ input }) => {
       const confirmationCode = 'BK' + Math.random().toString(36).substr(2, 9).toUpperCase();
+      const isWalkIn = input.notes === 'Walk-in';
 
       const { data, error } = await supabase
         .from('bookings')
@@ -119,7 +121,8 @@ export const bookingsRouter = router({
             customer_email: input.customerEmail,
             notes: input.notes || null,
             confirmation_code: confirmationCode,
-            status: 'pending',
+            status: isWalkIn ? 'CONFIRMED' : 'pending',
+            payment_status: isWalkIn ? 'lunas' : input.paymentStatus ?? 'dp',
           },
         ])
         .select();
@@ -160,5 +163,58 @@ export const bookingsRouter = router({
 
       if (error) throw error;
       return data?.[0] || null;
+    }),
+
+  processPayment: publicProcedure
+    .input(
+      z.object({
+        bookingId: z.string(),
+        paymentMethod: z.enum(['cash', 'transfer', 'qris']),
+        amountReceived: z.number().int().min(0),
+        servicePrice: z.number().int().min(0),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const changeAmount =
+        input.paymentMethod === 'cash' ? Math.max(0, input.amountReceived - input.servicePrice) : 0;
+      const effectiveAmount =
+        input.paymentMethod === 'cash' ? input.amountReceived : input.servicePrice;
+
+      const { data, error } = await supabase
+        .from('bookings')
+        .update({
+          payment_status: 'lunas',
+          payment_method: input.paymentMethod,
+          amount_paid: effectiveAmount,
+          change_amount: changeAmount,
+          paid_at: new Date().toISOString(),
+          status: 'COMPLETED',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', input.bookingId)
+        .select('id, payment_status, status')
+        .single();
+
+      if (error) {
+        // Only fall back if the error is due to missing columns (migration not yet run)
+        if (!error.message?.includes('column') && !error.message?.includes('does not exist')) {
+          throw error;
+        }
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('bookings')
+          .update({
+            payment_status: 'lunas',
+            status: 'COMPLETED',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', input.bookingId)
+          .select('id, payment_status, status')
+          .single();
+
+        if (fallbackError) throw fallbackError;
+        return { ...fallbackData, changeAmount, amountReceived: effectiveAmount };
+      }
+
+      return { ...data, changeAmount, amountReceived: effectiveAmount };
     }),
 });

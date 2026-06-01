@@ -173,6 +173,13 @@ export default function OverviewPage() {
       utils.bookings.getBySalon.invalidate();
     },
   });
+  const processPaymentMutation = trpc.bookings.processPayment.useMutation({
+    onSuccess: (_data, variables) => {
+      setPaymentStatusMap((m) => ({ ...m, [variables.bookingId]: 'PAID' }));
+      setBookingStatusMap((m) => ({ ...m, [variables.bookingId]: 'COMPLETED' }));
+      utils.bookings.getBySalon.invalidate();
+    },
+  });
   const [greeting, setGreeting] = useState('');
   const [dateLabel, setDateLabel] = useState('');
   const [isMobile, setIsMobile] = useState(false);
@@ -203,6 +210,9 @@ export default function OverviewPage() {
   const [bookingStatusMap, setBookingStatusMap] = useState<
     Record<string, import('@/features/dashboard/types/dashboard.types').BookingStatus>
   >({});
+  const [paymentStatusMap, setPaymentStatusMap] = useState<
+    Record<string, 'PAID' | 'DEPOSIT' | 'UNPAID'>
+  >({});
   const [confirmDialog, setConfirmDialog] = useState<{
     bookingId: string;
     customerName: string;
@@ -217,6 +227,9 @@ export default function OverviewPage() {
     reason: string;
   } | null>(null);
   const [declineReason, setDeclineReason] = useState('');
+  const [paymentError, setPaymentError] = useState<{ bookingId: string; message: string } | null>(
+    null
+  );
   const [proofZoom, setProofZoom] = useState<string | null>(null);
   const [visitorSearch, setVisitorSearch] = useState('');
   const [mobileSelectedId, setMobileSelectedId] = useState<string | null>(null);
@@ -464,9 +477,13 @@ export default function OverviewPage() {
   const effectiveBookings = useMemo(
     () =>
       [...upcomingBookings, ...manualBookings]
-        .map((b) => ({ ...b, status: bookingStatusMap[b.id] ?? b.status }))
+        .map((b) => ({
+          ...b,
+          status: bookingStatusMap[b.id] ?? b.status,
+          paymentStatus: paymentStatusMap[b.id] ?? b.paymentStatus,
+        }))
         .filter((b) => !(b.visitorType === 'BOOKING' && b.paymentStatus === 'UNPAID')),
-    [upcomingBookings, manualBookings, bookingStatusMap]
+    [upcomingBookings, manualBookings, bookingStatusMap, paymentStatusMap]
   );
 
   const filteredVisitors = useMemo(() => {
@@ -1371,144 +1388,145 @@ export default function OverviewPage() {
                                     Chat WA
                                   </a>
 
-                                  {/* Bukti pembayaran — tampil untuk UPCOMING dan CONFIRMED */}
-                                  {(b.status === 'UPCOMING' ||
-                                    b.status === 'CONFIRMED' ||
-                                    b.status === 'pending' ||
-                                    b.status === 'PENDING' ||
-                                    b.status === 'COMPLETED' ||
-                                    b.status === 'completed' ||
-                                    b.status === 'IN_PROGRESS') && (
-                                    <div
-                                      className="mt-1 flex flex-col gap-2"
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      <p className="text-[0.6875rem] font-semibold uppercase tracking-wider text-[#555]">
-                                        Bukti Pembayaran
-                                      </p>
-                                      {/* Thumbnail bukti pembayaran — dari database */}
-                                      {b.paymentProofUrl ? (
-                                        <button
-                                          onClick={() => setProofZoom(b.id)}
-                                          className="group relative w-full overflow-hidden rounded-xl border border-[#e8e8e6] transition-colors hover:border-[#ccc]"
-                                        >
-                                          <img
-                                            src={b.paymentProofUrl}
-                                            alt="Bukti pembayaran"
-                                            className="h-[7rem] w-full object-cover"
-                                          />
-                                          <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/10">
-                                            <div className="rounded-full bg-black/50 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
-                                              <MagnifyingGlassIcon className="h-3 w-3 text-white" />
+                                  {/* Bukti pembayaran — hanya untuk booking reguler (bukan walk-in) */}
+                                  {b.visitorType !== 'WALK_IN' &&
+                                    (b.status === 'UPCOMING' ||
+                                      b.status === 'CONFIRMED' ||
+                                      b.status === 'pending' ||
+                                      b.status === 'PENDING' ||
+                                      b.status === 'COMPLETED' ||
+                                      b.status === 'completed' ||
+                                      b.status === 'IN_PROGRESS') && (
+                                      <div
+                                        className="mt-1 flex flex-col gap-2"
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        <p className="text-[0.6875rem] font-semibold uppercase tracking-wider text-[#555]">
+                                          Bukti Pembayaran
+                                        </p>
+                                        {/* Thumbnail bukti pembayaran — dari database */}
+                                        {b.paymentProofUrl ? (
+                                          <button
+                                            onClick={() => setProofZoom(b.id)}
+                                            className="group relative w-full overflow-hidden rounded-xl border border-[#e8e8e6] transition-colors hover:border-[#ccc]"
+                                          >
+                                            <img
+                                              src={b.paymentProofUrl}
+                                              alt="Bukti pembayaran"
+                                              className="h-[7rem] w-full object-cover"
+                                            />
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/10">
+                                              <div className="rounded-full bg-black/50 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
+                                                <MagnifyingGlassIcon className="h-3 w-3 text-white" />
+                                              </div>
                                             </div>
-                                          </div>
-                                        </button>
-                                      ) : (
-                                        <div className="flex h-[7rem] w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#e0e0e0] bg-[#fafafa]">
-                                          <svg
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="#ccc"
-                                            strokeWidth="1.5"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                          >
-                                            <rect x="3" y="3" width="18" height="18" rx="2" />
-                                            <circle cx="8.5" cy="8.5" r="1.5" />
-                                            <path d="M21 15l-5-5L5 21" />
-                                          </svg>
-                                          <p className="text-[0.6875rem] text-gray-400">
-                                            Belum ada bukti pembayaran
-                                          </p>
-                                        </div>
-                                      )}
-
-                                      {/* Tombol konfirmasi & decline — hanya saat UPCOMING */}
-                                      {(b.status === 'UPCOMING' ||
-                                        b.status === 'pending' ||
-                                        b.status === 'PENDING') && (
-                                        <div className="flex gap-2">
-                                          <button
-                                            onClick={async (e) => {
-                                              e.preventDefault();
-                                              e.stopPropagation();
-                                              const id = b.id;
-                                              setBookingStatusMap((m) => ({
-                                                ...m,
-                                                [id]: 'CONFIRMED',
-                                              }));
-                                              setExpandedId(id);
-                                              await updateStatusMutation.mutateAsync({
-                                                bookingId: id,
-                                                status: 'CONFIRMED',
-                                              });
-                                              setWaBookingData({
-                                                customerName: b.customerName,
-                                                customerPhone: b.customerPhone,
-                                                serviceName: b.serviceName,
-                                                date: b.date,
-                                                timeSlot: b.timeSlot,
-                                                bookingCode: b.bookingCode,
-                                              });
-                                              setShowWANotif(true);
-                                            }}
-                                            className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#2563eb] text-[0.8125rem] font-semibold text-white transition-colors hover:bg-[#1d4ed8]"
-                                          >
-                                            <CheckIcon className="h-3.5 w-3.5 text-white" />
-                                            Konfirmasi
                                           </button>
-                                          <button
-                                            onClick={(e) => {
-                                              e.preventDefault();
-                                              e.stopPropagation();
-                                              setDeclineDialog({
-                                                bookingId: b.id,
-                                                customerName: b.customerName,
-                                                reason: '',
-                                              });
-                                              setDeclineReason('');
-                                            }}
-                                            className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl border border-[#e0e0e0] bg-[#f5f5f3] text-[0.8125rem] font-semibold text-[#ef4444] transition-colors hover:bg-[#efefed]"
-                                          >
+                                        ) : (
+                                          <div className="flex h-[7rem] w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#e0e0e0] bg-[#fafafa]">
                                             <svg
-                                              width="13"
-                                              height="13"
+                                              width="20"
+                                              height="20"
+                                              viewBox="0 0 24 24"
+                                              fill="none"
+                                              stroke="#ccc"
+                                              strokeWidth="1.5"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            >
+                                              <rect x="3" y="3" width="18" height="18" rx="2" />
+                                              <circle cx="8.5" cy="8.5" r="1.5" />
+                                              <path d="M21 15l-5-5L5 21" />
+                                            </svg>
+                                            <p className="text-[0.6875rem] text-gray-400">
+                                              Belum ada bukti pembayaran
+                                            </p>
+                                          </div>
+                                        )}
+
+                                        {/* Tombol konfirmasi & decline — hanya saat UPCOMING */}
+                                        {(b.status === 'UPCOMING' ||
+                                          b.status === 'pending' ||
+                                          b.status === 'PENDING') && (
+                                          <div className="flex gap-2">
+                                            <button
+                                              onClick={async (e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                const id = b.id;
+                                                setBookingStatusMap((m) => ({
+                                                  ...m,
+                                                  [id]: 'CONFIRMED',
+                                                }));
+                                                setExpandedId(id);
+                                                await updateStatusMutation.mutateAsync({
+                                                  bookingId: id,
+                                                  status: 'CONFIRMED',
+                                                });
+                                                setWaBookingData({
+                                                  customerName: b.customerName,
+                                                  customerPhone: b.customerPhone,
+                                                  serviceName: b.serviceName,
+                                                  date: b.date,
+                                                  timeSlot: b.timeSlot,
+                                                  bookingCode: b.bookingCode,
+                                                });
+                                                setShowWANotif(true);
+                                              }}
+                                              className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#2563eb] text-[0.8125rem] font-semibold text-white transition-colors hover:bg-[#1d4ed8]"
+                                            >
+                                              <CheckIcon className="h-3.5 w-3.5 text-white" />
+                                              Konfirmasi
+                                            </button>
+                                            <button
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                setDeclineDialog({
+                                                  bookingId: b.id,
+                                                  customerName: b.customerName,
+                                                  reason: '',
+                                                });
+                                                setDeclineReason('');
+                                              }}
+                                              className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl border border-[#e0e0e0] bg-[#f5f5f3] text-[0.8125rem] font-semibold text-[#ef4444] transition-colors hover:bg-[#efefed]"
+                                            >
+                                              <svg
+                                                width="13"
+                                                height="13"
+                                                viewBox="0 0 16 16"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                              >
+                                                <path d="M3 3l10 10M13 3L3 13" />
+                                              </svg>
+                                              Tolak
+                                            </button>
+                                          </div>
+                                        )}
+
+                                        {/* Status confirmed — tampil di bawah gambar */}
+                                        {b.status === 'CONFIRMED' && (
+                                          <div className="flex h-9 w-full items-center justify-center gap-1.5 rounded-xl bg-[#2563eb] text-[0.8125rem] font-semibold text-white">
+                                            <svg
+                                              width="14"
+                                              height="14"
                                               viewBox="0 0 16 16"
                                               fill="none"
-                                              stroke="currentColor"
+                                              stroke="white"
                                               strokeWidth="2.5"
                                               strokeLinecap="round"
                                               strokeLinejoin="round"
                                             >
-                                              <path d="M3 3l10 10M13 3L3 13" />
+                                              <path d="M3 8l3 3 7-7" />
                                             </svg>
-                                            Tolak
-                                          </button>
-                                        </div>
-                                      )}
-
-                                      {/* Status confirmed — tampil di bawah gambar */}
-                                      {b.status === 'CONFIRMED' && (
-                                        <div className="flex h-9 w-full items-center justify-center gap-1.5 rounded-xl bg-[#2563eb] text-[0.8125rem] font-semibold text-white">
-                                          <svg
-                                            width="14"
-                                            height="14"
-                                            viewBox="0 0 16 16"
-                                            fill="none"
-                                            stroke="white"
-                                            strokeWidth="2.5"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                          >
-                                            <path d="M3 8l3 3 7-7" />
-                                          </svg>
-                                          Terkonfirmasi
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
+                                            Terkonfirmasi
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
                                 </div>
 
                                 {/* Col 2: Layanan + Pembayaran */}
@@ -2059,112 +2077,172 @@ export default function OverviewPage() {
                                   {/* Card: Input pembayaran baru */}
                                   <div className="payment-input-card-mobile col-span-1 flex flex-col gap-2.5 rounded-xl border border-[#efefed] bg-white px-3 py-3 sm:col-span-2 sm:px-4 sm:py-3 md:col-span-2">
                                     <p className="text-[0.6875rem] font-medium uppercase tracking-wider text-[#555]">
-                                      Input Pembayaran
+                                      {b.paymentStatus === 'PAID'
+                                        ? 'Pembayaran Selesai'
+                                        : 'Input Pembayaran'}
                                     </p>
-                                    {/* Method pills */}
-                                    <div className="flex items-center gap-2">
-                                      {(['CASH', 'TRANSFER', 'QRIS'] as const).map((m) => (
-                                        <button
-                                          key={m}
-                                          onClick={() =>
-                                            setPaymentMethodMap((p) => ({ ...p, [b.id]: m }))
-                                          }
-                                          className={`h-7 rounded-lg border px-3 text-[0.75rem] transition-colors ${
-                                            (paymentMethodMap[b.id] ?? 'CASH') === m
-                                              ? 'border-[#1a1a1a] bg-[#1a1a1a] text-white'
-                                              : 'border-[#e8e8e8] bg-white text-[#555] hover:border-[#bbb]'
-                                          }`}
+                                    {b.paymentStatus === 'PAID' ? (
+                                      <div className="flex items-center gap-2 rounded-lg bg-[#f0fdf4] px-3 py-2.5">
+                                        <svg
+                                          width="14"
+                                          height="14"
+                                          viewBox="0 0 16 16"
+                                          fill="none"
+                                          stroke="#16a34a"
+                                          strokeWidth="2.5"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
                                         >
-                                          {m === 'CASH'
-                                            ? 'Cash'
-                                            : m === 'TRANSFER'
-                                              ? 'Transfer'
-                                              : 'QRIS'}
-                                        </button>
-                                      ))}
-                                    </div>
-                                    {/* Nominal input */}
-                                    <div className="flex h-9 items-center gap-2 rounded-lg bg-[#f8f8f6] px-3 transition-all focus-within:ring-1 focus-within:ring-[#ddd]">
-                                      <span className="shrink-0 text-[0.875rem] text-gray-500">
-                                        {(paymentMethodMap[b.id] ?? 'CASH') === 'CASH'
-                                          ? 'Uang diterima  Rp'
-                                          : 'Nominal  Rp'}
-                                      </span>
-                                      <input
-                                        type="text"
-                                        inputMode="numeric"
-                                        placeholder="0"
-                                        value={paymentAmountMap[b.id] ?? ''}
-                                        onChange={(e) =>
-                                          setPaymentAmountMap((p) => ({
-                                            ...p,
-                                            [b.id]: e.target.value.replace(/\D/g, ''),
-                                          }))
-                                        }
-                                        className="flex-1 bg-transparent text-[0.875rem] font-medium text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
-                                      />
-                                    </div>
-                                    {/* Cash calculator */}
-                                    {(paymentMethodMap[b.id] ?? 'CASH') === 'CASH' &&
-                                      (() => {
-                                        const received = parseInt(
-                                          paymentAmountMap[b.id] ?? '0',
-                                          10
-                                        );
-                                        const kembalian = received - finalTotal;
-                                        return (
-                                          <div className="flex items-center gap-3 rounded-lg bg-[#f8f8f6] px-3 py-2">
-                                            <div className="flex-1">
-                                              <p className="text-[0.6875rem] uppercase tracking-wide text-gray-500">
-                                                Tagihan
-                                              </p>
-                                              <p className="text-[0.9375rem] font-semibold text-[#1a1a1a]">
-                                                {formatRupiah(finalTotal)}
-                                              </p>
-                                            </div>
-                                            <div className="h-8 w-px bg-[#ebebeb]" />
-                                            <div className="flex-1 text-right">
-                                              <p className="text-[0.6875rem] uppercase tracking-wide text-gray-500">
-                                                Kembalian
-                                              </p>
-                                              <p
-                                                className={`text-[0.9375rem] font-semibold ${
-                                                  !paymentAmountMap[b.id]
-                                                    ? 'text-[#ccc]'
-                                                    : kembalian >= 0
-                                                      ? 'text-[#16a34a]'
-                                                      : 'text-[#ef4444]'
-                                                }`}
-                                              >
-                                                {!paymentAmountMap[b.id]
-                                                  ? '—'
-                                                  : kembalian >= 0
-                                                    ? formatRupiah(kembalian)
-                                                    : `−${formatRupiah(Math.abs(kembalian))}`}
-                                              </p>
-                                            </div>
-                                          </div>
-                                        );
-                                      })()}
-                                    {/* Method + Proses */}
-                                    <div className="flex items-center gap-2">
-                                      <button
-                                        disabled={!paymentAmountMap[b.id]}
-                                        onClick={() =>
-                                          setConfirmDialog({
-                                            bookingId: b.id,
-                                            customerName: b.customerName,
-                                            serviceName: currentService.serviceName,
-                                            amount: parseInt(paymentAmountMap[b.id] ?? '0', 10),
-                                            method: paymentMethodMap[b.id] ?? 'CASH',
-                                            finalTotal,
-                                          })
-                                        }
-                                        className="ml-auto h-8 rounded-lg bg-[#16a34a] px-4 text-[0.75rem] font-semibold text-white transition-colors hover:bg-[#15803d] disabled:cursor-not-allowed disabled:opacity-35"
-                                      >
-                                        Proses Pembayaran
-                                      </button>
-                                    </div>
+                                          <path d="M3 8l3 3 7-7" />
+                                        </svg>
+                                        <span className="text-[0.8125rem] font-semibold text-[#16a34a]">
+                                          Lunas · {formatRupiah(finalTotal)}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        {/* Method pills */}
+                                        <div className="flex items-center gap-2">
+                                          {(['CASH', 'TRANSFER', 'QRIS'] as const).map((m) => (
+                                            <button
+                                              key={m}
+                                              onClick={() =>
+                                                setPaymentMethodMap((p) => ({ ...p, [b.id]: m }))
+                                              }
+                                              className={`h-7 rounded-lg border px-3 text-[0.75rem] transition-colors ${
+                                                (paymentMethodMap[b.id] ?? 'CASH') === m
+                                                  ? 'border-[#1a1a1a] bg-[#1a1a1a] text-white'
+                                                  : 'border-[#e8e8e8] bg-white text-[#555] hover:border-[#bbb]'
+                                              }`}
+                                            >
+                                              {m === 'CASH'
+                                                ? 'Cash'
+                                                : m === 'TRANSFER'
+                                                  ? 'Transfer'
+                                                  : 'QRIS'}
+                                            </button>
+                                          ))}
+                                        </div>
+                                        {/* Nominal input */}
+                                        <div className="flex h-9 items-center gap-2 rounded-lg bg-[#f8f8f6] px-3 transition-all focus-within:ring-1 focus-within:ring-[#ddd]">
+                                          <span className="shrink-0 text-[0.875rem] text-gray-500">
+                                            {(paymentMethodMap[b.id] ?? 'CASH') === 'CASH'
+                                              ? 'Uang diterima  Rp'
+                                              : 'Nominal  Rp'}
+                                          </span>
+                                          <input
+                                            type="text"
+                                            inputMode="numeric"
+                                            placeholder="0"
+                                            value={paymentAmountMap[b.id] ?? ''}
+                                            onChange={(e) =>
+                                              setPaymentAmountMap((p) => ({
+                                                ...p,
+                                                [b.id]: e.target.value.replace(/\D/g, ''),
+                                              }))
+                                            }
+                                            className="flex-1 bg-transparent text-[0.875rem] font-medium text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
+                                          />
+                                        </div>
+                                        {/* Cash calculator */}
+                                        {(paymentMethodMap[b.id] ?? 'CASH') === 'CASH' &&
+                                          (() => {
+                                            const received = parseInt(
+                                              paymentAmountMap[b.id] ?? '0',
+                                              10
+                                            );
+                                            const kembalian = received - finalTotal;
+                                            return (
+                                              <div className="flex items-center gap-3 rounded-lg bg-[#f8f8f6] px-3 py-2">
+                                                <div className="flex-1">
+                                                  <p className="text-[0.6875rem] uppercase tracking-wide text-gray-500">
+                                                    Tagihan
+                                                  </p>
+                                                  <p className="text-[0.9375rem] font-semibold text-[#1a1a1a]">
+                                                    {formatRupiah(finalTotal)}
+                                                  </p>
+                                                </div>
+                                                <div className="h-8 w-px bg-[#ebebeb]" />
+                                                <div className="flex-1 text-right">
+                                                  <p className="text-[0.6875rem] uppercase tracking-wide text-gray-500">
+                                                    Kembalian
+                                                  </p>
+                                                  <p
+                                                    className={`text-[0.9375rem] font-semibold ${
+                                                      !paymentAmountMap[b.id]
+                                                        ? 'text-[#ccc]'
+                                                        : kembalian >= 0
+                                                          ? 'text-[#16a34a]'
+                                                          : 'text-[#ef4444]'
+                                                    }`}
+                                                  >
+                                                    {!paymentAmountMap[b.id]
+                                                      ? '—'
+                                                      : kembalian >= 0
+                                                        ? formatRupiah(kembalian)
+                                                        : `−${formatRupiah(Math.abs(kembalian))}`}
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            );
+                                          })()}
+                                        {/* Method + Proses */}
+                                        <div className="flex flex-col items-end gap-1">
+                                          {paymentError?.bookingId === b.id && (
+                                            <p className="text-[0.6875rem] text-[#ef4444]">
+                                              {paymentError.message}
+                                            </p>
+                                          )}
+                                          <button
+                                            disabled={
+                                              b.paymentStatus === 'PAID' ||
+                                              processPaymentMutation.isPending
+                                            }
+                                            onClick={() => {
+                                              setPaymentError(null);
+                                              const method = paymentMethodMap[b.id] ?? 'CASH';
+                                              const rawAmount = paymentAmountMap[b.id] ?? '';
+                                              const amountReceived =
+                                                method !== 'CASH'
+                                                  ? finalTotal
+                                                  : parseInt(rawAmount, 10);
+
+                                              if (method === 'CASH' && !rawAmount) {
+                                                setPaymentError({
+                                                  bookingId: b.id,
+                                                  message: 'Masukkan jumlah uang diterima',
+                                                });
+                                                return;
+                                              }
+                                              if (
+                                                method === 'CASH' &&
+                                                amountReceived < finalTotal
+                                              ) {
+                                                setPaymentError({
+                                                  bookingId: b.id,
+                                                  message: 'Uang tidak cukup',
+                                                });
+                                                return;
+                                              }
+
+                                              setConfirmDialog({
+                                                bookingId: b.id,
+                                                customerName: b.customerName,
+                                                serviceName: currentService.serviceName,
+                                                amount: amountReceived,
+                                                method,
+                                                finalTotal,
+                                              });
+                                            }}
+                                            className="ml-auto h-8 rounded-lg bg-[#16a34a] px-4 text-[0.75rem] font-semibold text-white transition-colors hover:bg-[#15803d] disabled:cursor-not-allowed disabled:opacity-35"
+                                          >
+                                            {processPaymentMutation.isPending
+                                              ? 'Memproses...'
+                                              : 'Proses Pembayaran'}
+                                          </button>
+                                        </div>
+                                      </>
+                                    )}
                                   </div>
                                 </div>
 
@@ -2631,12 +2709,11 @@ export default function OverviewPage() {
 
       {/* Confirmation Modal */}
       {confirmDialog &&
-        isMobile &&
         (() => {
           const d = confirmDialog;
           const kembalian = d.method === 'CASH' ? d.amount - d.finalTotal : null;
           return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:hidden">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
               {/* Backdrop */}
               <div
                 className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
@@ -2696,18 +2773,22 @@ export default function OverviewPage() {
                     Batal
                   </button>
                   <button
-                    onClick={() => {
-                      if (!d.customerName || !d.serviceName) return;
-
-                      const timeSinceLastAction = Date.now() - lastActionTime;
-                      if (timeSinceLastAction < 200) return;
-
-                      const customerName = d.customerName;
-                      const serviceName = d.serviceName;
-                      setBookingStatusMap((m) => ({ ...m, [d.bookingId]: 'COMPLETED' }));
-                      setConfirmDialog(null);
+                    disabled={processPaymentMutation.isPending}
+                    onClick={async () => {
+                      const method = d.method.toLowerCase() as 'cash' | 'transfer' | 'qris';
+                      try {
+                        await processPaymentMutation.mutateAsync({
+                          bookingId: d.bookingId,
+                          paymentMethod: method,
+                          amountReceived: d.amount,
+                          servicePrice: d.finalTotal,
+                        });
+                        setConfirmDialog(null);
+                      } catch (e) {
+                        console.error('processPayment error:', e);
+                      }
                     }}
-                    className="h-10 flex-1 rounded-xl bg-[#16a34a] text-[0.875rem] font-semibold text-white transition-colors hover:bg-[#15803d]"
+                    className="h-10 flex-1 rounded-xl bg-[#16a34a] text-[0.875rem] font-semibold text-white transition-colors hover:bg-[#15803d] disabled:opacity-50"
                   >
                     Ya, Proses ✓
                   </button>
@@ -3225,11 +3306,12 @@ export default function OverviewPage() {
                         salonId: SALON_ID,
                         serviceId: svc.id,
                         stylistId: stylist.id,
-                        bookingDate: now.toISOString().slice(0, 10),
+                        bookingDate: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`,
                         startTime: timeSlot,
                         endTime,
                         customerName: walkInForm.name,
                         customerPhone: walkInForm.phone || '-',
+                        customerEmail: '',
                         notes: 'Walk-in',
                         paymentStatus: 'lunas',
                       });
