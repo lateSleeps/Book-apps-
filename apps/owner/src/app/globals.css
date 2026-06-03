@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes skeleton-shimmer {
+  0%   { background-position: -800px 0; }
+  100% { background-position:  800px 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #e5e5ea 25%, #f2f2f7 50%, #e5e5ea 75%);
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
 @keyframes badge-shake {
   0%, 100% { transform: rotate(0deg); }
   15%       { transform: rotate(-12deg); }
@@ -16,6 +27,11 @@
   animation: badge-shake 0.8s ease-in-out infinite;
   animation-delay: 0s;
   transform-origin: top center;
+}
+
+input::placeholder {
+  color: #8E8E93;
+  font-weight: 400;
 }
 
 @layer base {

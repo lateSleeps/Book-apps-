@@ -1629,29 +1629,27 @@ export default function OverviewPage() {
                                   marginLeft: 'auto',
                                 }}
                               >
-                                {b.status.toUpperCase() === 'CONFIRMED' && (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setDeleteConfirm({
-                                        bookingId: b.id,
-                                        customerName: b.customerName,
-                                      });
-                                    }}
-                                    style={{
-                                      background: 'none',
-                                      border: 'none',
-                                      cursor: 'pointer',
-                                      padding: '4px 6px',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      borderRadius: 6,
-                                    }}
-                                    title="Hapus dari list"
-                                  >
-                                    <Trash size={16} weight="duotone" color="#FF3B30" />
-                                  </button>
-                                )}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setDeleteConfirm({
+                                      bookingId: b.id,
+                                      customerName: b.customerName,
+                                    });
+                                  }}
+                                  style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    padding: '4px 6px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    borderRadius: 6,
+                                  }}
+                                  title="Hapus dari list"
+                                >
+                                  <Trash size={16} weight="duotone" color="#FF3B30" />
+                                </button>
                                 <CaretDown
                                   size={14}
                                   weight="duotone"
@@ -4038,17 +4036,19 @@ export default function OverviewPage() {
               <button
                 onClick={() => {
                   const { bookingId } = deleteConfirm;
+                  // Close dialog + set skeleton in same render flush
                   setDeleteConfirm(null);
-                  if (expandedId === bookingId) setExpandedId(null);
                   setLoadingBookingId(bookingId);
-                  setTimeout(() => {
+                  if (expandedId === bookingId) setExpandedId(null);
+                  // After delay, move to deletedIds and clear skeleton
+                  window.setTimeout(() => {
                     setDeletedIds((prev) => {
                       const s = new Set(prev);
                       s.add(bookingId);
                       return s;
                     });
                     setLoadingBookingId(null);
-                  }, 1500);
+                  }, 800);
                 }}
                 style={{
                   flex: 1,

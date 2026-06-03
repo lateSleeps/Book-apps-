@@ -4,6 +4,10 @@ const nextConfig = {
   images: {
     remotePatterns: [],
   },
+  onDemandEntries: {
+    maxInactiveAge: 10 * 1000,
+    pagesBufferLength: 2,
+  },
 };
 
 module.exports = nextConfig;
