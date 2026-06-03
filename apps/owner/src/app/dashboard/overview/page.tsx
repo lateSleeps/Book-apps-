@@ -12,6 +12,7 @@ import {
 import { CaretDown, Trash } from '@phosphor-icons/react';
 import Link from 'next/link';
 import { useMemo, useState, useEffect, useRef } from 'react';
+import { SkeletonRow } from '@/components/SkeletonLoader';
 import { useDashboardData } from '@/features/dashboard/hooks/use-dashboard-data';
 import type { AddOn } from '@/features/dashboard/types/dashboard.types';
 import { useServices } from '@/hooks/useServices';
@@ -196,6 +197,12 @@ export default function OverviewPage() {
   const [isMobile, setIsMobile] = useState(false);
   const [visitorTab, setVisitorTab] = useState<VisitorTab>('ALL');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+  const [loadingBookingId, setLoadingBookingId] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    bookingId: string;
+    customerName: string;
+  } | null>(null);
   const [manualBookings, setManualBookings] = useState<
     import('@/features/dashboard/types/dashboard.types').DashboardBooking[]
   >([]);
@@ -493,8 +500,11 @@ export default function OverviewPage() {
           status: bookingStatusMap[b.id] ?? b.status,
           paymentStatus: paymentStatusMap[b.id] ?? b.paymentStatus,
         }))
-        .filter((b) => !(b.visitorType === 'BOOKING' && b.paymentStatus === 'UNPAID')),
-    [upcomingBookings, manualBookings, bookingStatusMap, paymentStatusMap]
+        .filter(
+          (b) =>
+            !(b.visitorType === 'BOOKING' && b.paymentStatus === 'UNPAID') && !deletedIds.has(b.id)
+        ),
+    [upcomingBookings, manualBookings, bookingStatusMap, paymentStatusMap, deletedIds]
   );
 
   const filteredVisitors = useMemo(() => {
@@ -1438,6 +1448,21 @@ export default function OverviewPage() {
                       };
                       const sm = statusMeta[b.status] ?? statusMeta.NO_SHOW;
 
+                      if (loadingBookingId === b.id) {
+                        return (
+                          <div
+                            key={b.id}
+                            style={{
+                              borderBottom: '1px solid #F2F2F7',
+                              opacity: 0.5,
+                              transition: 'opacity 0.3s',
+                            }}
+                          >
+                            <SkeletonRow />
+                          </div>
+                        );
+                      }
+
                       return (
                         <div
                           key={b.id}
@@ -1560,7 +1585,14 @@ export default function OverviewPage() {
                               {b.timeSlot}
                             </span>
                             {/* TIPE + trailing */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                gap: 8,
+                              }}
+                            >
                               <span
                                 style={{
                                   display: 'inline-flex',
@@ -1589,24 +1621,48 @@ export default function OverviewPage() {
                                 />
                                 {b.visitorType === 'WALK_IN' ? 'Walk-in' : 'Booking'}
                               </span>
-                              {(b.status === 'CONFIRMED' || b.status === 'confirmed') && (
-                                <Trash
-                                  size={16}
-                                  weight="duotone"
-                                  color="#FF3B30"
-                                  style={{ flexShrink: 0 }}
-                                />
-                              )}
-                              <CaretDown
-                                size={14}
-                                weight="duotone"
-                                color="#8E8E93"
+                              <div
                                 style={{
-                                  flexShrink: 0,
-                                  transform: isExpanded ? 'rotate(180deg)' : 'none',
-                                  transition: 'transform 0.15s',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 12,
+                                  marginLeft: 'auto',
                                 }}
-                              />
+                              >
+                                {b.status.toUpperCase() === 'CONFIRMED' && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setDeleteConfirm({
+                                        bookingId: b.id,
+                                        customerName: b.customerName,
+                                      });
+                                    }}
+                                    style={{
+                                      background: 'none',
+                                      border: 'none',
+                                      cursor: 'pointer',
+                                      padding: '4px 6px',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      borderRadius: 6,
+                                    }}
+                                    title="Hapus dari list"
+                                  >
+                                    <Trash size={16} weight="duotone" color="#FF3B30" />
+                                  </button>
+                                )}
+                                <CaretDown
+                                  size={14}
+                                  weight="duotone"
+                                  color="#8E8E93"
+                                  style={{
+                                    flexShrink: 0,
+                                    transform: isExpanded ? 'rotate(180deg)' : 'none',
+                                    transition: 'transform 0.15s',
+                                  }}
+                                />
+                              </div>
                             </div>
                           </div>
 
@@ -3900,6 +3956,118 @@ export default function OverviewPage() {
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirm && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 60,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(0,0,0,0.3)',
+              backdropFilter: 'blur(2px)',
+            }}
+            onClick={() => setDeleteConfirm(null)}
+          />
+          <div
+            style={{
+              position: 'relative',
+              width: 340,
+              borderRadius: 16,
+              background: '#FFFFFF',
+              padding: 24,
+              boxShadow: '0 20px 60px rgba(0,0,0,0.18)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 16,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 12,
+                  background: '#FEE2E2',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Trash size={20} weight="duotone" color="#FF3B30" />
+              </div>
+              <div>
+                <p style={{ fontSize: 16, fontWeight: 700, color: '#1C1C1E', margin: 0 }}>
+                  Hapus dari List?
+                </p>
+                <p style={{ fontSize: 13, color: '#8E8E93', margin: 0, marginTop: 2 }}>
+                  {deleteConfirm.customerName}
+                </p>
+              </div>
+            </div>
+            <p style={{ fontSize: 14, color: '#3C3C43', margin: 0, lineHeight: 1.5 }}>
+              Booking ini akan dihapus dari tampilan list. Data tetap tersimpan di sistem.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                style={{
+                  flex: 1,
+                  height: 44,
+                  borderRadius: 9999,
+                  border: '1px solid #E5E5EA',
+                  background: '#F2F2F7',
+                  color: '#3C3C43',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  const { bookingId } = deleteConfirm;
+                  setDeleteConfirm(null);
+                  if (expandedId === bookingId) setExpandedId(null);
+                  setLoadingBookingId(bookingId);
+                  setTimeout(() => {
+                    setDeletedIds((prev) => {
+                      const s = new Set(prev);
+                      s.add(bookingId);
+                      return s;
+                    });
+                    setLoadingBookingId(null);
+                  }, 1500);
+                }}
+                style={{
+                  flex: 1,
+                  height: 44,
+                  borderRadius: 9999,
+                  border: 'none',
+                  background: '#FF3B30',
+                  color: 'white',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showWANotif && waBookingData && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30">
