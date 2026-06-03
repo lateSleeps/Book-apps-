@@ -125,7 +125,7 @@ export const bookingsRouter = router({
             payment_status: isWalkIn ? 'lunas' : input.paymentStatus ?? 'dp',
           },
         ])
-        .select();
+        .select('id, confirmation_code, status, payment_status');
 
       if (error) throw error;
       return data?.[0] || null;
@@ -159,7 +159,7 @@ export const bookingsRouter = router({
         .from('bookings')
         .update(updateData)
         .eq('id', input.bookingId)
-        .select();
+        .select('id, status, updated_at');
 
       if (error) throw error;
       return data?.[0] || null;

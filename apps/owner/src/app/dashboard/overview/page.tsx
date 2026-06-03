@@ -9,6 +9,7 @@ import {
   UserIcon,
   CogIcon,
 } from '@heroicons/react/24/solid';
+import { CaretDown, Trash } from '@phosphor-icons/react';
 import Link from 'next/link';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { useDashboardData } from '@/features/dashboard/hooks/use-dashboard-data';
@@ -36,20 +37,30 @@ const MONTHS_ID = [
   'Desember',
 ];
 
-const AVATAR_COLORS = [
-  { bg: '#fde8ec', text: '#c4627a' },
-  { bg: '#e0eeff', text: '#4a7fc4' },
-  { bg: '#e0f5e9', text: '#4a9e6a' },
-  { bg: '#ede8ff', text: '#7a62c4' },
-  { bg: '#fff0e0', text: '#c48a4a' },
-  { bg: '#e0f5f5', text: '#4a9e9e' },
-  { bg: '#fef3c2', text: '#92600e' },
-  { bg: '#fce7f3', text: '#be4a8c' },
+const AVATAR_BG_COLORS = [
+  '#D1FAE5', // mint green
+  '#DBEAFE', // soft blue
+  '#FEF3C7', // soft amber
+  '#FECACA', // soft coral
+  '#E9D5FF', // soft lavender
+  '#FFEDD5', // soft peach
+  '#CCFBF1', // soft teal
+  '#FEE2E2', // soft rose
 ];
 
 function avatarColor(name: string) {
-  const idx = name.charCodeAt(0) % AVATAR_COLORS.length;
-  return AVATAR_COLORS[idx]!;
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const bg = AVATAR_BG_COLORS[Math.abs(hash) % AVATAR_BG_COLORS.length]!;
+  return { bg, text: '#1C1C1E' };
+}
+
+function getInitials(name: string): string {
+  const words = name.trim().split(/\s+/);
+  if (words.length === 1) return (words[0]?.[0] ?? '').toUpperCase();
+  return ((words[0]?.[0] ?? '') + (words[words.length - 1]?.[0] ?? '')).toUpperCase();
 }
 
 function getGreeting() {
@@ -646,13 +657,12 @@ export default function OverviewPage() {
         }
       }
     `}</style>
-      <div className="flex flex-1 flex-col overflow-y-auto" style={{ backgroundColor: '#fafaf8' }}>
+      <div className="flex flex-1 flex-col overflow-y-auto" style={{ backgroundColor: '#F2F2F7' }}>
         <div className="flex w-full flex-col gap-5 px-4 py-5 sm:gap-7 sm:px-6 sm:py-7 md:gap-10 md:px-8 md:py-10">
           {/* Greeting */}
           <div className="flex flex-col gap-0">
-            <p className="text-[0.75rem] text-[#555] sm:text-[0.875rem]">{dateLabel}</p>
             <div className="flex items-center justify-between gap-4 sm:gap-4">
-              <h1 className="text-[1.25rem] font-semibold tracking-tight text-[#1a1a1a] sm:text-[1.5rem] md:text-[1.75rem]">
+              <h1 className="text-[1.25rem] font-semibold tracking-tight text-[#1C1C1E] sm:text-[1.5rem] md:text-[1.75rem]">
                 {greeting || 'Halo'}, Rara ✦
               </h1>
 
@@ -723,160 +733,288 @@ export default function OverviewPage() {
               </div>
             </div>
           </div>
-          {/* Stats row — Colorful cards with abstract shapes */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-            {/* Pendapatan - Grayscale */}
+          {/* Stats — 4 cards satu baris */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1.5fr 1fr 1fr 1fr',
+              gap: 16,
+              alignItems: 'stretch',
+            }}
+          >
+            {/* Pendapatan */}
             <div
-              className="relative flex flex-col overflow-hidden rounded-2xl p-4 shadow backdrop-blur-sm"
-              style={{ backgroundColor: '#F1F2F3' }}
+              className="relative overflow-hidden transition-all duration-200 hover:-translate-y-1"
+              style={{
+                background: 'linear-gradient(145deg, #0071E3 0%, #3A9BFF 100%)',
+                boxShadow: '0 8px 28px rgba(0,113,227,0.38)',
+                borderRadius: 20,
+                padding: 24,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
             >
-              {/* Abstract shapes - circles */}
               <svg
-                className="absolute bottom-6 right-4 opacity-80 sm:bottom-3"
-                width="70"
-                height="70"
-                viewBox="0 0 70 70"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: 20,
+                }}
+                viewBox="0 0 300 160"
                 fill="none"
+                preserveAspectRatio="xMidYMid slice"
               >
-                <circle cx="20" cy="20" r="12" fill="#054A57" opacity="0.6" />
-                <circle cx="50" cy="30" r="16" fill="#054A57" opacity="0.75" />
-                <circle cx="35" cy="55" r="14" fill="#054A57" opacity="0.85" />
+                <circle cx="240" cy="30" r="60" fill="white" opacity="0.12" />
+                <circle cx="280" cy="120" r="45" fill="white" opacity="0.09" />
+                <circle cx="190" cy="140" r="35" fill="white" opacity="0.07" />
+                <polygon points="50,150 85,100 120,150" fill="white" opacity="0.07" />
+                <polygon points="200,5 225,50 175,50" fill="white" opacity="0.06" />
               </svg>
-              <div className="relative z-10 mb-[3rem] flex items-start justify-between">
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-                  Pendapatan
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    marginBottom: 10,
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      letterSpacing: '0.07em',
+                      textTransform: 'uppercase',
+                      color: 'rgba(255,255,255,0.75)',
+                      margin: 0,
+                    }}
+                  >
+                    Pendapatan Hari Ini
+                  </p>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ opacity: 0.85 }}
+                  >
+                    <path d="M7 17L17 7M17 7H7M17 7v10" />
+                  </svg>
+                </div>
+                <p style={{ lineHeight: 1, margin: 0 }}>
+                  <span style={{ fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+                    Rp{' '}
+                  </span>
+                  <span style={{ fontSize: 28, fontWeight: 700, color: 'white' }}>
+                    <span className="sm:hidden">{formatCompactRupiah(stats.revenueToday)}</span>
+                    <span className="hidden sm:inline">
+                      {stats.revenueToday.toLocaleString('id-ID')}
+                    </span>
+                  </span>
                 </p>
               </div>
-              <p className="relative z-10 text-[1.5rem] font-bold leading-none text-[#2a2a2a] sm:text-[1.75rem]">
-                <span className="sm:hidden">{formatCompactRupiah(stats.revenueToday)}</span>
-                <span className="hidden sm:inline">{formatRupiah(stats.revenueToday)}</span>
+              <p
+                style={{
+                  position: 'relative',
+                  zIndex: 1,
+                  fontSize: 12,
+                  color: 'rgba(255,255,255,0.65)',
+                  margin: '12px 0 0',
+                }}
+              >
+                Belum ada data pembanding kemarin.
               </p>
             </div>
 
-            {/* Booking - Grayscale */}
+            {/* Booking */}
             <div
-              className="relative flex flex-col overflow-hidden rounded-2xl p-4 shadow backdrop-blur-sm"
-              style={{ backgroundColor: '#F1F2F3' }}
+              className="transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+              style={{
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E5E5EA',
+                borderRadius: 20,
+                padding: 20,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
             >
-              {/* Abstract shapes - squares */}
-              <svg
-                className="absolute bottom-6 right-4 opacity-80 sm:bottom-3"
-                width="70"
-                height="70"
-                viewBox="0 0 70 70"
-                fill="none"
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'space-between',
+                  marginBottom: 12,
+                }}
               >
-                <rect x="10" y="10" width="16" height="16" fill="#3A1F6B" opacity="0.6" rx="2" />
-                <rect x="35" y="20" width="24" height="24" fill="#3A1F6B" opacity="0.75" rx="2" />
-                <rect x="15" y="45" width="20" height="20" fill="#3A1F6B" opacity="0.85" rx="2" />
-              </svg>
-              <div className="relative z-10 mb-[3rem] flex items-start justify-between">
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-                  Booking Mendatang
+                <p
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    letterSpacing: '0.07em',
+                    textTransform: 'uppercase',
+                    color: '#8E8E93',
+                    margin: 0,
+                  }}
+                >
+                  Booking Hari Ini
                 </p>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect
+                    x="3"
+                    y="4"
+                    width="18"
+                    height="18"
+                    rx="3"
+                    stroke="#007AFF"
+                    strokeWidth="1.8"
+                  />
+                  <path d="M16 2v4M8 2v4M3 10h18" stroke="#007AFF" strokeWidth="1.8" />
+                </svg>
               </div>
-              <p className="relative z-10 text-[1.5rem] font-bold leading-none text-[#2a2a2a] sm:text-[1.75rem]">
+              <p
+                style={{
+                  fontSize: 36,
+                  fontWeight: 700,
+                  color: '#1C1C1E',
+                  lineHeight: 1,
+                  margin: 0,
+                }}
+              >
                 {String(stats.bookingsToday)}
               </p>
             </div>
 
-            {/* Rating - Grayscale */}
+            {/* Selesai */}
             <div
-              className="relative flex flex-col overflow-hidden rounded-2xl p-4 shadow backdrop-blur-sm"
-              style={{ backgroundColor: '#F1F2F3' }}
+              className="transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+              style={{
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E5E5EA',
+                borderRadius: 20,
+                padding: 20,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
             >
-              {/* Smooth wavy lines */}
-              <svg
-                className="absolute bottom-6 right-4 opacity-80 sm:bottom-3"
-                width="70"
-                height="70"
-                viewBox="0 0 70 70"
-                fill="none"
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'space-between',
+                  marginBottom: 12,
+                }}
               >
-                {/* Wave 1 - smooth sine curve */}
-                <path
-                  d="M10,25 Q20,15 30,25 T50,25 T70,25"
-                  stroke="#8B0E43"
-                  strokeWidth="2.5"
-                  opacity="0.65"
-                  strokeLinecap="round"
+                <p
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    letterSpacing: '0.07em',
+                    textTransform: 'uppercase',
+                    color: '#8E8E93',
+                    margin: 0,
+                  }}
+                >
+                  Selesai
+                </p>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
                   fill="none"
-                />
-                {/* Wave 2 - smooth sine curve */}
-                <path
-                  d="M10,42 Q20,32 30,42 T50,42 T70,42"
-                  stroke="#8B0E43"
-                  strokeWidth="2.5"
-                  opacity="0.75"
                   strokeLinecap="round"
-                  fill="none"
-                />
-                {/* Wave 3 - smooth sine curve */}
-                <path
-                  d="M10,60 Q20,50 30,60 T50,60 T70,60"
-                  stroke="#8B0E43"
-                  strokeWidth="2"
-                  opacity="0.85"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-              </svg>
-              <div className="relative z-10 mb-[3rem] flex items-start justify-between">
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Rating</p>
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="9" stroke="#34C759" strokeWidth="1.8" />
+                  <path d="M8 12l3 3 5-5" stroke="#34C759" strokeWidth="2" />
+                </svg>
               </div>
-              <p className="relative z-10 text-[1.5rem] font-bold leading-none text-[#2a2a2a] sm:text-[1.75rem]">
-                {stats.avgRating}/5 ⭐
+              <p
+                style={{
+                  fontSize: 36,
+                  fontWeight: 700,
+                  color: '#1C1C1E',
+                  lineHeight: 1,
+                  margin: 0,
+                }}
+              >
+                {allBookings.filter((b) => b.status === 'COMPLETED').length}
               </p>
             </div>
 
-            {/* Penyelesaian - Grayscale */}
+            {/* Pembatalan */}
             <div
-              className="relative flex flex-col overflow-hidden rounded-2xl p-4 shadow backdrop-blur-sm"
-              style={{ backgroundColor: '#F1F2F3' }}
+              className="transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+              style={{
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E5E5EA',
+                borderRadius: 20,
+                padding: 20,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
             >
-              {/* Zigzag lines */}
-              <svg
-                className="absolute bottom-6 right-4 opacity-80 sm:bottom-3"
-                width="70"
-                height="70"
-                viewBox="0 0 70 70"
-                fill="none"
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'space-between',
+                  marginBottom: 12,
+                }}
               >
-                {/* Zigzag line 1 - diagonal */}
-                <polyline
-                  points="50,10 58,20 50,30 58,40"
-                  stroke="#737373"
-                  strokeWidth="2.5"
-                  opacity="0.65"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                {/* Zigzag line 2 - steeper */}
-                <polyline
-                  points="20,25 30,35 20,45 30,55 20,65"
-                  stroke="#737373"
-                  strokeWidth="2.5"
-                  opacity="0.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                {/* Zigzag line 3 - shorter */}
-                <polyline
-                  points="50,50 60,60 50,70"
-                  stroke="#737373"
-                  strokeWidth="2"
-                  opacity="0.85"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <div className="relative z-10 mb-[3rem] flex items-start justify-between">
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-                  Penyelesaian
+                <p
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    letterSpacing: '0.07em',
+                    textTransform: 'uppercase',
+                    color: '#8E8E93',
+                    margin: 0,
+                  }}
+                >
+                  Pembatalan
                 </p>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="9" stroke="#FF3B30" strokeWidth="1.8" />
+                  <path d="M9 9l6 6M15 9l-6 6" stroke="#FF3B30" strokeWidth="2" />
+                </svg>
               </div>
-              <p className="relative z-10 text-[1.5rem] font-bold leading-none text-[#2a2a2a] sm:text-[1.75rem]">
-                {stats.completionRate}%
+              <p
+                style={{
+                  fontSize: 36,
+                  fontWeight: 700,
+                  color: '#FF3B30',
+                  lineHeight: 1,
+                  margin: 0,
+                }}
+              >
+                {allBookings.filter((b) => b.status === 'CANCELLED').length}
               </p>
             </div>
           </div>
@@ -884,21 +1022,106 @@ export default function OverviewPage() {
           {/* Visitor list */}
           <div>
             {/* Schedule — Desktop view */}
-            <div className="hidden flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)] md:flex">
-              {/* Header */}
-              <div className="visitor-header-controls flex items-center justify-between gap-4 px-6 pb-0 pt-5">
-                <h2 className="hide-on-mobile shrink-0 text-[1rem] font-semibold text-[#1a1a1a]">
-                  Pengunjung Mendatang
-                </h2>
-                <div className="visitor-header-controls ml-auto flex items-center gap-2">
-                  {/* Sort button */}
+            <div
+              className="hidden flex-col overflow-hidden md:flex"
+              style={{
+                backgroundColor: '#FFFFFF',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                borderRadius: 16,
+                padding: '0 0 4px',
+              }}
+            >
+              {/* Header — tabs + controls satu baris */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '16px 20px 8px',
+                }}
+              >
+                {/* Tabs — Segmented Control */}
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    borderRadius: 12,
+                    padding: 4,
+                    backgroundColor: '#F2F2F7',
+                  }}
+                >
+                  {(
+                    [
+                      { key: 'ALL', label: 'Semua' },
+                      { key: 'BOOKING', label: 'Booking' },
+                      { key: 'WALK_IN', label: 'Datang Langsung' },
+                      { key: 'COMPLETED', label: 'Selesai' },
+                    ] as { key: VisitorTab; label: string }[]
+                  ).map(({ key, label }) => {
+                    const active = visitorTab === key;
+                    const showBadge = key === 'BOOKING' && pendingConfirmCount > 0;
+                    return (
+                      <div key={key} style={{ position: 'relative' }}>
+                        <button
+                          onClick={() => setVisitorTab(key)}
+                          style={{
+                            whiteSpace: 'nowrap',
+                            padding: '6px 14px',
+                            borderRadius: 10,
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: 13,
+                            fontWeight: active ? 600 : 400,
+                            transition: 'all 0.15s',
+                            backgroundColor: active ? '#FFFFFF' : 'transparent',
+                            color: active ? '#1C1C1E' : '#8E8E93',
+                            boxShadow: active ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+                          }}
+                        >
+                          {label}
+                          <span
+                            style={{
+                              marginLeft: 5,
+                              fontSize: 11,
+                              color: active ? '#8E8E93' : '#C7C7CC',
+                            }}
+                          >
+                            {visitorCounts[key]}
+                          </span>
+                        </button>
+                        {showBadge && (
+                          <span className="animate-badge-shake pointer-events-none absolute -right-1.5 -top-2 flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-[#f59e0b] px-1 text-[0.625rem] font-bold text-white shadow-sm ring-2 ring-white">
+                            {pendingConfirmCount}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Controls — sort + search */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <button
                     onClick={() => setSortOrder((o) => (o === 'ASC' ? 'DESC' : 'ASC'))}
-                    className="sort-button-mobile flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-[#f5f5f3] px-3 text-[0.8125rem] font-medium text-[#555] transition-colors hover:bg-[#ececea]"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      height: 32,
+                      padding: '0 12px',
+                      borderRadius: 8,
+                      background: '#F2F2F7',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: '#3C3C43',
+                    }}
                   >
                     <svg
-                      width="13"
-                      height="13"
+                      width="12"
+                      height="12"
                       viewBox="0 0 16 16"
                       fill="none"
                       stroke="currentColor"
@@ -920,68 +1143,51 @@ export default function OverviewPage() {
                     </svg>
                     {sortOrder === 'DESC' ? 'Terbaru' : 'Terlama'}
                   </button>
-                  {/* Search bar */}
-                  <div className="search-bar-mobile flex h-7 flex-1 items-center gap-2 rounded-lg bg-[#f5f5f3] px-2 transition-all focus-within:bg-white focus-within:ring-1 focus-within:ring-[#ddd] sm:h-8 sm:w-[14rem] sm:px-3">
-                    <MagnifyingGlassIcon className="h-3.5 w-3.5 text-gray-400" />
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      height: 32,
+                      padding: '0 10px',
+                      borderRadius: 8,
+                      background: '#F2F2F7',
+                      width: 160,
+                    }}
+                  >
+                    <MagnifyingGlassIcon
+                      style={{ width: 13, height: 13, color: '#8E8E93', flexShrink: 0 }}
+                    />
                     <input
                       type="text"
                       placeholder="Cari pelanggan..."
                       value={visitorSearch}
                       onChange={(e) => setVisitorSearch(e.target.value)}
-                      className="flex-1 bg-transparent text-[0.75rem] text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none sm:text-[0.8125rem]"
+                      style={{
+                        flex: 1,
+                        background: 'none',
+                        border: 'none',
+                        outline: 'none',
+                        fontSize: 12,
+                        color: '#1C1C1E',
+                      }}
                     />
                     {visitorSearch && (
                       <button
                         onClick={() => setVisitorSearch('')}
-                        className="text-gray-400 transition-colors hover:text-gray-500"
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: 0,
+                          display: 'flex',
+                        }}
                       >
-                        <XMarkIcon className="h-3 w-3" />
+                        <XMarkIcon style={{ width: 12, height: 12, color: '#8E8E93' }} />
                       </button>
                     )}
                   </div>
                 </div>
-              </div>
-
-              {/* Tabs */}
-              <div className="flex gap-0.5 overflow-x-auto px-3 pb-0 pt-2 sm:gap-1 sm:overflow-visible sm:px-6 sm:pt-3">
-                {(
-                  [
-                    { key: 'ALL', label: 'Semua' },
-                    { key: 'BOOKING', label: 'Booking' },
-                    { key: 'WALK_IN', label: 'Datang Langsung' },
-                    { key: 'COMPLETED', label: 'Selesai' },
-                  ] as { key: VisitorTab; label: string }[]
-                ).map(({ key, label }) => {
-                  const active = visitorTab === key;
-                  const isCompleted = key === 'COMPLETED';
-                  const showBadge = key === 'BOOKING' && pendingConfirmCount > 0;
-                  return (
-                    <div key={key} className="relative inline-flex flex-shrink-0">
-                      <button
-                        onClick={() => setVisitorTab(key)}
-                        className={`h-7 whitespace-nowrap rounded-lg px-2.5 text-[0.7rem] font-medium transition-all sm:h-8 sm:px-3.5 sm:text-[0.8125rem] ${
-                          active
-                            ? isCompleted
-                              ? 'bg-[#16a34a] text-white'
-                              : 'bg-[#1a1a1a] text-white'
-                            : 'text-gray-500 hover:bg-[#f5f5f3] hover:text-[#444]'
-                        }`}
-                      >
-                        {label}
-                        <span
-                          className={`ml-1.5 text-[0.6875rem] ${active ? 'opacity-70' : 'text-gray-400'}`}
-                        >
-                          {visitorCounts[key]}
-                        </span>
-                      </button>
-                      {showBadge && (
-                        <span className="animate-badge-shake pointer-events-none absolute -right-1.5 -top-2 flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-[#f59e0b] px-1 text-[0.625rem] font-bold text-white shadow-sm ring-2 ring-white">
-                          {pendingConfirmCount}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
               </div>
 
               {/* Completed list */}
@@ -1000,13 +1206,14 @@ export default function OverviewPage() {
                         >
                           {/* Avatar */}
                           <div
-                            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-[0.8125rem] font-semibold"
+                            className="flex h-9 w-9 flex-shrink-0 items-center justify-center text-[0.8125rem] font-semibold"
                             style={{
                               backgroundColor: avatarColor(b.customerName).bg,
                               color: avatarColor(b.customerName).text,
+                              borderRadius: 8,
                             }}
                           >
-                            {b.customerName.charAt(0)}
+                            {getInitials(b.customerName)}
                           </div>
                           {/* Name + service */}
                           <div className="min-w-0 flex-1">
@@ -1055,6 +1262,33 @@ export default function OverviewPage() {
               {/* Active visitor list */}
               {visitorTab !== 'COMPLETED' && (
                 <div className="mt-2">
+                  {/* Table Header */}
+                  {filteredVisitors.length > 0 && (
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '2fr 1fr 2fr 1.5fr 1fr 1.2fr',
+                        padding: '12px 24px',
+                        borderBottom: '1px solid #E5E5EA',
+                        alignItems: 'center',
+                      }}
+                    >
+                      {['PELANGGAN', 'STATUS', 'LAYANAN', 'STYLIST', 'WAKTU', 'TIPE'].map((h) => (
+                        <span
+                          key={h}
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 600,
+                            color: '#8E8E93',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px',
+                          }}
+                        >
+                          {h}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   {filteredVisitors.length === 0 ? (
                     <div className="px-6 py-10 text-center">
                       <p className="text-[0.875rem] text-[#555]">Tidak ada pengunjung</p>
@@ -1205,146 +1439,175 @@ export default function OverviewPage() {
                       const sm = statusMeta[b.status] ?? statusMeta.NO_SHOW;
 
                       return (
-                        <div key={b.id} className="border-b border-[#f7f7f7] last:border-0">
-                          {/* Collapsed row */}
+                        <div
+                          key={b.id}
+                          style={{ borderBottom: '1px solid #F2F2F7' }}
+                          className="last:border-0"
+                        >
+                          {/* Collapsed row — grid layout */}
                           <div
                             onClick={() => toggleExpand(b.id)}
-                            className="flex cursor-pointer items-center gap-2 px-3 py-3 text-sm transition-colors hover:bg-[#fafaf8] sm:gap-4 sm:px-6 sm:py-4 sm:text-base"
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: '2fr 1fr 2fr 1.5fr 1fr 1.2fr',
+                              padding: '14px 24px',
+                              alignItems: 'center',
+                              cursor: 'pointer',
+                              transition: 'background 0.15s',
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = '#F9F9FB')}
+                            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                           >
-                            {/* Avatar */}
-                            <div className="relative flex-shrink-0">
+                            {/* PELANGGAN */}
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 10,
+                                minWidth: 0,
+                              }}
+                            >
                               <div
-                                className="flex h-10 w-10 items-center justify-center rounded-full text-[0.8125rem] font-semibold"
                                 style={{
+                                  width: 48,
+                                  height: 48,
+                                  borderRadius: 10,
                                   backgroundColor: avatarColor(b.customerName).bg,
-                                  color: avatarColor(b.customerName).text,
+                                  color: '#1C1C1E',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: getInitials(b.customerName).length > 1 ? 13 : 16,
+                                  fontWeight: 600,
+                                  flexShrink: 0,
                                 }}
                               >
-                                {b.customerName.charAt(0)}
+                                {getInitials(b.customerName)}
                               </div>
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-[0.9375rem] font-medium text-[#1a1a1a]">
+                              <span
+                                style={{
+                                  fontSize: 14,
+                                  fontWeight: 500,
+                                  color: '#1C1C1E',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
                                 {b.customerName}
-                              </p>
-                              <div className="mt-0.5 flex items-center gap-2">
-                                <p className="truncate text-[0.875rem] text-[#555]">
-                                  {b.serviceName}
-                                </p>
-                                <span className="h-3 w-px flex-shrink-0 bg-[#ddd]" />
-                                <span
-                                  className={`flex flex-shrink-0 items-center gap-1.5 text-[0.75rem] font-medium ${
-                                    b.paymentStatus === 'PAID'
-                                      ? 'text-[#16a34a]'
-                                      : b.paymentStatus === 'DEPOSIT'
-                                        ? 'text-[#a16207]'
-                                        : 'text-[#dc2626]'
-                                  }`}
-                                >
-                                  {b.paymentStatus === 'PAID' ? (
-                                    <svg
-                                      width="13"
-                                      height="13"
-                                      viewBox="0 0 13 13"
-                                      fill="none"
-                                      className="flex-shrink-0"
-                                    >
-                                      <circle cx="6.5" cy="6.5" r="6" fill="#16a34a" />
-                                      <path
-                                        d="M3.5 6.5l2 2 4-4"
-                                        stroke="white"
-                                        strokeWidth="1.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                      />
-                                    </svg>
-                                  ) : b.paymentStatus === 'DEPOSIT' ? (
-                                    <svg
-                                      width="13"
-                                      height="13"
-                                      viewBox="0 0 13 13"
-                                      fill="none"
-                                      className="flex-shrink-0"
-                                    >
-                                      <circle cx="6.5" cy="6.5" r="6" fill="#a16207" />
-                                      <path
-                                        d="M6.5 3.5v3l2 1.5"
-                                        stroke="white"
-                                        strokeWidth="1.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                      />
-                                    </svg>
-                                  ) : (
-                                    <svg
-                                      width="13"
-                                      height="13"
-                                      viewBox="0 0 13 13"
-                                      fill="none"
-                                      className="flex-shrink-0"
-                                    >
-                                      <circle cx="6.5" cy="6.5" r="6" fill="#dc2626" />
-                                      <path
-                                        d="M4.5 4.5l4 4M8.5 4.5l-4 4"
-                                        stroke="white"
-                                        strokeWidth="1.5"
-                                        strokeLinecap="round"
-                                      />
-                                    </svg>
-                                  )}
-                                  {b.paymentStatus === 'PAID'
-                                    ? 'Lunas'
-                                    : b.paymentStatus === 'DEPOSIT'
-                                      ? 'DP'
-                                      : 'Belum bayar'}
-                                </span>
-                              </div>
+                              </span>
                             </div>
-                            <span className="flex-shrink-0 text-[0.875rem] tabular-nums text-gray-500">
+                            {/* STATUS (payment) */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span
+                                style={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: '50%',
+                                  flexShrink: 0,
+                                  backgroundColor:
+                                    b.paymentStatus === 'PAID'
+                                      ? '#34C759'
+                                      : b.paymentStatus === 'DEPOSIT'
+                                        ? '#FF9500'
+                                        : '#8E8E93',
+                                }}
+                              />
+                              <span
+                                style={{
+                                  fontSize: 13,
+                                  color:
+                                    b.paymentStatus === 'PAID'
+                                      ? '#34C759'
+                                      : b.paymentStatus === 'DEPOSIT'
+                                        ? '#FF9500'
+                                        : '#8E8E93',
+                                }}
+                              >
+                                {b.paymentStatus === 'PAID'
+                                  ? 'Lunas'
+                                  : b.paymentStatus === 'DEPOSIT'
+                                    ? 'DP'
+                                    : 'Belum Bayar'}
+                              </span>
+                            </div>
+                            {/* LAYANAN */}
+                            <span
+                              style={{
+                                fontSize: 14,
+                                color: '#3C3C43',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {b.serviceName}
+                            </span>
+                            {/* STYLIST */}
+                            <span
+                              style={{
+                                fontSize: 14,
+                                color: '#3C3C43',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {b.stylistName}
+                            </span>
+                            {/* WAKTU */}
+                            <span style={{ fontSize: 14, fontWeight: 600, color: '#1C1C1E' }}>
                               {b.timeSlot}
                             </span>
-                            {b.status === 'CONFIRMED' ? (
-                              <CheckCircleIcon className="h-[24px] w-[24px] text-[#2563eb]" />
-                            ) : (
-                              (b.status === 'UPCOMING' ||
-                                b.status === 'IN_PROGRESS' ||
-                                b.status === 'pending' ||
-                                b.status === 'PENDING') && (
+                            {/* TIPE + trailing */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <span
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 4,
+                                  padding: '4px 12px',
+                                  borderRadius: 20,
+                                  fontSize: 12,
+                                  fontWeight: 500,
+                                  backgroundColor:
+                                    b.visitorType === 'WALK_IN' ? '#FFF3CD' : '#E3F2FD',
+                                  color: b.visitorType === 'WALK_IN' ? '#856404' : '#1565C0',
+                                  whiteSpace: 'nowrap',
+                                  border: 'none',
+                                }}
+                              >
                                 <span
-                                  className="flex flex-shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.6875rem] font-semibold"
                                   style={{
-                                    backgroundColor: sm.bg,
-                                    color: sm.color,
-                                    borderColor: `${sm.color}30`,
+                                    width: 6,
+                                    height: 6,
+                                    borderRadius: '50%',
+                                    backgroundColor:
+                                      b.visitorType === 'WALK_IN' ? '#856404' : '#1565C0',
+                                    flexShrink: 0,
                                   }}
-                                >
-                                  {b.status === 'IN_PROGRESS' && (
-                                    <span
-                                      className="h-1.5 w-1.5 flex-shrink-0 animate-pulse rounded-full"
-                                      style={{ backgroundColor: sm.color }}
-                                    />
-                                  )}
-                                  {sm.label}
-                                </span>
-                              )
-                            )}
-                            <span
-                              className={`flex-shrink-0 rounded-full px-2.5 py-1 text-[0.6875rem] font-medium ${b.visitorType === 'WALK_IN' ? 'bg-[#fef3c2] text-[#92400e]' : 'bg-[#dbeafe] text-[#1e40af]'}`}
-                            >
-                              {b.visitorType === 'WALK_IN' ? 'Walk-in' : 'Booking'}
-                            </span>
-                            <svg
-                              width="14"
-                              height="14"
-                              viewBox="0 0 14 14"
-                              fill="none"
-                              stroke="#ccc"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              className={`flex-shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                            >
-                              <path d="M2.5 4.5l4.5 5 4.5-5" />
-                            </svg>
+                                />
+                                {b.visitorType === 'WALK_IN' ? 'Walk-in' : 'Booking'}
+                              </span>
+                              {(b.status === 'CONFIRMED' || b.status === 'confirmed') && (
+                                <Trash
+                                  size={16}
+                                  weight="duotone"
+                                  color="#FF3B30"
+                                  style={{ flexShrink: 0 }}
+                                />
+                              )}
+                              <CaretDown
+                                size={14}
+                                weight="duotone"
+                                color="#8E8E93"
+                                style={{
+                                  flexShrink: 0,
+                                  transform: isExpanded ? 'rotate(180deg)' : 'none',
+                                  transition: 'transform 0.15s',
+                                }}
+                              />
+                            </div>
                           </div>
 
                           {/* Expanded detail */}
@@ -1807,14 +2070,26 @@ export default function OverviewPage() {
                                         ) : (
                                           <button
                                             onClick={() => setShowServicePicker(b.id)}
-                                            className="mt-2.5 flex items-center gap-1.5 rounded-lg bg-[#f0f0ee] px-3 py-1.5 text-[0.75rem] font-medium text-[#555] transition-colors hover:bg-[#e5e5e2]"
+                                            style={{
+                                              background: 'none',
+                                              border: 'none',
+                                              cursor: 'pointer',
+                                              padding: 0,
+                                              fontSize: 13,
+                                              fontWeight: 500,
+                                              color: '#007AFF',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: 4,
+                                              marginTop: 8,
+                                            }}
                                           >
                                             <svg
                                               width="11"
                                               height="11"
                                               viewBox="0 0 12 12"
                                               fill="none"
-                                              stroke="currentColor"
+                                              stroke="#007AFF"
                                               strokeWidth="2.5"
                                               strokeLinecap="round"
                                             >
@@ -1959,14 +2234,26 @@ export default function OverviewPage() {
                                     ) : (
                                       <button
                                         onClick={() => setShowProductPicker(b.id)}
-                                        className="mt-2.5 flex items-center gap-1.5 rounded-lg bg-[#f0f0ee] px-3 py-1.5 text-[0.75rem] font-medium text-[#555] transition-colors hover:bg-[#e5e5e2]"
+                                        style={{
+                                          background: 'none',
+                                          border: 'none',
+                                          cursor: 'pointer',
+                                          padding: 0,
+                                          fontSize: 13,
+                                          fontWeight: 500,
+                                          color: '#007AFF',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: 4,
+                                          marginTop: 8,
+                                        }}
                                       >
                                         <svg
                                           width="11"
                                           height="11"
                                           viewBox="0 0 12 12"
                                           fill="none"
-                                          stroke="currentColor"
+                                          stroke="#007AFF"
                                           strokeWidth="2.5"
                                           strokeLinecap="round"
                                         >
@@ -1996,25 +2283,59 @@ export default function OverviewPage() {
                                 </div>
                               </div>
 
-                              {/* Pembayaran + Promo — sticky bottom */}
-                              <div className="mt-6 flex flex-col gap-2.5 border-t border-[#f0f0f0] pt-3">
-                                {/* Row 1: Status + Input pembayaran baru — same grid as columns above */}
-                                <div className="payment-section-mobile grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+                              {/* Pembayaran */}
+                              <div className="mt-6 border-t border-[#f0f0f0] pt-4">
+                                <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                                   {/* Card: Status pembayaran — col 1 */}
-                                  <div className="payment-status-card-mobile col-span-1 flex flex-col gap-4 rounded-xl border border-[#efefed] bg-white px-4 py-4 sm:col-span-2 sm:px-5 sm:py-5 md:col-span-1">
-                                    {/* Label + badge row */}
-                                    <div className="flex items-center justify-between gap-2">
-                                      <p className="text-[0.75rem] font-semibold uppercase tracking-wider text-[#555]">
+                                  <div
+                                    style={{
+                                      borderRadius: 12,
+                                      border: '1px solid #E5E5EA',
+                                      background: 'white',
+                                      padding: 16,
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: 12,
+                                    }}
+                                  >
+                                    <div
+                                      style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                      }}
+                                    >
+                                      <p
+                                        style={{
+                                          fontSize: 11,
+                                          fontWeight: 600,
+                                          textTransform: 'uppercase',
+                                          letterSpacing: '0.05em',
+                                          color: '#8E8E93',
+                                          margin: 0,
+                                        }}
+                                      >
                                         Status Pembayaran
                                       </p>
                                       <span
-                                        className={`shrink-0 rounded-full px-3 py-1 text-[0.75rem] font-semibold ${
-                                          b.paymentStatus === 'PAID'
-                                            ? 'bg-[#dcfce7] text-[#16a34a]'
-                                            : b.paymentStatus === 'DEPOSIT'
-                                              ? 'bg-[#fef9c3] text-[#a16207]'
-                                              : 'bg-[#f5f5f5] text-gray-500'
-                                        }`}
+                                        style={{
+                                          borderRadius: 9999,
+                                          padding: '4px 12px',
+                                          fontSize: 12,
+                                          fontWeight: 600,
+                                          background:
+                                            b.paymentStatus === 'PAID'
+                                              ? '#DCFCE7'
+                                              : b.paymentStatus === 'DEPOSIT'
+                                                ? '#FEF9C3'
+                                                : '#F5F5F5',
+                                          color:
+                                            b.paymentStatus === 'PAID'
+                                              ? '#16a34a'
+                                              : b.paymentStatus === 'DEPOSIT'
+                                                ? '#a16207'
+                                                : '#8E8E93',
+                                        }}
                                       >
                                         {b.paymentStatus === 'PAID'
                                           ? 'Lunas'
@@ -2023,7 +2344,6 @@ export default function OverviewPage() {
                                             : 'Belum bayar'}
                                       </span>
                                     </div>
-                                    {/* Progress section */}
                                     {(() => {
                                       const paid =
                                         b.paymentStatus === 'PAID'
@@ -2034,36 +2354,84 @@ export default function OverviewPage() {
                                       const pct =
                                         finalTotal > 0 ? Math.round((paid / finalTotal) * 100) : 0;
                                       return (
-                                        <div className="flex flex-col gap-3">
-                                          {/* Bar */}
-                                          <div className="h-2 overflow-hidden rounded-full bg-[#f0f0ee]">
+                                        <div
+                                          style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: 8,
+                                          }}
+                                        >
+                                          <div
+                                            style={{
+                                              height: 6,
+                                              borderRadius: 9999,
+                                              background: '#F2F2F7',
+                                              overflow: 'hidden',
+                                            }}
+                                          >
                                             <div
-                                              className={`h-full rounded-full transition-all duration-500 ${
-                                                b.paymentStatus === 'PAID'
-                                                  ? 'bg-[#16a34a]'
-                                                  : b.paymentStatus === 'DEPOSIT'
-                                                    ? 'bg-[#f59e0b]'
-                                                    : 'bg-[#e5e5e3]'
-                                              }`}
-                                              style={{ width: `${pct}%` }}
+                                              style={{
+                                                height: '100%',
+                                                borderRadius: 9999,
+                                                width: `${pct}%`,
+                                                transition: 'width 0.5s',
+                                                background:
+                                                  b.paymentStatus === 'PAID'
+                                                    ? '#34C759'
+                                                    : b.paymentStatus === 'DEPOSIT'
+                                                      ? '#FF9500'
+                                                      : '#E5E5EA',
+                                              }}
                                             />
                                           </div>
-                                          {/* Terbayar / sisa */}
-                                          <div className="flex items-end justify-between">
+                                          <div
+                                            style={{
+                                              display: 'flex',
+                                              justifyContent: 'space-between',
+                                              alignItems: 'flex-end',
+                                            }}
+                                          >
                                             <div>
-                                              <p className="text-[1rem] font-bold text-[#1a1a1a]">
+                                              <p
+                                                style={{
+                                                  fontSize: 18,
+                                                  fontWeight: 700,
+                                                  color: '#1C1C1E',
+                                                  margin: 0,
+                                                  lineHeight: 1,
+                                                }}
+                                              >
                                                 {formatRupiah(paid)}
                                               </p>
-                                              <p className="mt-0.5 text-[0.75rem] text-gray-500">
+                                              <p
+                                                style={{
+                                                  fontSize: 12,
+                                                  color: '#8E8E93',
+                                                  marginTop: 2,
+                                                }}
+                                              >
                                                 terbayar · {pct}%
                                               </p>
                                             </div>
                                             {b.paymentStatus === 'DEPOSIT' && (
-                                              <div className="text-right">
-                                                <p className="text-[1rem] font-semibold text-[#444]">
+                                              <div style={{ textAlign: 'right' }}>
+                                                <p
+                                                  style={{
+                                                    fontSize: 16,
+                                                    fontWeight: 600,
+                                                    color: '#3C3C43',
+                                                    margin: 0,
+                                                  }}
+                                                >
                                                   {formatRupiah(finalTotal - paid)}
                                                 </p>
-                                                <p className="mt-0.5 text-[0.75rem] text-gray-500">
+                                                <p
+                                                  style={{
+                                                    fontSize: 12,
+                                                    color: '#8E8E93',
+                                                    marginTop: 2,
+                                                  }}
+                                                >
                                                   sisa
                                                 </p>
                                               </div>
@@ -2072,11 +2440,181 @@ export default function OverviewPage() {
                                         </div>
                                       );
                                     })()}
+                                    {/* Kode Promo — inside Status Pembayaran */}
+                                    <div style={{ borderTop: '1px solid #F2F2F7', paddingTop: 12 }}>
+                                      <p
+                                        style={{
+                                          fontSize: 11,
+                                          fontWeight: 600,
+                                          textTransform: 'uppercase',
+                                          letterSpacing: '0.05em',
+                                          color: '#8E8E93',
+                                          marginBottom: 8,
+                                        }}
+                                      >
+                                        Kode Promo
+                                      </p>
+                                      {promoData?.appliedCode ? (
+                                        <div
+                                          style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 8,
+                                            borderRadius: 8,
+                                            border: '1px solid #BBF7D0',
+                                            background: '#F0FDF4',
+                                            padding: '8px 12px',
+                                          }}
+                                        >
+                                          <svg
+                                            width="12"
+                                            height="12"
+                                            viewBox="0 0 16 16"
+                                            fill="none"
+                                            stroke="#16a34a"
+                                            strokeWidth="1.8"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          >
+                                            <circle cx="8" cy="8" r="6.5" />
+                                            <path d="M5 8l2 2 4-4" />
+                                          </svg>
+                                          <span
+                                            style={{
+                                              fontSize: 13,
+                                              fontWeight: 500,
+                                              color: '#16a34a',
+                                            }}
+                                          >
+                                            {promoData.appliedCode}
+                                          </span>
+                                          <span style={{ fontSize: 12, color: '#4ade80' }}>
+                                            −{formatRupiah(discount)}
+                                          </span>
+                                          <button
+                                            onClick={() => removePromo(b.id)}
+                                            style={{
+                                              marginLeft: 'auto',
+                                              background: 'none',
+                                              border: 'none',
+                                              cursor: 'pointer',
+                                              fontSize: 12,
+                                              color: '#16a34a',
+                                            }}
+                                          >
+                                            ✕
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <div>
+                                          <div style={{ display: 'flex', gap: 8 }}>
+                                            <div
+                                              style={{
+                                                flex: 1,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 8,
+                                                height: 40,
+                                                borderRadius: 9999,
+                                                border: '1px solid #E5E5EA',
+                                                background: 'white',
+                                                padding: '0 14px',
+                                              }}
+                                            >
+                                              <svg
+                                                width="12"
+                                                height="12"
+                                                viewBox="0 0 16 16"
+                                                fill="none"
+                                                stroke="#C7C7CC"
+                                                strokeWidth="1.8"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                              >
+                                                <path d="M9.5 2.5l4 4-7 7-4-4 7-7z" />
+                                                <circle cx="5.5" cy="10.5" r="1" />
+                                              </svg>
+                                              <input
+                                                placeholder="Kode promo"
+                                                value={promoInputMap[b.id] ?? ''}
+                                                onChange={(e) =>
+                                                  setPromoInputMap((p) => ({
+                                                    ...p,
+                                                    [b.id]: e.target.value.toUpperCase(),
+                                                  }))
+                                                }
+                                                onKeyDown={(e) => {
+                                                  if (e.key === 'Enter')
+                                                    applyPromo(b.id, totalPrice);
+                                                }}
+                                                style={{
+                                                  flex: 1,
+                                                  background: 'none',
+                                                  border: 'none',
+                                                  outline: 'none',
+                                                  fontSize: 13,
+                                                  textTransform: 'uppercase',
+                                                  color: '#1C1C1E',
+                                                }}
+                                              />
+                                            </div>
+                                            <button
+                                              onClick={() => applyPromo(b.id, totalPrice)}
+                                              style={{
+                                                height: 40,
+                                                borderRadius: 9999,
+                                                background: '#1C1C1E',
+                                                color: 'white',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                padding: '0 20px',
+                                                fontSize: 13,
+                                                fontWeight: 600,
+                                                flexShrink: 0,
+                                              }}
+                                            >
+                                              Terapkan
+                                            </button>
+                                          </div>
+                                          {promoData?.error && (
+                                            <p
+                                              style={{
+                                                fontSize: 11,
+                                                color: '#ef4444',
+                                                marginTop: 4,
+                                              }}
+                                            >
+                                              {promoData.error}
+                                            </p>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
 
-                                  {/* Card: Input pembayaran baru */}
-                                  <div className="payment-input-card-mobile col-span-1 flex flex-col gap-2.5 rounded-xl border border-[#efefed] bg-white px-3 py-3 sm:col-span-2 sm:px-4 sm:py-3 md:col-span-2">
-                                    <p className="text-[0.6875rem] font-medium uppercase tracking-wider text-[#555]">
+                                  {/* Card: Input pembayaran — col 2-3 */}
+                                  <div
+                                    className="md:col-span-2"
+                                    style={{
+                                      borderRadius: 12,
+                                      border: '1px solid #E5E5EA',
+                                      background: 'white',
+                                      padding: 16,
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: 12,
+                                    }}
+                                  >
+                                    <p
+                                      style={{
+                                        fontSize: 11,
+                                        fontWeight: 600,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        color: '#8E8E93',
+                                        margin: 0,
+                                      }}
+                                    >
                                       {b.paymentStatus === 'PAID'
                                         ? 'Pembayaran Selesai'
                                         : 'Input Pembayaran'}
@@ -2144,52 +2682,17 @@ export default function OverviewPage() {
                                             className="flex-1 bg-transparent text-[0.875rem] font-medium text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
                                           />
                                         </div>
-                                        {/* Cash calculator */}
-                                        {(paymentMethodMap[b.id] ?? 'CASH') === 'CASH' &&
-                                          (() => {
-                                            const received = parseInt(
-                                              paymentAmountMap[b.id] ?? '0',
-                                              10
-                                            );
-                                            const kembalian = received - finalTotal;
-                                            return (
-                                              <div className="flex items-center gap-3 rounded-lg bg-[#f8f8f6] px-3 py-2">
-                                                <div className="flex-1">
-                                                  <p className="text-[0.6875rem] uppercase tracking-wide text-gray-500">
-                                                    Tagihan
-                                                  </p>
-                                                  <p className="text-[0.9375rem] font-semibold text-[#1a1a1a]">
-                                                    {formatRupiah(finalTotal)}
-                                                  </p>
-                                                </div>
-                                                <div className="h-8 w-px bg-[#ebebeb]" />
-                                                <div className="flex-1 text-right">
-                                                  <p className="text-[0.6875rem] uppercase tracking-wide text-gray-500">
-                                                    Kembalian
-                                                  </p>
-                                                  <p
-                                                    className={`text-[0.9375rem] font-semibold ${
-                                                      !paymentAmountMap[b.id]
-                                                        ? 'text-[#ccc]'
-                                                        : kembalian >= 0
-                                                          ? 'text-[#16a34a]'
-                                                          : 'text-[#ef4444]'
-                                                    }`}
-                                                  >
-                                                    {!paymentAmountMap[b.id]
-                                                      ? '—'
-                                                      : kembalian >= 0
-                                                        ? formatRupiah(kembalian)
-                                                        : `−${formatRupiah(Math.abs(kembalian))}`}
-                                                  </p>
-                                                </div>
-                                              </div>
-                                            );
-                                          })()}
-                                        {/* Method + Proses */}
-                                        <div className="flex flex-col items-end gap-1">
+                                        {/* Error + Proses Pembayaran */}
+                                        <div
+                                          style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: 6,
+                                            marginTop: 12,
+                                          }}
+                                        >
                                           {paymentError?.bookingId === b.id && (
-                                            <p className="text-[0.6875rem] text-[#ef4444]">
+                                            <p style={{ fontSize: 11, color: '#ef4444' }}>
                                               {paymentError.message}
                                             </p>
                                           )}
@@ -2206,7 +2709,6 @@ export default function OverviewPage() {
                                                 method !== 'CASH'
                                                   ? finalTotal
                                                   : parseInt(rawAmount, 10);
-
                                               if (method === 'CASH' && !rawAmount) {
                                                 setPaymentError({
                                                   bookingId: b.id,
@@ -2224,7 +2726,6 @@ export default function OverviewPage() {
                                                 });
                                                 return;
                                               }
-
                                               setConfirmDialog({
                                                 bookingId: b.id,
                                                 customerName: b.customerName,
@@ -2234,7 +2735,22 @@ export default function OverviewPage() {
                                                 finalTotal,
                                               });
                                             }}
-                                            className="ml-auto h-8 rounded-lg bg-[#16a34a] px-4 text-[0.75rem] font-semibold text-white transition-colors hover:bg-[#15803d] disabled:cursor-not-allowed disabled:opacity-35"
+                                            style={{
+                                              height: 44,
+                                              borderRadius: 9999,
+                                              border: 'none',
+                                              background: '#34C759',
+                                              color: 'white',
+                                              fontSize: 14,
+                                              fontWeight: 600,
+                                              cursor: processPaymentMutation.isPending
+                                                ? 'not-allowed'
+                                                : 'pointer',
+                                              opacity: processPaymentMutation.isPending ? 0.6 : 1,
+                                              transition: 'opacity 0.15s',
+                                              padding: '0 28px',
+                                              alignSelf: 'flex-end',
+                                            }}
                                           >
                                             {processPaymentMutation.isPending
                                               ? 'Memproses...'
@@ -2243,98 +2759,6 @@ export default function OverviewPage() {
                                         </div>
                                       </>
                                     )}
-                                  </div>
-                                </div>
-
-                                {/* Row 2: Promo + Total */}
-                                <div className="flex flex-col items-start gap-3 border-t border-[#f8f8f6] pt-2 sm:flex-col sm:items-start md:flex-row md:items-center">
-                                  {/* Promo */}
-                                  <div className="flex flex-1 flex-col gap-0.5">
-                                    {promoData?.appliedCode ? (
-                                      <div className="flex items-center gap-1.5 rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] px-2 py-1">
-                                        <svg
-                                          width="11"
-                                          height="11"
-                                          viewBox="0 0 16 16"
-                                          fill="none"
-                                          stroke="#16a34a"
-                                          strokeWidth="1.8"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                        >
-                                          <circle cx="8" cy="8" r="6.5" />
-                                          <path d="M5 8l2 2 4-4" />
-                                        </svg>
-                                        <span className="text-[0.75rem] font-medium text-[#16a34a]">
-                                          {promoData.appliedCode}
-                                        </span>
-                                        <span className="text-[0.6875rem] text-[#4ade80]">
-                                          −{formatRupiah(discount)}
-                                        </span>
-                                        <button
-                                          onClick={() => removePromo(b.id)}
-                                          className="ml-auto text-[0.6875rem] font-medium text-[#16a34a] hover:text-[#15803d]"
-                                        >
-                                          ✕
-                                        </button>
-                                      </div>
-                                    ) : (
-                                      <div>
-                                        <div className="flex items-center gap-1.5">
-                                          <div className="flex h-7 w-[8rem] items-center gap-1.5 rounded-lg border border-[#e8e8e8] bg-white px-2 transition-colors focus-within:border-[#bbb]">
-                                            <svg
-                                              width="11"
-                                              height="11"
-                                              viewBox="0 0 16 16"
-                                              fill="none"
-                                              stroke="#ccc"
-                                              strokeWidth="1.8"
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                            >
-                                              <path d="M9.5 2.5l4 4-7 7-4-4 7-7z" />
-                                              <circle cx="5.5" cy="10.5" r="1" />
-                                            </svg>
-                                            <input
-                                              placeholder="Kode promo"
-                                              value={promoInputMap[b.id] ?? ''}
-                                              onChange={(e) =>
-                                                setPromoInputMap((p) => ({
-                                                  ...p,
-                                                  [b.id]: e.target.value.toUpperCase(),
-                                                }))
-                                              }
-                                              onKeyDown={(e) => {
-                                                if (e.key === 'Enter') applyPromo(b.id, totalPrice);
-                                              }}
-                                              className="w-full bg-transparent text-[0.75rem] uppercase tracking-wider text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
-                                            />
-                                          </div>
-                                          <button
-                                            onClick={() => applyPromo(b.id, totalPrice)}
-                                            className="h-7 shrink-0 rounded-lg bg-[#1a1a1a] px-3 text-[0.6875rem] font-medium text-white transition-colors hover:bg-[#333]"
-                                          >
-                                            Terapkan
-                                          </button>
-                                        </div>
-                                        {promoData?.error && (
-                                          <p className="text-[0.6875rem] text-[#ef4444]">
-                                            {promoData.error}
-                                          </p>
-                                        )}
-                                      </div>
-                                    )}
-                                  </div>
-                                  {/* Total */}
-                                  <div className="shrink-0 text-right">
-                                    {discount > 0 && (
-                                      <p className="text-[0.75rem] text-gray-400 line-through">
-                                        {formatRupiah(totalPrice)}
-                                      </p>
-                                    )}
-                                    <p className="text-[1rem] font-semibold text-[#1a1a1a]">
-                                      {formatRupiah(finalTotal)}
-                                    </p>
                                   </div>
                                 </div>
                               </div>
@@ -2410,13 +2834,14 @@ export default function OverviewPage() {
                           {/* Avatar */}
                           <div className="relative flex-shrink-0">
                             <div
-                              className="flex h-10 w-10 items-center justify-center rounded-full text-[0.8125rem] font-semibold"
+                              className="flex h-10 w-10 items-center justify-center text-[0.8125rem] font-semibold"
                               style={{
                                 backgroundColor: avatarColor(b.customerName).bg,
                                 color: avatarColor(b.customerName).text,
+                                borderRadius: 8,
                               }}
                             >
-                              {b.customerName.charAt(0)}
+                              {getInitials(b.customerName)}
                             </div>
                           </div>
 

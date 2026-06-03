@@ -1,5 +1,6 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
+import { SALON_SLUG } from "@/config/constants";
 
 export default function Home() {
-  notFound();
+  redirect(`/book/${SALON_SLUG}`);
 }

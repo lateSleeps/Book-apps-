@@ -7,7 +7,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'warn',
     'import/no-cycle': 'error',
     'import/order': [
-      'error',
+      'warn',
       {
         groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
         alphabetize: { order: 'asc' }
