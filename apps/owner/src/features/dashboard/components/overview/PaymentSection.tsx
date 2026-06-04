@@ -46,10 +46,7 @@ export function PaymentSection({
   const finalTotal = serviceTotal - discount;
 
   return (
-    <div
-      className="payment-grid-tablet grid gap-5 border-t border-bd-detail pt-4"
-      style={{ gridTemplateColumns: '1fr 2fr' }}
-    >
+    <div className="mt-6 grid grid-cols-1 gap-3 border-t border-[#f0f0f0] pt-4 md:grid-cols-3">
       <PaymentStatusCard
         booking={booking}
         finalTotal={finalTotal}

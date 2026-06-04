@@ -15,10 +15,7 @@
 
 'use client';
 
-import type {
-  BookingPaymentState,
-  SettlementProof,
-} from '../../hooks/overview/use-booking-payment';
+import type { BookingPaymentState } from '../../hooks/overview/use-booking-payment';
 import type { BookingPromoState } from '../../hooks/overview/use-booking-promo';
 import type { DashboardBooking } from '../../types/dashboard.types';
 import type { PaymentMethod } from '../../types/overview.types';
@@ -67,13 +64,13 @@ export function PaymentInputCard({
     <div
       className="md:col-span-2"
       style={{
-        borderRadius: '0.75rem',
+        borderRadius: 12,
         background: 'white',
-        border: '1px solid #f0f0f0',
-        padding: '1rem',
+        padding: 16,
         display: 'flex',
         flexDirection: 'column',
-        gap: '0.875rem',
+        gap: 12,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
       }}
     >
       {/* Header */}

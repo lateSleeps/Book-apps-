@@ -42,13 +42,13 @@ export function PaymentStatusCard({
   return (
     <div
       style={{
-        borderRadius: '0.75rem',
+        borderRadius: 12,
         background: 'white',
-        border: '1px solid #f0f0f0',
-        padding: '1rem',
+        padding: 16,
         display: 'flex',
         flexDirection: 'column',
-        gap: '0.75rem',
+        gap: 12,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
       }}
     >
       {/* Header */}
