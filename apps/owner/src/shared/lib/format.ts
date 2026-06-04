@@ -38,3 +38,19 @@ export function formatCountdown(seconds: number): string {
   const s = seconds % 60;
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
+
+/**
+ * Format a number as compact Rupiah for stat cards.
+ * e.g. 1500000 → "1.5M", 85000 → "85K"
+ *
+ * @usedBy StatCardsRow, overview/page.tsx
+ */
+export function formatCompactRupiah(value: number): string {
+  if (value >= 1_000_000) {
+    return (value / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+  }
+  if (value >= 1_000) {
+    return (value / 1_000).toFixed(0) + 'K';
+  }
+  return value.toString();
+}
