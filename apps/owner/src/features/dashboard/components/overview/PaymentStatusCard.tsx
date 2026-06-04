@@ -43,6 +43,8 @@ export function PaymentStatusCard({
         flexDirection: 'column',
         gap: 12,
         boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+        height: '100%',
+        boxSizing: 'border-box',
       }}
     >
       {/* Header */}

@@ -208,9 +208,24 @@ export function BookingDetailPanel({
                         };
                         await status.confirmBooking(b.id, waData);
                       }}
-                      className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-r10 bg-ac-primary text-ts-fn font-semibold text-white transition-colors hover:bg-blue-700"
+                      style={{
+                        display: 'flex',
+                        height: 36,
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 6,
+                        borderRadius: 10,
+                        background: '#2563eb',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: 'white',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'background 0.15s',
+                      }}
                     >
-                      <CheckIcon className="h-3.5 w-3.5" />
+                      <CheckIcon className="h-3.5 w-3.5 text-white" />
                       Konfirmasi
                     </button>
                     <button
@@ -223,16 +238,32 @@ export function BookingDetailPanel({
                           customerPhone: b.customerPhone,
                         });
                       }}
-                      className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-r10 border border-bd-card bg-bg-input text-ts-fn font-semibold text-st-cancelled transition-colors hover:bg-red-50"
+                      style={{
+                        display: 'flex',
+                        height: 36,
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 6,
+                        borderRadius: 10,
+                        background: '#F9F9FB',
+                        border: '1px solid #E5E5EA',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: '#ef4444',
+                        cursor: 'pointer',
+                        transition: 'background 0.15s',
+                      }}
                     >
                       <svg
-                        width="11"
-                        height="11"
+                        width="13"
+                        height="13"
                         viewBox="0 0 16 16"
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="2.5"
                         strokeLinecap="round"
+                        strokeLinejoin="round"
                       >
                         <path d="M3 3l10 10M13 3L3 13" />
                       </svg>

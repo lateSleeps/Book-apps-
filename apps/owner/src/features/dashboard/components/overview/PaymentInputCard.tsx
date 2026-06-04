@@ -56,6 +56,8 @@ export function PaymentInputCard({ booking: b, finalTotal, payment }: PaymentInp
         flexDirection: 'column',
         gap: 12,
         boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+        height: '100%',
+        boxSizing: 'border-box',
       }}
     >
       {/* Header */}
@@ -266,14 +268,14 @@ export function PaymentInputCard({ booking: b, finalTotal, payment }: PaymentInp
             </div>
           )}
 
-          {/* Bottom row: Bukti Pelunasan (left) + Proses Pembayaran (right) */}
+          {/* Bottom row: Bukti Pelunasan (left) + Proses Pembayaran (right) — rata bawah */}
           <div
             style={{
               display: 'flex',
               gap: 8,
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginTop: 4,
+              marginTop: 'auto',
             }}
           >
             {/* Bukti pelunasan upload — hanya TRANSFER/QRIS */}
