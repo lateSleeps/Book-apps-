@@ -45,6 +45,7 @@ export interface WalkInFlowState {
   // ── Form ───────────────────────────────────────────────────────────────────
   walkInForm: WalkInFormData;
   setWalkInField: <K extends keyof WalkInFormData>(field: K, value: WalkInFormData[K]) => void;
+  setWalkInForm: React.Dispatch<React.SetStateAction<WalkInFormData>>;
 
   // ── Service search ─────────────────────────────────────────────────────────
   drawerServiceSearch: string;
@@ -284,6 +285,7 @@ export function useWalkInFlow(callbacks: WalkInCallbacks): WalkInFlowState {
     setAddDropdownOpen,
     walkInForm,
     setWalkInField,
+    setWalkInForm,
     drawerServiceSearch,
     setDrawerServiceSearch,
     drawerServiceOpen,
