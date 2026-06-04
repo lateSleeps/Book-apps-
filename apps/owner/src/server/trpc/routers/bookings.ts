@@ -174,7 +174,7 @@ export const bookingsRouter = router({
         paymentMethod: z.enum(['cash', 'transfer', 'qris']),
         amountReceived: z.number().int().min(0),
         servicePrice: z.number().int().min(0),
-        paymentProofUrl: z.string().optional(),
+        settlementProofUrl: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -193,7 +193,7 @@ export const bookingsRouter = router({
           paid_at: new Date().toISOString(),
           status: 'COMPLETED',
           updated_at: new Date().toISOString(),
-          ...(input.paymentProofUrl ? { settlement_proof_url: input.paymentProofUrl } : {}),
+          ...(input.settlementProofUrl ? { settlement_proof_url: input.settlementProofUrl } : {}),
         })
         .eq('id', input.bookingId)
         .select('id, payment_status, status')

@@ -165,6 +165,158 @@ const MOCK_PRODUCTS: MockProduct[] = [
 
 type ServiceData = { serviceName: string; price: number; categoryName: string };
 
+// DEV-only seed data — remove before production
+const _TODAY = new Date().toISOString().slice(0, 10);
+const DUMMY_BOOKINGS: import('@/features/dashboard/types/dashboard.types').DashboardBooking[] = [
+  {
+    id: 'dummy-1',
+    bookingCode: 'BK-D001',
+    customerName: 'Siti Rahayu',
+    customerPhone: '081234561001',
+    serviceName: 'Haircut & Blow Dry',
+    categoryName: 'Hair',
+    stylistName: 'Maya Putri',
+    stylistInitials: 'MP',
+    stylistColor: '#FF6B9D',
+    date: _TODAY,
+    timeSlot: '09:00:00',
+    endTime: '10:00:00',
+    duration: 60,
+    price: 85000,
+    status: 'CONFIRMED',
+    visitorType: 'BOOKING',
+    paymentStatus: 'DEPOSIT',
+    addOns: [],
+    notes: '',
+  },
+  {
+    id: 'dummy-2',
+    bookingCode: 'BK-D002',
+    customerName: 'Dewi Kusuma',
+    customerPhone: '081234561002',
+    serviceName: 'Make Up Natural',
+    categoryName: 'Make Up',
+    stylistName: 'Maya Putri',
+    stylistInitials: 'MP',
+    stylistColor: '#FF6B9D',
+    date: _TODAY,
+    timeSlot: '10:00:00',
+    endTime: '11:00:00',
+    duration: 60,
+    price: 200000,
+    status: 'UPCOMING',
+    visitorType: 'BOOKING',
+    paymentStatus: 'DEPOSIT',
+    addOns: [],
+    notes: '',
+  },
+  {
+    id: 'dummy-3',
+    bookingCode: 'WI-D003',
+    customerName: 'Rina Marlina',
+    customerPhone: '081234561003',
+    serviceName: 'Creambath',
+    categoryName: 'Hair',
+    stylistName: 'Maya Putri',
+    stylistInitials: 'MP',
+    stylistColor: '#FF6B9D',
+    date: _TODAY,
+    timeSlot: '11:00:00',
+    endTime: '12:00:00',
+    duration: 60,
+    price: 120000,
+    status: 'IN_PROGRESS',
+    visitorType: 'WALK_IN',
+    paymentStatus: 'UNPAID',
+    addOns: [],
+    notes: 'Walk-in',
+  },
+  {
+    id: 'dummy-4',
+    bookingCode: 'WI-D004',
+    customerName: 'Aulia Putri',
+    customerPhone: '081234561004',
+    serviceName: 'Facial Basic',
+    categoryName: 'Face',
+    stylistName: 'Maya Putri',
+    stylistInitials: 'MP',
+    stylistColor: '#FF6B9D',
+    date: _TODAY,
+    timeSlot: '13:00:00',
+    endTime: '14:00:00',
+    duration: 60,
+    price: 150000,
+    status: 'CONFIRMED',
+    visitorType: 'WALK_IN',
+    paymentStatus: 'UNPAID',
+    addOns: [],
+    notes: 'Walk-in',
+  },
+  {
+    id: 'dummy-5',
+    bookingCode: 'BK-D005',
+    customerName: 'Nisa Amalia',
+    customerPhone: '081234561005',
+    serviceName: 'Keratin Treatment',
+    categoryName: 'Hair',
+    stylistName: 'Maya Putri',
+    stylistInitials: 'MP',
+    stylistColor: '#FF6B9D',
+    date: _TODAY,
+    timeSlot: '14:00:00',
+    endTime: '16:00:00',
+    duration: 120,
+    price: 350000,
+    status: 'COMPLETED',
+    visitorType: 'BOOKING',
+    paymentStatus: 'PAID',
+    addOns: [],
+    notes: '',
+  },
+  {
+    id: 'dummy-6',
+    bookingCode: 'BK-D006',
+    customerName: 'Mega Wulandari',
+    customerPhone: '081234561006',
+    serviceName: 'Nail Art',
+    categoryName: 'Nail',
+    stylistName: 'Maya Putri',
+    stylistInitials: 'MP',
+    stylistColor: '#FF6B9D',
+    date: _TODAY,
+    timeSlot: '15:00:00',
+    endTime: '16:00:00',
+    duration: 60,
+    price: 95000,
+    status: 'UPCOMING',
+    visitorType: 'BOOKING',
+    paymentStatus: 'DEPOSIT',
+    addOns: [],
+    notes: '',
+  },
+  {
+    id: 'dummy-7',
+    bookingCode: 'WI-D007',
+    customerName: 'Fitri Handayani',
+    customerPhone: '081234561007',
+    serviceName: 'Body Massage',
+    categoryName: 'Massage',
+    stylistName: 'Maya Putri',
+    stylistInitials: 'MP',
+    stylistColor: '#FF6B9D',
+    date: _TODAY,
+    timeSlot: '16:00:00',
+    endTime: '17:00:00',
+    duration: 60,
+    price: 180000,
+    status: 'CONFIRMED',
+    visitorType: 'WALK_IN',
+    paymentStatus: 'UNPAID',
+    addOns: [],
+    notes: 'Walk-in',
+  },
+];
+
 const PROMO_CODES: Record<string, { type: 'percent' | 'fixed'; value: number }> = {
   DISKON10: { type: 'percent', value: 10 },
   HEMAT50K: { type: 'fixed', value: 50000 },
@@ -212,157 +364,10 @@ export default function OverviewPage() {
     bookingId: string;
     customerName: string;
   } | null>(null);
-  const [manualBookings, setManualBookings] = useState<
-    import('@/features/dashboard/types/dashboard.types').DashboardBooking[]
-  >([
-    {
-      id: 'dummy-1',
-      bookingCode: 'BK-D001',
-      customerName: 'Siti Rahayu',
-      customerPhone: '081234561001',
-      serviceName: 'Haircut & Blow Dry',
-      categoryName: 'Hair',
-      stylistName: 'Maya Putri',
-      stylistInitials: 'MP',
-      stylistColor: '#FF6B9D',
-      date: new Date().toISOString().slice(0, 10),
-      timeSlot: '09:00:00',
-      endTime: '10:00:00',
-      duration: 60,
-      price: 85000,
-      status: 'CONFIRMED',
-      visitorType: 'BOOKING',
-      paymentStatus: 'DEPOSIT',
-      addOns: [],
-      notes: '',
-    },
-    {
-      id: 'dummy-2',
-      bookingCode: 'BK-D002',
-      customerName: 'Dewi Kusuma',
-      customerPhone: '081234561002',
-      serviceName: 'Make Up Natural',
-      categoryName: 'Make Up',
-      stylistName: 'Maya Putri',
-      stylistInitials: 'MP',
-      stylistColor: '#FF6B9D',
-      date: new Date().toISOString().slice(0, 10),
-      timeSlot: '10:00:00',
-      endTime: '11:00:00',
-      duration: 60,
-      price: 200000,
-      status: 'UPCOMING',
-      visitorType: 'BOOKING',
-      paymentStatus: 'DEPOSIT',
-      addOns: [],
-      notes: '',
-    },
-    {
-      id: 'dummy-3',
-      bookingCode: 'WI-D003',
-      customerName: 'Rina Marlina',
-      customerPhone: '081234561003',
-      serviceName: 'Creambath',
-      categoryName: 'Hair',
-      stylistName: 'Maya Putri',
-      stylistInitials: 'MP',
-      stylistColor: '#FF6B9D',
-      date: new Date().toISOString().slice(0, 10),
-      timeSlot: '11:00:00',
-      endTime: '12:00:00',
-      duration: 60,
-      price: 120000,
-      status: 'IN_PROGRESS',
-      visitorType: 'WALK_IN',
-      paymentStatus: 'UNPAID',
-      addOns: [],
-      notes: 'Walk-in',
-    },
-    {
-      id: 'dummy-4',
-      bookingCode: 'WI-D004',
-      customerName: 'Aulia Putri',
-      customerPhone: '081234561004',
-      serviceName: 'Facial Basic',
-      categoryName: 'Face',
-      stylistName: 'Maya Putri',
-      stylistInitials: 'MP',
-      stylistColor: '#FF6B9D',
-      date: new Date().toISOString().slice(0, 10),
-      timeSlot: '13:00:00',
-      endTime: '14:00:00',
-      duration: 60,
-      price: 150000,
-      status: 'CONFIRMED',
-      visitorType: 'WALK_IN',
-      paymentStatus: 'UNPAID',
-      addOns: [],
-      notes: 'Walk-in',
-    },
-    {
-      id: 'dummy-5',
-      bookingCode: 'BK-D005',
-      customerName: 'Nisa Amalia',
-      customerPhone: '081234561005',
-      serviceName: 'Keratin Treatment',
-      categoryName: 'Hair',
-      stylistName: 'Maya Putri',
-      stylistInitials: 'MP',
-      stylistColor: '#FF6B9D',
-      date: new Date().toISOString().slice(0, 10),
-      timeSlot: '14:00:00',
-      endTime: '16:00:00',
-      duration: 120,
-      price: 350000,
-      status: 'COMPLETED',
-      visitorType: 'BOOKING',
-      paymentStatus: 'PAID',
-      addOns: [],
-      notes: '',
-    },
-    {
-      id: 'dummy-6',
-      bookingCode: 'BK-D006',
-      customerName: 'Mega Wulandari',
-      customerPhone: '081234561006',
-      serviceName: 'Nail Art',
-      categoryName: 'Nail',
-      stylistName: 'Maya Putri',
-      stylistInitials: 'MP',
-      stylistColor: '#FF6B9D',
-      date: new Date().toISOString().slice(0, 10),
-      timeSlot: '15:00:00',
-      endTime: '16:00:00',
-      duration: 60,
-      price: 95000,
-      status: 'UPCOMING',
-      visitorType: 'BOOKING',
-      paymentStatus: 'DEPOSIT',
-      addOns: [],
-      notes: '',
-    },
-    {
-      id: 'dummy-7',
-      bookingCode: 'WI-D007',
-      customerName: 'Fitri Handayani',
-      customerPhone: '081234561007',
-      serviceName: 'Body Massage',
-      categoryName: 'Massage',
-      stylistName: 'Maya Putri',
-      stylistInitials: 'MP',
-      stylistColor: '#FF6B9D',
-      date: new Date().toISOString().slice(0, 10),
-      timeSlot: '16:00:00',
-      endTime: '17:00:00',
-      duration: 60,
-      price: 180000,
-      status: 'CONFIRMED',
-      visitorType: 'WALK_IN',
-      paymentStatus: 'UNPAID',
-      addOns: [],
-      notes: 'Walk-in',
-    },
-  ]);
+  const [manualBookings, setManualBookings] =
+    useState<import('@/features/dashboard/types/dashboard.types').DashboardBooking[]>(
+      DUMMY_BOOKINGS
+    );
   const [addOnsMap, setAddOnsMap] = useState<Record<string, AddOn[]>>({});
   const [notesMap, setNotesMap] = useState<Record<string, string>>({});
   const [serviceMap, setServiceMap] = useState<Record<string, ServiceData>>({});
@@ -405,7 +410,10 @@ export default function OverviewPage() {
   const [paymentError, setPaymentError] = useState<{ bookingId: string; message: string } | null>(
     null
   );
-  const [proofZoom, setProofZoom] = useState<string | null>(null);
+  const [proofZoom, setProofZoom] = useState<{
+    bookingId: string;
+    type: 'dp' | 'settlement';
+  } | null>(null);
   const [pelunasanProofMap, setPelunasanProofMap] = useState<
     Record<string, { file: File; preview: string } | null>
   >({});
@@ -2015,7 +2023,9 @@ export default function OverviewPage() {
                                         {/* Thumbnail bukti pembayaran — dari database */}
                                         {b.paymentProofUrl ? (
                                           <button
-                                            onClick={() => setProofZoom(b.id)}
+                                            onClick={() =>
+                                              setProofZoom({ bookingId: b.id, type: 'dp' })
+                                            }
                                             className="group relative w-full overflow-hidden rounded-xl border border-[#e8e8e6] transition-colors hover:border-[#ccc]"
                                           >
                                             <img
@@ -3186,7 +3196,9 @@ export default function OverviewPage() {
                                         {/* Bukti pelunasan — button kecil */}
                                         {b.settlementProofUrl ? (
                                           <button
-                                            onClick={() => setProofZoom(`settlement_${b.id}`)}
+                                            onClick={() =>
+                                              setProofZoom({ bookingId: b.id, type: 'settlement' })
+                                            }
                                             style={{
                                               display: 'flex',
                                               alignItems: 'center',
@@ -3457,6 +3469,9 @@ export default function OverviewPage() {
                                                   onChange={(e) => {
                                                     const file = e.target.files?.[0];
                                                     if (!file) return;
+                                                    const existing = pelunasanProofMap[b.id];
+                                                    if (existing?.preview)
+                                                      URL.revokeObjectURL(existing.preview);
                                                     const preview = URL.createObjectURL(file);
                                                     setPelunasanProofMap((p) => ({
                                                       ...p,
@@ -4012,6 +4027,8 @@ export default function OverviewPage() {
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (!file) return;
+                              const existingPreview = pelunasanProofMap[d.bookingId]?.preview;
+                              if (existingPreview) URL.revokeObjectURL(existingPreview);
                               const preview = URL.createObjectURL(file);
                               setPelunasanProofMap((p) => ({
                                 ...p,
@@ -4104,9 +4121,11 @@ export default function OverviewPage() {
                           paymentMethod: method,
                           amountReceived: d.amount,
                           servicePrice: d.finalTotal,
-                          paymentProofUrl: proofUrl,
+                          settlementProofUrl: proofUrl,
                         });
                         setConfirmDialog(null);
+                        const donePreview = pelunasanProofMap[d.bookingId]?.preview;
+                        if (donePreview) URL.revokeObjectURL(donePreview);
                         setPelunasanProofMap((p) => ({ ...p, [d.bookingId]: null }));
                       } catch (e) {
                         setUploadingProof(false);
@@ -4233,8 +4252,8 @@ export default function OverviewPage() {
       {/* Proof zoom modal */}
       {proofZoom &&
         (() => {
-          const isSettlement = proofZoom.startsWith('settlement_');
-          const bookingId = isSettlement ? proofZoom.replace('settlement_', '') : proofZoom;
+          const { bookingId, type } = proofZoom;
+          const isSettlement = type === 'settlement';
           const booking =
             allBookings.find((b) => b.id === bookingId) ??
             manualBookings.find((b) => b.id === bookingId);
