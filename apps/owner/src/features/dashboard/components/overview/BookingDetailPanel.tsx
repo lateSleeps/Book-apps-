@@ -161,8 +161,8 @@ export function BookingDetailPanel({
               {effectiveStatus === 'UPCOMING' &&
                 (status.confirmingId === b.id ? (
                   <div className="flex animate-pulse gap-2">
-                    <div className="h-9 flex-1 rounded-r10 bg-blue-100" />
-                    <div className="h-9 flex-1 rounded-r10 bg-bg-surface" />
+                    <div className="h-9 flex-1 rounded-[10px] bg-blue-100" />
+                    <div className="h-9 flex-1 rounded-[10px] bg-[#f0f0f0]" />
                   </div>
                 ) : (
                   <div className="flex gap-2">
@@ -214,9 +214,66 @@ export function BookingDetailPanel({
                 ))}
 
               {effectiveStatus === 'CONFIRMED' && (
-                <div className="flex items-center gap-1.5 rounded-r8 bg-blue-50 px-3 py-1.5">
-                  <CheckIcon className="h-3.5 w-3.5 text-ac-primary" />
-                  <span className="text-ts-fn font-medium text-ac-primary">Terkonfirmasi</span>
+                <div
+                  style={{
+                    display: 'flex',
+                    height: 36,
+                    width: '100%',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    borderRadius: 10,
+                    background: '#2563eb',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: 'white',
+                  }}
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 8l3 3 7-7" />
+                  </svg>
+                  Terkonfirmasi
+                </div>
+              )}
+
+              {effectiveStatus === 'CANCELLED' && (
+                <div
+                  style={{
+                    display: 'flex',
+                    height: 36,
+                    width: '100%',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    borderRadius: 10,
+                    background: '#ef4444',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: 'white',
+                  }}
+                >
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 3l10 10M13 3L3 13" />
+                  </svg>
+                  Ditolak
                 </div>
               )}
             </div>
@@ -229,92 +286,206 @@ export function BookingDetailPanel({
             <Label>Layanan</Label>
             {detail.editServiceId === b.id ? (
               /* Edit service picker */
-              <div className="relative z-20">
-                <div className="flex h-8 items-center gap-2 rounded-r8 border border-bd-card bg-white px-2">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="#8E8E93"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
+              <div style={{ position: 'relative', zIndex: 20 }}>
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    background: 'white',
+                    borderRadius: 14,
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {/* Search bar */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      padding: '10px 12px',
+                      background: '#F2F2F7',
+                      margin: 8,
+                      borderRadius: 10,
+                    }}
                   >
-                    <circle cx="7" cy="7" r="5" />
-                    <path d="M11 11l3 3" />
-                  </svg>
-                  <input
-                    autoFocus
-                    type="text"
-                    placeholder="Cari layanan..."
-                    value={detail.serviceSearchQuery}
-                    onChange={(e) => detail.setServiceSearchQuery(e.target.value)}
-                    className="flex-1 bg-transparent text-ts-fn text-tx-primary outline-none placeholder:text-tx-muted"
-                  />
-                  {detail.serviceSearchQuery && (
-                    <button
-                      onClick={() => detail.setServiceSearchQuery('')}
-                      className="flex h-4 w-4 items-center justify-center rounded-full bg-tx-muted"
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="#8E8E93"
+                      strokeWidth="2"
+                      strokeLinecap="round"
                     >
-                      <svg
-                        width="8"
-                        height="8"
-                        viewBox="0 0 8 8"
-                        fill="none"
-                        stroke="white"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      >
-                        <path d="M1.5 1.5l5 5M6.5 1.5l-5 5" />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-                <div className="absolute left-0 right-0 top-9 z-30 max-h-44 overflow-y-auto rounded-r10 border border-bd-card bg-white shadow-card">
-                  {MOCK_SERVICES.filter((s) =>
-                    s.name.toLowerCase().includes(detail.serviceSearchQuery.toLowerCase())
-                  ).map((svc) => (
-                    <button
-                      key={svc.id}
-                      onClick={() => {
-                        detail.changeService(b.id, svc);
-                        detail.setServiceSearchQuery('');
+                      <circle cx="7" cy="7" r="5" />
+                      <path d="M11 11l3 3" />
+                    </svg>
+                    <input
+                      autoFocus
+                      type="text"
+                      placeholder="Cari layanan..."
+                      value={detail.serviceSearchQuery}
+                      onChange={(e) => detail.setServiceSearchQuery(e.target.value)}
+                      style={{
+                        flex: 1,
+                        background: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        fontSize: 13,
+                        color: '#1C1C1E',
+                        fontFamily: 'inherit',
                       }}
-                      className="flex w-full items-center justify-between px-3 py-2 text-left transition-colors hover:bg-bg-surface"
-                    >
-                      <span className="text-ts-fn text-tx-primary">{svc.name}</span>
-                      <span className="text-ts-fn text-tx-secondary">
-                        {formatRupiah(svc.price)}
-                      </span>
-                    </button>
-                  ))}
+                    />
+                    {detail.serviceSearchQuery && (
+                      <button
+                        onClick={() => detail.setServiceSearchQuery('')}
+                        style={{
+                          background: '#C7C7CC',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: 16,
+                          height: 16,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          flexShrink: 0,
+                          padding: 0,
+                        }}
+                      >
+                        <svg
+                          width="8"
+                          height="8"
+                          viewBox="0 0 10 10"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                        >
+                          <path d="M2 2l6 6M8 2l-6 6" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                  {/* Results grouped by category */}
+                  <div style={{ maxHeight: 240, overflowY: 'auto', paddingBottom: 8 }}>
+                    {['Hair', 'Colour', 'Face', 'Nail', 'Massage'].map((cat) => {
+                      const catServices = MOCK_SERVICES.filter(
+                        (s) =>
+                          s.categoryName === cat &&
+                          s.name.toLowerCase().includes(detail.serviceSearchQuery.toLowerCase())
+                      );
+                      if (!catServices.length) return null;
+                      return (
+                        <div key={cat}>
+                          {!detail.serviceSearchQuery && (
+                            <p
+                              style={{
+                                fontSize: 11,
+                                fontWeight: 600,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.08em',
+                                color: '#8E8E93',
+                                padding: '10px 16px 4px',
+                                margin: 0,
+                              }}
+                            >
+                              {cat}
+                            </p>
+                          )}
+                          {catServices.map((svc) => {
+                            const isActive = currentService.serviceName === svc.name;
+                            return (
+                              <button
+                                key={svc.id}
+                                onClick={() => {
+                                  detail.changeService(b.id, svc);
+                                  detail.setServiceSearchQuery('');
+                                }}
+                                style={{
+                                  display: 'flex',
+                                  width: '100%',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  padding: '10px 16px',
+                                  border: 'none',
+                                  background: isActive ? '#F0F4FF' : 'transparent',
+                                  cursor: 'pointer',
+                                  textAlign: 'left',
+                                  transition: 'background 0.1s',
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (!isActive) e.currentTarget.style.background = '#F5F5F7';
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (!isActive) e.currentTarget.style.background = 'transparent';
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    fontSize: 14,
+                                    fontWeight: isActive ? 600 : 400,
+                                    color: isActive ? '#2563eb' : '#1C1C1E',
+                                  }}
+                                >
+                                  {svc.name}
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: 13,
+                                    color: '#8E8E93',
+                                    flexShrink: 0,
+                                    marginLeft: 12,
+                                  }}
+                                >
+                                  {formatRupiah(svc.price)}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                    {MOCK_SERVICES.filter((s) =>
+                      s.name.toLowerCase().includes(detail.serviceSearchQuery.toLowerCase())
+                    ).length === 0 && (
+                      <p
+                        style={{ fontSize: 13, color: '#8E8E93', padding: '12px 16px', margin: 0 }}
+                      >
+                        Layanan tidak ditemukan
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="flex items-start gap-2">
-                <div className="flex-1">
-                  <p className="text-ts-fn font-semibold text-tx-body">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-[0.875rem] font-medium text-[#1a1a1a]">
                     {currentService.serviceName}
                   </p>
-                  <p className="text-ts-fn text-tx-secondary">
+                  <p className="mt-0.5 text-[0.875rem] text-[#555]">
                     oleh {b.stylistName} · {formatRupiah(currentService.price)}
                   </p>
                 </div>
                 <button
                   onClick={() => detail.setEditServiceId(b.id)}
-                  className="flex h-6 w-6 items-center justify-center rounded-r6 text-tx-muted transition-colors hover:bg-bg-surface hover:text-tx-subtle"
+                  className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#f0f0ee] text-gray-500 transition-colors hover:bg-[#e2e2df] hover:text-[#444]"
                 >
                   <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 16 16"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 14 14"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="1.8"
+                    strokeWidth="1.6"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M11 2l3 3-9 9H2v-3L11 2z" />
+                    <path d="M10 1.5l2.5 2.5-8 8H2v-2.5l8-8z" />
                   </svg>
                 </button>
               </div>
@@ -327,8 +498,8 @@ export function BookingDetailPanel({
                 className="mt-2 flex items-center justify-between border-t border-bd-row pt-2"
               >
                 <div>
-                  <p className="text-ts-fn font-medium text-tx-body">{sv.serviceName}</p>
-                  <p className="text-ts-fn text-tx-secondary">{formatRupiah(sv.price)}</p>
+                  <p className="text-[0.8125rem] font-medium text-[#1a1a1a]">{sv.serviceName}</p>
+                  <p className="text-[0.8125rem] text-[#555]">{formatRupiah(sv.price)}</p>
                 </div>
                 <button
                   onClick={() => detail.removeAdditionalService(b.id, idx)}
@@ -352,55 +523,119 @@ export function BookingDetailPanel({
             {/* Add service */}
             {detail.showServicePicker === b.id ? (
               <div className="relative z-20 mt-2">
-                <div className="absolute left-0 right-0 top-0 overflow-hidden rounded-r10 border border-bd-card bg-white shadow-card">
-                  <div className="flex h-8 items-center gap-2 border-b border-bd-row px-2">
+                <div className="absolute left-0 right-0 top-0 overflow-hidden rounded-xl border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+                  <div className="flex items-center gap-2 border-b border-[#f0f0f0] px-3 py-2">
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="#bbb"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    >
+                      <circle cx="7" cy="7" r="5" />
+                      <path d="M11 11l3 3" />
+                    </svg>
                     <input
                       autoFocus
                       type="text"
-                      placeholder="Cari layanan tambahan..."
+                      placeholder="Cari layanan..."
                       value={detail.serviceSearchQuery}
                       onChange={(e) => detail.setServiceSearchQuery(e.target.value)}
-                      className="flex-1 bg-transparent text-ts-fn outline-none placeholder:text-tx-muted"
+                      className="flex-1 bg-transparent text-[0.8125rem] text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
                     />
+                    <button
+                      onClick={() => {
+                        detail.setShowServicePicker(null);
+                        detail.setServiceSearchQuery('');
+                      }}
+                      className="flex h-5 w-5 flex-shrink-0 items-center justify-center text-[#ccc] transition-colors hover:text-[#888]"
+                    >
+                      <svg
+                        width="10"
+                        height="10"
+                        viewBox="0 0 10 10"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                      >
+                        <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
+                      </svg>
+                    </button>
                   </div>
-                  <div className="max-h-40 overflow-y-auto">
-                    {availableServices
-                      .filter((s) =>
-                        s.name.toLowerCase().includes(detail.serviceSearchQuery.toLowerCase())
-                      )
-                      .map((svc) => (
-                        <button
-                          key={svc.id}
-                          onClick={() => {
-                            detail.addService(b.id, svc);
-                            detail.setServiceSearchQuery('');
-                          }}
-                          className="flex w-full items-center justify-between px-3 py-2 transition-colors hover:bg-bg-surface"
-                        >
-                          <span className="text-ts-fn text-tx-primary">{svc.name}</span>
-                          <span className="text-ts-fn text-tx-secondary">
-                            {formatRupiah(svc.price)}
-                          </span>
-                        </button>
-                      ))}
+                  <div className="max-h-44 overflow-y-auto">
+                    {availableServices.filter((s) =>
+                      s.name.toLowerCase().includes(detail.serviceSearchQuery.toLowerCase())
+                    ).length === 0 ? (
+                      <p className="px-3 py-3 text-[0.875rem] text-[#555]">
+                        Layanan tidak ditemukan
+                      </p>
+                    ) : (
+                      ['Hair', 'Colour', 'Face', 'Nail', 'Massage'].map((cat) => {
+                        const catSvcs = availableServices.filter(
+                          (s) =>
+                            s.categoryName === cat &&
+                            s.name.toLowerCase().includes(detail.serviceSearchQuery.toLowerCase())
+                        );
+                        if (!catSvcs.length) return null;
+                        return (
+                          <div key={cat}>
+                            {!detail.serviceSearchQuery && (
+                              <p className="px-3 pb-1 pt-2.5 text-[0.6875rem] font-semibold uppercase tracking-wider text-[#555]">
+                                {cat}
+                              </p>
+                            )}
+                            {catSvcs.map((svc) => (
+                              <button
+                                key={svc.id}
+                                onClick={() => {
+                                  detail.addService(b.id, svc);
+                                  detail.setServiceSearchQuery('');
+                                }}
+                                className="flex w-full items-center justify-between border-b border-[#f9f9f9] px-3 py-2 text-left transition-colors last:border-0 hover:bg-[#fafaf8]"
+                              >
+                                <span className="text-[0.8125rem] text-[#333]">{svc.name}</span>
+                                <span className="ml-2 flex-shrink-0 text-[0.8125rem] text-[#555]">
+                                  {formatRupiah(svc.price)}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
                 </div>
               </div>
             ) : (
               <button
                 onClick={() => detail.setShowServicePicker(b.id)}
-                className="mt-2 flex items-center gap-1 text-ts-fn text-ac-primary"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: '#007AFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  marginTop: 8,
+                }}
               >
                 <svg
                   width="11"
                   height="11"
-                  viewBox="0 0 11 11"
+                  viewBox="0 0 12 12"
                   fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
+                  stroke="#007AFF"
+                  strokeWidth="2.5"
                   strokeLinecap="round"
                 >
-                  <path d="M5.5 1v9M1 5.5h9" />
+                  <path d="M6 1v10M1 6h10" />
                 </svg>
                 Tambah layanan
               </button>
@@ -416,8 +651,13 @@ export function BookingDetailPanel({
                 onChange={(e) => detail.setNote(b.id, e.target.value)}
                 placeholder="Kondisi kulit, alergi, preferensi..."
                 rows={3}
-                className="w-full resize-none rounded-r10 border border-bd-card px-3 py-2 text-ts-fn leading-relaxed text-tx-body placeholder:text-tx-muted focus:outline-none"
-                style={{ fontFamily: 'inherit' }}
+                className="w-full resize-none border px-3 py-2 text-[0.8125rem] leading-relaxed text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
+                style={{
+                  borderRadius: 10,
+                  borderColor: '#E5E5EA',
+                  outline: 'none',
+                  fontFamily: 'inherit',
+                }}
               />
             </div>
           )}
@@ -428,88 +668,142 @@ export function BookingDetailPanel({
           <div>
             <Label>Product Add-on</Label>
             {addOns.length === 0 && (
-              <p className="mb-1 text-ts-fn text-tx-subtle">Belum ada add-on</p>
+              <p className="mb-1 text-[0.875rem] text-gray-500">Belum ada add-on</p>
             )}
             {addOns.map((ao, i) => (
               <div
                 key={ao.id}
                 className="flex items-center justify-between border-b border-[#f5f5f5] py-1.5 last:border-0"
               >
-                <div>
-                  <p className="text-ts-fn font-medium text-tx-body">{ao.name}</p>
-                  <p className="text-ts-fn text-tx-secondary">{formatRupiah(ao.price)}</p>
-                </div>
-                <button
-                  onClick={() => detail.removeAddOn(b.id, i)}
-                  className="flex h-6 w-6 items-center justify-center rounded-full text-tx-muted transition-colors hover:bg-red-50 hover:text-st-cancelled"
-                >
-                  <svg
-                    width="10"
-                    height="10"
-                    viewBox="0 0 10 10"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
+                <span className="text-[0.8125rem] text-[#555]">{ao.name}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[0.875rem] font-medium text-[#444]">
+                    {formatRupiah(ao.price)}
+                  </span>
+                  <button
+                    onClick={() => detail.removeAddOn(b.id, i)}
+                    className="flex h-5 w-5 items-center justify-center rounded-full text-[#ccc] transition-colors hover:bg-[#fef2f2] hover:text-[#ef4444]"
                   >
-                    <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
-                  </svg>
-                </button>
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 10 10"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    >
+                      <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             ))}
 
             {/* Product picker */}
             {detail.showProductPicker === b.id ? (
               <div className="relative z-20 mt-2">
-                <div className="absolute left-0 right-0 top-0 overflow-hidden rounded-r10 border border-bd-card bg-white shadow-card">
-                  <div className="flex h-8 items-center gap-2 border-b border-bd-row px-2">
+                <div className="absolute left-0 right-0 top-0 overflow-hidden rounded-xl border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+                  <div className="flex items-center gap-2 border-b border-[#f0f0f0] px-3 py-2">
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="#bbb"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    >
+                      <circle cx="7" cy="7" r="5" />
+                      <path d="M11 11l3 3" />
+                    </svg>
                     <input
                       autoFocus
                       type="text"
                       placeholder="Cari produk..."
                       value={detail.productSearchQuery}
                       onChange={(e) => detail.setProductSearchQuery(e.target.value)}
-                      className="flex-1 bg-transparent text-ts-fn outline-none placeholder:text-tx-muted"
+                      className="flex-1 bg-transparent text-[0.8125rem] text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
                     />
+                    <button
+                      onClick={() => {
+                        detail.setShowProductPicker(null);
+                        detail.setProductSearchQuery('');
+                      }}
+                      className="flex h-5 w-5 flex-shrink-0 items-center justify-center text-[#ccc] transition-colors hover:text-[#888]"
+                    >
+                      <svg
+                        width="10"
+                        height="10"
+                        viewBox="0 0 10 10"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                      >
+                        <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
+                      </svg>
+                    </button>
                   </div>
-                  <div className="max-h-40 overflow-y-auto">
-                    {availableProducts
-                      .filter((p) =>
+                  <div className="max-h-44 overflow-y-auto">
+                    {(() => {
+                      const filtered = availableProducts.filter((p) =>
                         p.name.toLowerCase().includes(detail.productSearchQuery.toLowerCase())
-                      )
-                      .map((p) => (
+                      );
+                      if (filtered.length === 0)
+                        return (
+                          <p className="px-3 py-3 text-[0.875rem] text-[#555]">
+                            {availableProducts.length === 0
+                              ? 'Semua produk sudah ditambahkan'
+                              : 'Produk tidak ditemukan'}
+                          </p>
+                        );
+                      return filtered.map((prod) => (
                         <button
-                          key={p.id}
+                          key={prod.id}
                           onClick={() => {
-                            detail.addProduct(b.id, p);
+                            detail.addProduct(b.id, prod);
                             detail.setProductSearchQuery('');
                           }}
-                          className="flex w-full items-center justify-between px-3 py-2 transition-colors hover:bg-bg-surface"
+                          className="flex w-full items-center justify-between border-b border-[#f9f9f9] px-3 py-2.5 text-left transition-colors last:border-0 hover:bg-[#fafaf8]"
                         >
-                          <span className="text-ts-fn text-tx-primary">{p.name}</span>
-                          <span className="text-ts-fn text-tx-secondary">
-                            {formatRupiah(p.price)}
+                          <span className="text-[0.8125rem] text-[#333]">{prod.name}</span>
+                          <span className="text-[0.8125rem] text-[#555]">
+                            {formatRupiah(prod.price)}
                           </span>
                         </button>
-                      ))}
+                      ));
+                    })()}
                   </div>
                 </div>
               </div>
             ) : (
               <button
                 onClick={() => detail.setShowProductPicker(b.id)}
-                className="mt-2 flex items-center gap-1 text-ts-fn text-ac-primary"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: '#007AFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  marginTop: 8,
+                }}
               >
                 <svg
                   width="11"
                   height="11"
-                  viewBox="0 0 11 11"
+                  viewBox="0 0 12 12"
                   fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
+                  stroke="#007AFF"
+                  strokeWidth="2.5"
                   strokeLinecap="round"
                 >
-                  <path d="M5.5 1v9M1 5.5h9" />
+                  <path d="M6 1v10M1 6h10" />
                 </svg>
                 Tambah add-on
               </button>
