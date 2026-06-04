@@ -4,16 +4,15 @@ import React from 'react';
 import type { WalkInFlowState } from '../../hooks/overview/use-walk-in-flow';
 import type { DashboardBooking } from '../../types/dashboard.types';
 import { AddVisitFAB } from './AddVisitFAB';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyService = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyStylist = any;
 import { BarcodeScanner } from './BarcodeScanner';
 import { BookingCodeSection } from './BookingCodeSection';
 import { ServiceSearchDropdown } from './ServiceSearchDropdown';
 import { StylistTimeSelector } from './StylistTimeSelector';
 import { WalkInNamePhoneFields } from './WalkInNamePhoneFields';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyService = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyStylist = any;
 
 interface WalkInDrawerProps extends WalkInFlowState {
   isMobile: boolean;
@@ -21,25 +20,7 @@ interface WalkInDrawerProps extends WalkInFlowState {
   realStylists: AnyStylist[];
   effectiveBookings: DashboardBooking[];
   bookingStatusMap: Record<string, string>;
-  setManualBookings: React.Dispatch<React.SetStateAction<DashboardBooking[]>>;
-  createBookingMutation: {
-    mutateAsync: (args: {
-      salonId: string;
-      serviceId: string;
-      stylistId: string;
-      bookingDate: string;
-      startTime: string;
-      endTime: string;
-      customerName: string;
-      customerPhone: string;
-      customerEmail: string;
-      notes: string;
-      paymentStatus: string;
-    }) => Promise<unknown>;
-  };
 }
-
-const SALON_ID = '5cdb0848-1b43-44f6-be29-b2ead49ff65a';
 
 export function WalkInDrawer({
   addDrawer,
@@ -62,87 +43,14 @@ export function WalkInDrawer({
   closeDrawer,
   openDrawer,
   setAddDropdownOpen,
+  submitWalkIn,
   isMobile,
   realServices,
   realStylists,
   effectiveBookings,
   bookingStatusMap,
-  setManualBookings,
-  createBookingMutation,
 }: WalkInDrawerProps) {
   const isSubmitDisabled = !walkInForm.name || !walkInForm.serviceId || !walkInForm.stylistId;
-
-  async function handleSubmitWalkIn() {
-    const svc = (realServices as AnyService[]).find(
-      (s: AnyService) => s.id === walkInForm.serviceId
-    );
-    const stylist = (realStylists as AnyStylist[]).find(
-      (s: AnyService) => s.id === walkInForm.stylistId
-    );
-    if (!svc || !stylist) return;
-
-    const now = new Date();
-    const timeSlot =
-      walkInForm.time ||
-      `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    const [h, m] = timeSlot.split(':').map(Number);
-    const totalMin = h * 60 + m + (svc.duration || 60);
-    const endTime = `${String(Math.floor(totalMin / 60) % 24).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`;
-    const stylistName = stylist.user?.full_name ?? stylist.name ?? 'Stylist';
-    const stylistInitials = stylistName
-      .split(' ')
-      .map((n: string) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-    const newId = `walkin-${Date.now()}`;
-    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
-    setManualBookings((prev) => [
-      {
-        id: newId,
-        bookingCode: `WI-${newId.slice(-6).toUpperCase()}`,
-        customerName: walkInForm.name,
-        customerPhone: walkInForm.phone || '-',
-        customerEmail: '',
-        serviceName: svc.name,
-        categoryName: svc.categoryName ?? svc.category?.name ?? '',
-        stylistName,
-        stylistInitials,
-        stylistColor: '#c8ede2',
-        date: today,
-        timeSlot,
-        endTime,
-        duration: svc.duration || 60,
-        price: svc.price,
-        status: 'IN_PROGRESS',
-        visitorType: 'WALK_IN',
-        paymentStatus: 'PAID',
-        addOns: [],
-        notes: 'Walk-in',
-        createdAt: now.toISOString(),
-      },
-      ...prev,
-    ]);
-    setWalkInForm(() => ({ name: '', phone: '', serviceId: '', stylistId: '', time: timeSlot }));
-    closeDrawer();
-
-    createBookingMutation
-      .mutateAsync({
-        salonId: SALON_ID,
-        serviceId: svc.id,
-        stylistId: stylist.id,
-        bookingDate: today,
-        startTime: timeSlot,
-        endTime,
-        customerName: walkInForm.name,
-        customerPhone: walkInForm.phone || '-',
-        customerEmail: '',
-        notes: 'Walk-in',
-        paymentStatus: 'lunas',
-      })
-      .catch((e) => console.error('Failed to save walk-in to DB:', e));
-  }
 
   return (
     <>
@@ -271,7 +179,7 @@ export function WalkInDrawer({
               <div style={{ padding: '16px 24px', borderTop: '1px solid #F2F2F7', flexShrink: 0 }}>
                 <button
                   disabled={isSubmitDisabled}
-                  onClick={handleSubmitWalkIn}
+                  onClick={() => submitWalkIn(realServices, realStylists)}
                   style={{
                     width: '100%',
                     height: 44,

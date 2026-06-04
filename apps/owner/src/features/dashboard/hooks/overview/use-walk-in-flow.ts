@@ -66,7 +66,8 @@ export interface WalkInFlowState {
 
   // ── Submission ─────────────────────────────────────────────────────────────
   isSubmitting: boolean;
-  submitWalkIn: () => Promise<void>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  submitWalkIn: (realServices: any[], realStylists: any[]) => Promise<void>;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -225,57 +226,79 @@ export function useWalkInFlow(callbacks: WalkInCallbacks): WalkInFlowState {
 
   // ── Submit walk-in ──────────────────────────────────────────────────────────
 
-  const submitWalkIn = useCallback(async () => {
-    const now = new Date();
-    const today = now.toISOString().slice(0, 10);
-    const timeSlot = walkInForm.time || makeCurrentTime();
-    const [hh, mm] = timeSlot.split(':').map(Number);
-    const endDate = new Date(now);
-    endDate.setHours((hh ?? 0) + 1, mm ?? 0);
-    const endTime = `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}`;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const submitWalkIn = useCallback(
+    async (realServices: any[], realStylists: any[]) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const svc = realServices.find((s: any) => s.id === walkInForm.serviceId);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const stylist = realStylists.find((s: any) => s.id === walkInForm.stylistId);
+      if (!svc || !stylist) return;
 
-    const newBooking: DashboardBooking = {
-      id: `walkin-${Date.now()}`,
-      bookingCode: `WI-${Date.now()}`,
-      customerName: walkInForm.name,
-      customerPhone: walkInForm.phone || '-',
-      serviceName: walkInForm.serviceId,
-      categoryName: '',
-      stylistName: walkInForm.stylistId,
-      stylistInitials: walkInForm.stylistId.slice(0, 2).toUpperCase(),
-      stylistColor: '#c8ede2',
-      date: today,
-      timeSlot,
-      endTime,
-      duration: 60,
-      price: 0,
-      status: 'IN_PROGRESS',
-      visitorType: 'WALK_IN',
-      paymentStatus: 'PAID',
-      addOns: [],
-      notes: 'Walk-in',
-    };
+      const now = new Date();
+      const timeSlot =
+        walkInForm.time ||
+        `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const [h, m] = timeSlot.split(':').map(Number);
+      const totalMin = h * 60 + m + (svc.duration || 60);
+      const endTime = `${String(Math.floor(totalMin / 60) % 24).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`;
+      const stylistName = stylist.user?.full_name ?? stylist.name ?? 'Stylist';
+      const stylistInitials = stylistName
+        .split(' ')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((n: any) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+      const newId = `walkin-${Date.now()}`;
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-    callbacks.onBookingCreated(newBooking);
-
-    if (!walkInForm.name.startsWith('test')) {
-      createBookingMutation.mutate({
-        salonId: SALON_ID,
-        serviceId: walkInForm.serviceId,
-        stylistId: walkInForm.stylistId,
-        bookingDate: today,
-        startTime: timeSlot,
-        endTime,
+      const newBooking: DashboardBooking = {
+        id: newId,
+        bookingCode: `WI-${newId.slice(-6).toUpperCase()}`,
         customerName: walkInForm.name,
         customerPhone: walkInForm.phone || '-',
         customerEmail: '',
+        serviceName: svc.name,
+        categoryName: svc.categoryName ?? svc.category?.name ?? '',
+        stylistName,
+        stylistInitials,
+        stylistColor: '#c8ede2',
+        date: today,
+        timeSlot,
+        endTime,
+        duration: svc.duration || 60,
+        price: svc.price,
+        status: 'IN_PROGRESS',
+        visitorType: 'WALK_IN',
+        paymentStatus: 'PAID',
+        addOns: [],
         notes: 'Walk-in',
-        paymentStatus: 'lunas',
-      });
-    }
+        createdAt: now.toISOString(),
+      };
 
-    closeDrawer();
-  }, [walkInForm, callbacks, createBookingMutation, closeDrawer]);
+      callbacks.onBookingCreated(newBooking);
+
+      createBookingMutation
+        .mutateAsync({
+          salonId: SALON_ID,
+          serviceId: svc.id,
+          stylistId: stylist.id,
+          bookingDate: today,
+          startTime: timeSlot,
+          endTime,
+          customerName: walkInForm.name,
+          customerPhone: walkInForm.phone || '-',
+          customerEmail: '',
+          notes: 'Walk-in',
+          paymentStatus: 'lunas',
+        })
+        .catch((e) => console.error('Failed to save walk-in to DB:', e));
+
+      closeDrawer();
+    },
+    [walkInForm, callbacks, createBookingMutation, closeDrawer]
+  );
 
   return {
     addDrawer,
