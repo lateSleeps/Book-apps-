@@ -1,18 +1,3 @@
-/**
- * @responsibility
- * Interactive payment input card: method selector (Cash/Transfer/QRIS),
- * amount input, kembalian/kekurangan display, promo code, proof upload,
- * and the "Selesaikan" submit button.
- *
- * @usedBy
- * PaymentSection.tsx
- *
- * @notes
- * - Presentation only — no local state.
- * - Shows "Pembayaran Selesai" when paymentStatus === 'PAID'.
- * - All state lives in use-booking-payment and use-booking-promo.
- */
-
 'use client';
 
 import type { BookingPaymentState } from '../../hooks/overview/use-booking-payment';
@@ -57,7 +42,6 @@ export function PaymentInputCard({
   const promoData = promo.promoData[b.id];
   const proof = payment.pelunasanProofMap[b.id];
   const isPaid = b.paymentStatus === 'PAID';
-
   const kembalian = method === 'CASH' ? amountReceived - finalTotal : null;
 
   return (
@@ -74,46 +58,80 @@ export function PaymentInputCard({
       }}
     >
       {/* Header */}
-      <p className="text-ts-cap2 font-semibold uppercase tracking-[0.05em] text-tx-secondary">
+      <p
+        style={{
+          fontSize: 11,
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          color: '#8E8E93',
+          margin: 0,
+        }}
+      >
         {isPaid ? 'Pembayaran Selesai' : 'Input Pembayaran'}
       </p>
 
       {isPaid ? (
-        /* ── PAID state ── */
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-100">
-              <svg
-                width="10"
-                height="10"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="#16a34a"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              >
-                <path d="M3 8l4 4 6-6" />
-              </svg>
-            </span>
-            <span className="text-ts-fn font-semibold text-st-in-progress">
+        <>
+          {/* Status lunas — green card */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              background: '#F0FDF4',
+              borderRadius: 10,
+              padding: '10px 14px',
+            }}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="#16a34a"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 8l3 3 7-7" />
+            </svg>
+            <span style={{ fontSize: 13, fontWeight: 600, color: '#16a34a' }}>
               Lunas · {formatRupiah(finalTotal)}
             </span>
           </div>
+
+          {/* Bukti pelunasan */}
           {b.settlementProofUrl ? (
             <button
               onClick={() =>
                 payment.openProofZoom({ url: b.settlementProofUrl!, label: 'Bukti Pelunasan' })
               }
-              className="flex items-center gap-1.5 text-ts-fn text-ac-primary"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                alignSelf: 'flex-start',
+                height: 36,
+                borderRadius: 10,
+                border: '1px solid #E5E5EA',
+                background: 'transparent',
+                padding: '0 14px',
+                fontSize: 13,
+                fontWeight: 500,
+                color: '#1C1C1E',
+                cursor: 'pointer',
+              }}
             >
               <svg
-                width="12"
-                height="12"
+                width="14"
+                height="14"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
+                strokeLinejoin="round"
               >
                 <rect x="3" y="3" width="18" height="18" rx="2" />
                 <circle cx="8.5" cy="8.5" r="1.5" />
@@ -122,20 +140,19 @@ export function PaymentInputCard({
               Lihat Bukti Pelunasan
             </button>
           ) : (
-            <span className="text-ts-cap1 text-tx-muted">Belum ada bukti pelunasan</span>
+            <span style={{ fontSize: 12, color: '#8E8E93' }}>Belum ada bukti pelunasan</span>
           )}
-        </div>
+        </>
       ) : (
-        /* ── Input state ── */
-        <div className="flex flex-col gap-3">
-          {/* Method selector */}
+        <>
+          {/* Method selector tabs */}
           <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: 2,
-              borderRadius: '0.75rem',
-              padding: '0.25rem',
+              borderRadius: 12,
+              padding: 4,
               backgroundColor: '#F2F2F7',
               alignSelf: 'flex-start',
             }}
@@ -147,16 +164,17 @@ export function PaymentInputCard({
                   key={m}
                   onClick={() => payment.setPaymentMethod(b.id, m)}
                   style={{
-                    padding: '0.3125rem 0.875rem',
-                    borderRadius: '0.625rem',
+                    whiteSpace: 'nowrap',
+                    padding: '6px 14px',
+                    borderRadius: 10,
                     border: 'none',
                     cursor: 'pointer',
-                    fontSize: '0.8125rem',
+                    fontSize: 13,
                     fontWeight: active ? 600 : 400,
+                    transition: 'all 0.15s',
                     backgroundColor: active ? 'white' : 'transparent',
                     color: active ? '#1C1C1E' : '#8E8E93',
                     boxShadow: active ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
-                    transition: 'all 0.15s',
                   }}
                 >
                   {m === 'CASH' ? 'Cash' : m === 'TRANSFER' ? 'Transfer' : 'QRIS'}
@@ -167,182 +185,313 @@ export function PaymentInputCard({
 
           {/* Cash amount input */}
           {method === 'CASH' && (
-            <div className="flex h-9 items-center gap-1.5 rounded-r10 border border-bd-card bg-bg-input px-3">
-              <span className="text-ts-fn text-tx-secondary">Uang diterima Rp</span>
+            <div
+              style={{
+                display: 'flex',
+                height: 36,
+                alignItems: 'center',
+                gap: 8,
+                borderRadius: 10,
+                border: '1px solid #E5E5EA',
+                background: '#F9F9FB',
+                padding: '0 12px',
+              }}
+            >
+              <span style={{ flexShrink: 0, fontSize: 13, color: '#8E8E93' }}>
+                Uang diterima Rp
+              </span>
               <input
                 type="text"
                 inputMode="numeric"
                 placeholder="0"
                 value={rawAmount}
                 onChange={(e) => payment.setPaymentAmount(b.id, e.target.value.replace(/\D/g, ''))}
-                className="flex-1 bg-transparent text-ts-fn tabular-nums text-tx-primary outline-none"
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: '#1C1C1E',
+                }}
               />
             </div>
           )}
 
-          {/* Summary: total + kembalian */}
-          <div className="flex flex-col gap-1 rounded-r8 bg-bg-surface p-2.5">
-            <div className="flex items-baseline justify-between">
-              <span className="text-ts-cap1 text-tx-secondary">Total tagihan</span>
-              <span className="text-ts-fn font-semibold text-tx-primary">
-                {formatRupiah(finalTotal)}
-              </span>
-            </div>
-            {discount > 0 && (
-              <div className="flex items-baseline justify-between">
-                <span className="text-ts-cap1 text-tx-secondary">Diskon</span>
-                <span className="text-ts-cap1 font-medium text-st-in-progress">
-                  −{formatRupiah(discount)}
-                </span>
-              </div>
-            )}
-            {method === 'CASH' && amountReceived > 0 && (
-              <div className="mt-1 flex items-baseline justify-between border-t border-bd-row pt-1">
-                <span className="text-ts-cap1 font-semibold text-tx-primary">
-                  {(kembalian ?? 0) >= 0 ? 'Kembalian' : 'Kekurangan'}
-                </span>
-                <span
-                  className={`text-ts-fn font-semibold ${(kembalian ?? 0) >= 0 ? 'text-st-in-progress' : 'text-st-cancelled'}`}
-                >
-                  {(kembalian ?? 0) >= 0
-                    ? formatRupiah(kembalian ?? 0)
-                    : `−${formatRupiah(Math.abs(kembalian ?? 0))}`}
-                </span>
-              </div>
-            )}
+          {/* Total tagihan — bordered card */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '8px 12px',
+              background: '#F9F9FB',
+              borderRadius: 10,
+              border: '1px solid #E5E5EA',
+            }}
+          >
+            <span style={{ fontSize: 13, color: '#6B6B6B' }}>Total Tagihan</span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: '#1C1C1E' }}>
+              {formatRupiah(finalTotal)}
+            </span>
           </div>
 
-          {/* Promo code */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-ts-cap2 font-semibold uppercase tracking-[0.05em] text-tx-secondary">
+          {/* Diskon row */}
+          {discount > 0 && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '8px 12px',
+                background: '#F0FDF4',
+                borderRadius: 10,
+                border: '1px solid #BBF7D0',
+              }}
+            >
+              <span style={{ fontSize: 13, color: '#16a34a' }}>Diskon</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: '#16a34a' }}>
+                −{formatRupiah(discount)}
+              </span>
+            </div>
+          )}
+
+          {/* Kembalian / Kekurangan */}
+          {method === 'CASH' && amountReceived > 0 && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '8px 12px',
+                background: (kembalian ?? 0) >= 0 ? '#F0FDF4' : '#FFF1F0',
+                borderRadius: 10,
+                border: `1px solid ${(kembalian ?? 0) >= 0 ? '#BBF7D0' : '#FECACA'}`,
+              }}
+            >
+              <span style={{ fontSize: 13, color: (kembalian ?? 0) >= 0 ? '#16a34a' : '#ef4444' }}>
+                {(kembalian ?? 0) >= 0 ? 'Kembalian' : 'Kekurangan'}
+              </span>
+              <span
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: (kembalian ?? 0) >= 0 ? '#16a34a' : '#ef4444',
+                }}
+              >
+                {formatRupiah(Math.abs(kembalian ?? 0))}
+              </span>
+            </div>
+          )}
+
+          {/* Kode Promo */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <p
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: '#8E8E93',
+                margin: 0,
+              }}
+            >
               Kode Promo
-            </label>
+            </p>
             {promoData?.appliedCode ? (
-              <div className="flex items-center gap-2">
-                <span className="rounded-r6 bg-green-50 px-2 py-0.5 text-ts-cap1 font-semibold text-st-in-progress">
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  borderRadius: 10,
+                  border: '1px solid #BBF7D0',
+                  background: '#F0FDF4',
+                  padding: '8px 12px',
+                }}
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="#16a34a"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="8" cy="8" r="6.5" />
+                  <path d="M5 8l2 2 4-4" />
+                </svg>
+                <span style={{ fontSize: 13, fontWeight: 500, color: '#16a34a' }}>
                   {promoData.appliedCode}
                 </span>
-                <span className="text-ts-cap1 text-st-in-progress">
-                  −{formatRupiah(promoData.discount)}
-                </span>
+                <span style={{ fontSize: 12, color: '#4ade80' }}>−{formatRupiah(discount)}</span>
                 <button
                   onClick={() => promo.removePromo(b.id)}
-                  className="text-ts-cap1 text-tx-muted underline"
+                  style={{
+                    marginLeft: 'auto',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: 12,
+                    color: '#ef4444',
+                  }}
                 >
                   Hapus
                 </button>
               </div>
             ) : (
-              <div className="flex gap-2">
+              <div style={{ display: 'flex', gap: 8 }}>
                 <input
                   type="text"
                   placeholder="Kode promo..."
                   value={promo.promoInput[b.id] ?? ''}
                   onChange={(e) => promo.setPromoInput(b.id, e.target.value.toUpperCase())}
-                  className="flex-1 rounded-r8 border border-bd-card bg-bg-input px-3 py-1.5 text-ts-fn uppercase text-tx-primary outline-none placeholder:normal-case placeholder:text-tx-muted"
+                  style={{
+                    flex: 1,
+                    height: 36,
+                    borderRadius: 10,
+                    border: '1px solid #E5E5EA',
+                    background: '#F9F9FB',
+                    padding: '0 12px',
+                    fontSize: 13,
+                    color: '#1C1C1E',
+                    outline: 'none',
+                    textTransform: 'uppercase',
+                    fontFamily: 'inherit',
+                  }}
                 />
                 <button
                   onClick={() => promo.applyPromo(b.id, finalTotal)}
-                  className="rounded-r8 border border-bd-card px-3 text-ts-fn font-medium text-tx-subtle transition-colors hover:bg-bg-surface"
+                  style={{
+                    height: 36,
+                    borderRadius: 10,
+                    border: '1px solid #E5E5EA',
+                    background: 'white',
+                    padding: '0 16px',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: '#1C1C1E',
+                    cursor: 'pointer',
+                  }}
                 >
                   Pakai
                 </button>
               </div>
             )}
             {promoData?.error && (
-              <p className="text-ts-cap1 text-st-cancelled">{promoData.error}</p>
+              <p style={{ fontSize: 11, color: '#ef4444', margin: 0 }}>{promoData.error}</p>
             )}
           </div>
 
-          {/* Settlement proof for non-cash */}
+          {/* Bukti Pelunasan upload — hanya untuk TRANSFER/QRIS */}
           {method !== 'CASH' && (
-            <div className="flex flex-col gap-1.5">
-              <label className="text-ts-cap2 font-semibold uppercase tracking-[0.05em] text-tx-secondary">
-                Bukti Pelunasan
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  height: 40,
+                  borderRadius: 10,
+                  border: proof ? '1px solid #BBF7D0' : '1px solid #E5E5EA',
+                  background: proof ? '#F0FDF4' : 'transparent',
+                  padding: '0 14px',
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: proof ? '#16a34a' : '#8E8E93',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <path d="M21 15l-5-5L5 21" />
+                </svg>
+                {proof ? 'Bukti Dipilih ✓' : 'Bukti Pelunasan'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    if (proof?.preview) URL.revokeObjectURL(proof.preview);
+                    payment.setSettlementProof(b.id, {
+                      file,
+                      preview: URL.createObjectURL(file),
+                    });
+                  }}
+                />
               </label>
-              {proof?.preview ? (
-                <div className="relative">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={proof.preview}
-                    alt="Bukti"
-                    className="h-24 w-full rounded-r10 object-cover"
-                  />
-                  <label className="absolute right-2 top-2 cursor-pointer rounded-r6 bg-black/60 px-2 py-0.5 text-ts-cap2 text-white">
-                    Ganti
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        if (proof.preview) URL.revokeObjectURL(proof.preview);
-                        payment.setSettlementProof(b.id, {
-                          file,
-                          preview: URL.createObjectURL(file),
-                        });
-                      }}
-                    />
-                  </label>
-                </div>
-              ) : (
-                <label className="flex h-16 cursor-pointer flex-col items-center justify-center gap-1 rounded-r10 border-2 border-dashed border-bd-card hover:bg-bg-surface">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#8E8E93"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <path d="M21 15l-5-5L5 21" />
-                  </svg>
-                  <span className="text-ts-cap1 text-tx-secondary">Tambah bukti transfer</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      payment.setSettlementProof(b.id, {
-                        file,
-                        preview: URL.createObjectURL(file),
-                      });
-                    }}
-                  />
-                </label>
+              {proof?.preview && (
+                <button
+                  onClick={() => payment.openProofZoom({ url: proof.preview!, label: 'Preview' })}
+                  style={{
+                    height: 36,
+                    borderRadius: 10,
+                    border: '1px solid #E5E5EA',
+                    background: 'transparent',
+                    padding: '0 12px',
+                    fontSize: 12,
+                    color: '#007AFF',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Preview
+                </button>
               )}
             </div>
           )}
 
-          {/* Submit */}
-          <button
-            disabled={payment.isProcessingPayment}
-            onClick={() =>
-              payment.openConfirmDialog({
-                bookingId: b.id,
-                customerName: b.customerName,
-                serviceName: b.serviceName,
-                amount: amountReceived,
-                method,
-                finalTotal,
-              })
-            }
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-r10 bg-tx-primary text-ts-fn font-semibold text-white transition-opacity disabled:opacity-50"
-          >
-            {payment.isProcessingPayment ? (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            ) : null}
-            {payment.isProcessingPayment ? 'Memproses...' : 'Selesaikan'}
-          </button>
-        </div>
+          {/* Selesaikan button */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+            <button
+              disabled={payment.isProcessingPayment}
+              onClick={() =>
+                payment.openConfirmDialog({
+                  bookingId: b.id,
+                  customerName: b.customerName,
+                  serviceName: b.serviceName,
+                  amount: method !== 'CASH' ? finalTotal : amountReceived,
+                  method,
+                  finalTotal,
+                })
+              }
+              style={{
+                height: 40,
+                borderRadius: 10,
+                border: 'none',
+                background: payment.isProcessingPayment ? '#E5E5EA' : '#34C759',
+                color: payment.isProcessingPayment ? '#8E8E93' : 'white',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: payment.isProcessingPayment ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+              }}
+            >
+              {payment.isProcessingPayment ? 'Memproses...' : 'Selesaikan'}
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
