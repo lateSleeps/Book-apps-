@@ -1,5 +1,7 @@
 'use client';
 
+import { PlusIcon } from '@heroicons/react/24/solid';
+import { CalendarCheck, PersonSimpleWalk } from '@phosphor-icons/react';
 import { SkeletonRow } from '@/components/SkeletonLoader';
 import { BookingDetailPanel } from '@/features/dashboard/components/overview/BookingDetailPanel';
 import {
@@ -30,68 +32,240 @@ export default function OverviewPage() {
   const { stylists: realStylists } = useStylists(SALON_ID);
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#F7F7F8]">
-      {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-10 border-b border-[#EFEFEF] bg-white px-6 py-4">
-        <div>
-          <p className="text-[0.75rem] font-medium uppercase tracking-widest text-[#8E8E93]">
-            {ui.dateLabel}
-          </p>
-          <h1 className="text-[1.5rem] font-bold text-[#1C1C1E]">{ui.greeting} 👋</h1>
-        </div>
-      </div>
+    <>
+      {/* ── Responsive CSS ──────────────────────────────────────────────── */}
+      <style suppressHydrationWarning>{`
+        @media (max-width: 1023px) {
+          .payment-grid-tablet { gap: 2.5rem !important; }
+        }
+        @media (max-width: 767px) {
+          .expanded-details-mobile { grid-template-columns: 1fr !important; }
+          .expanded-col-separator {
+            border-right: none !important;
+            border-bottom: 1px solid #f0f0f0 !important;
+          }
+          .expanded-details-mobile > div > div {
+            padding-bottom: 1rem !important;
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+          }
+          .visitor-row-badges { flex-wrap: wrap !important; gap: 0.5rem !important; }
+          .visitor-name-mobile { font-size: 0.8125rem !important; }
+          .visitor-service-mobile { font-size: 0.75rem !important; }
+          .visitor-tabs-mobile { gap: 0.25rem !important; }
+          .search-bar-mobile { flex: 1 !important; width: auto !important; }
+          .visitor-header-controls { flex-direction: column !important; gap: 0.5rem !important; }
+          .sort-button-mobile { width: 100% !important; }
+          .payment-section-mobile { grid-template-columns: 1fr !important; }
+          .button-group-mobile { gap: 0.5rem !important; }
+          .button-group-mobile button {
+            font-size: 0.75rem !important;
+            padding: 0.5rem 0.75rem !important;
+            height: auto !important;
+          }
+          .greeting-section-mobile {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+          .greeting-text-mobile h1 { font-size: 1.125rem !important; }
+          .hide-on-mobile { display: none !important; }
+          .dropdown-item-mobile { padding: 0.75rem !important; }
+        }
+      `}</style>
 
-      <div className="flex flex-1 flex-col gap-6 p-6">
-        {/* ── Stat Cards ──────────────────────────────────────────────────── */}
-        <StatCardsRow stats={stats} allBookings={list.allBookings} />
+      <div className="flex flex-1 flex-col overflow-y-auto" style={{ backgroundColor: '#F2F2F7' }}>
+        <div className="flex w-full flex-col gap-5 px-4 py-5 sm:gap-7 sm:px-6 sm:py-7 md:gap-10 md:px-8 md:py-10">
+          {/* ── Greeting + Tambah Pelanggan ──────────────────────────────── */}
+          <div className="greeting-section-mobile flex items-center justify-between gap-4">
+            <div className="greeting-text-mobile flex flex-col gap-0">
+              <p className="text-[0.75rem] font-medium uppercase tracking-widest text-[#8E8E93]">
+                {ui.dateLabel}
+              </p>
+              <h1 className="text-[1.25rem] font-semibold tracking-tight text-[#1C1C1E] sm:text-[1.5rem] md:text-[1.75rem]">
+                {ui.greeting || 'Halo'}, Rara ✦
+              </h1>
+            </div>
 
-        {/* ── Booking Table (desktop) ──────────────────────────────────── */}
-        <div className="hidden flex-col overflow-hidden rounded-2xl border border-[#EFEFEF] bg-white shadow-sm sm:flex">
-          <BookingTableHeader
-            list={list}
-            addDropdownOpen={walkIn.addDropdownOpen}
-            setAddDropdownOpen={walkIn.setAddDropdownOpen}
-            onOpenDrawer={walkIn.openDrawer}
-          />
-
-          <BookingRowColumnHeaders />
-
-          <div className="divide-y divide-[#F7F7F8]">
-            {list.bookings.length === 0 ? (
-              <SkeletonRow />
-            ) : (
-              list.bookings.map((b) => (
-                <BookingRow
-                  key={b.id}
-                  booking={b}
-                  isExpanded={list.expandedId === b.id}
-                  isLoading={status.loadingBookingId === b.id}
-                  confirmingId={status.confirmingId}
-                  effectiveStatus={list.getEffectiveStatus(b.id) ?? b.status}
-                  onToggle={() => list.toggleExpand(b.id)}
-                  onDelete={() =>
-                    status.openDeleteDialog({ bookingId: b.id, customerName: b.customerName })
-                  }
+            {/* Desktop "Tambah Pelanggan" button */}
+            <div className="relative hidden flex-shrink-0 sm:block">
+              <button
+                onClick={() => walkIn.setAddDropdownOpen(!walkIn.addDropdownOpen)}
+                className="flex h-10 items-center gap-2 rounded-xl bg-[#1a1a1a] px-4 text-[0.875rem] font-medium text-white transition-colors hover:bg-[#333]"
+              >
+                <PlusIcon className="h-3.5 w-3.5" />
+                <span>Tambah Pelanggan</span>
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`transition-transform ${walkIn.addDropdownOpen ? 'rotate-180' : ''}`}
                 >
-                  {list.expandedId === b.id && (
-                    <BookingDetailPanel
-                      booking={b}
-                      detail={detail}
-                      status={status}
-                      payment={payment}
-                      promo={promo}
-                      list={list}
+                  <path d="M4 6l4 4 4-4" />
+                </svg>
+              </button>
+              {walkIn.addDropdownOpen && (
+                <>
+                  {ui.isMobile && (
+                    <div
+                      className="fixed inset-0 z-30"
+                      onClick={() => walkIn.setAddDropdownOpen(false)}
                     />
                   )}
-                </BookingRow>
-              ))
-            )}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: 'calc(100% + 8px)',
+                      zIndex: 40,
+                      width: 220,
+                      background: 'white',
+                      borderRadius: 14,
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
+                      overflow: 'hidden',
+                      padding: 6,
+                    }}
+                  >
+                    <button
+                      onClick={() => {
+                        walkIn.openDrawer('WALK_IN');
+                        walkIn.setDrawerServiceOpen(false);
+                        walkIn.setDrawerServiceSearch('');
+                      }}
+                      style={{
+                        display: 'flex',
+                        width: '100%',
+                        alignItems: 'center',
+                        gap: 12,
+                        padding: '10px 12px',
+                        borderRadius: 10,
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'background 0.1s',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = '#F5F5F7')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <PersonSimpleWalk
+                        size={20}
+                        weight="duotone"
+                        color="#1C1C1E"
+                        style={{ flexShrink: 0 }}
+                      />
+                      <div>
+                        <p style={{ fontSize: 14, fontWeight: 500, color: '#1C1C1E', margin: 0 }}>
+                          Walk-in
+                        </p>
+                        <p style={{ fontSize: 12, color: '#8E8E93', margin: 0 }}>Datang langsung</p>
+                      </div>
+                    </button>
+                    <div style={{ height: 1, background: '#F2F2F7', margin: '2px 10px' }} />
+                    <button
+                      onClick={() => {
+                        walkIn.openDrawer('BOOKING');
+                        walkIn.setDrawerServiceOpen(false);
+                        walkIn.setDrawerServiceSearch('');
+                      }}
+                      style={{
+                        display: 'flex',
+                        width: '100%',
+                        alignItems: 'center',
+                        gap: 12,
+                        padding: '10px 12px',
+                        borderRadius: 10,
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'background 0.1s',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = '#F5F5F7')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <CalendarCheck
+                        size={20}
+                        weight="duotone"
+                        color="#1C1C1E"
+                        style={{ flexShrink: 0 }}
+                      />
+                      <div>
+                        <p style={{ fontSize: 14, fontWeight: 500, color: '#1C1C1E', margin: 0 }}>
+                          Booking Online
+                        </p>
+                        <p style={{ fontSize: 12, color: '#8E8E93', margin: 0 }}>
+                          Sudah punya kode booking
+                        </p>
+                      </div>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* ── Booking List (mobile) ────────────────────────────────────── */}
-        <div className="flex flex-col sm:hidden">
-          <MobileBookingList list={list} onSelectBooking={ui.setMobileSelectedId} />
+          {/* ── Stat Cards ──────────────────────────────────────────────── */}
+          <StatCardsRow stats={stats} allBookings={list.allBookings} />
+
+          {/* ── Booking Table (desktop) ──────────────────────────────── */}
+          <div
+            className="hidden flex-col md:flex"
+            style={{
+              backgroundColor: '#FFFFFF',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+              borderRadius: 16,
+              padding: '0 0 4px',
+            }}
+          >
+            <BookingTableHeader
+              list={list}
+              addDropdownOpen={walkIn.addDropdownOpen}
+              setAddDropdownOpen={walkIn.setAddDropdownOpen}
+              onOpenDrawer={walkIn.openDrawer}
+            />
+            <BookingRowColumnHeaders />
+            <div>
+              {list.bookings.length === 0 ? (
+                <SkeletonRow />
+              ) : (
+                list.bookings.map((b) => (
+                  <BookingRow
+                    key={b.id}
+                    booking={b}
+                    isExpanded={list.expandedId === b.id}
+                    isLoading={status.loadingBookingId === b.id}
+                    confirmingId={status.confirmingId}
+                    effectiveStatus={list.getEffectiveStatus(b.id) ?? b.status}
+                    onToggle={() => list.toggleExpand(b.id)}
+                    onDelete={() =>
+                      status.openDeleteDialog({ bookingId: b.id, customerName: b.customerName })
+                    }
+                  >
+                    {list.expandedId === b.id && (
+                      <BookingDetailPanel
+                        booking={b}
+                        detail={detail}
+                        status={status}
+                        payment={payment}
+                        promo={promo}
+                        list={list}
+                      />
+                    )}
+                  </BookingRow>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* ── Booking List (mobile) ────────────────────────────────── */}
+          <div className="flex flex-col md:hidden">
+            <MobileBookingList list={list} onSelectBooking={ui.setMobileSelectedId} />
+          </div>
         </div>
       </div>
 
@@ -179,6 +353,6 @@ export default function OverviewPage() {
           onDismiss={status.dismissWANotif}
         />
       )}
-    </div>
+    </>
   );
 }

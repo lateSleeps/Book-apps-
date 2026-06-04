@@ -104,13 +104,95 @@ export function StatCardsRow({ stats, allBookings }: StatCardsRowProps) {
         }}
       >
         {/* Background doodle */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-20">
-          <svg width="100%" height="100%" viewBox="0 0 300 140" fill="none">
-            <circle cx="240" cy="20" r="60" stroke="white" strokeWidth="1.5" />
-            <circle cx="240" cy="20" r="40" stroke="white" strokeWidth="1" />
-            <circle cx="240" cy="20" r="20" stroke="white" strokeWidth="0.8" />
-          </svg>
-        </div>
+        <svg
+          style={{ position: 'absolute', right: 0, top: 0, height: '100%', width: '55%' }}
+          viewBox="0 0 200 160"
+          fill="none"
+          preserveAspectRatio="xMaxYMid meet"
+        >
+          <circle cx="160" cy="40" r="55" fill="white" opacity="0.10" />
+          <circle cx="185" cy="110" r="38" fill="white" opacity="0.08" />
+          <circle
+            cx="145"
+            cy="30"
+            r="18"
+            stroke="white"
+            strokeWidth="1.5"
+            opacity="0.18"
+            fill="none"
+            strokeDasharray="4 3"
+          />
+          <circle
+            cx="175"
+            cy="125"
+            r="12"
+            stroke="white"
+            strokeWidth="1.2"
+            opacity="0.15"
+            fill="none"
+            strokeDasharray="3 3"
+          />
+          <path
+            d="M80 90 Q100 75 120 90 Q140 105 160 90 Q180 75 200 90"
+            stroke="white"
+            strokeWidth="1.5"
+            opacity="0.20"
+            fill="none"
+            strokeLinecap="round"
+          />
+          <path
+            d="M95 110 Q115 95 135 110 Q155 125 175 110"
+            stroke="white"
+            strokeWidth="1"
+            opacity="0.12"
+            fill="none"
+            strokeLinecap="round"
+          />
+          <circle cx="100" cy="30" r="2.5" fill="white" opacity="0.30" />
+          <circle cx="190" cy="55" r="2" fill="white" opacity="0.25" />
+          <circle cx="130" cy="140" r="2" fill="white" opacity="0.20" />
+          <circle cx="165" cy="70" r="1.5" fill="white" opacity="0.22" />
+          <line
+            x1="108"
+            y1="55"
+            x2="108"
+            y2="65"
+            stroke="white"
+            strokeWidth="1.5"
+            opacity="0.22"
+            strokeLinecap="round"
+          />
+          <line
+            x1="103"
+            y1="60"
+            x2="113"
+            y2="60"
+            stroke="white"
+            strokeWidth="1.5"
+            opacity="0.22"
+            strokeLinecap="round"
+          />
+          <line
+            x1="185"
+            y1="80"
+            x2="185"
+            y2="88"
+            stroke="white"
+            strokeWidth="1.2"
+            opacity="0.18"
+            strokeLinecap="round"
+          />
+          <line
+            x1="181"
+            y1="84"
+            x2="189"
+            y2="84"
+            stroke="white"
+            strokeWidth="1.2"
+            opacity="0.18"
+            strokeLinecap="round"
+          />
+        </svg>
 
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div
