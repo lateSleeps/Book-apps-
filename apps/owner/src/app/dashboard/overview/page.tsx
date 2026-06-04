@@ -315,6 +315,111 @@ const DUMMY_BOOKINGS: import('@/features/dashboard/types/dashboard.types').Dashb
     addOns: [],
     notes: 'Walk-in',
   },
+  {
+    id: 'dummy-8',
+    bookingCode: 'BK-D008',
+    customerName: 'Laras Setiawati',
+    customerPhone: '081234561008',
+    serviceName: 'Color Treatment',
+    categoryName: 'Colour',
+    stylistName: 'Maya Putri',
+    stylistInitials: 'MP',
+    stylistColor: '#FF6B9D',
+    date: _TODAY,
+    timeSlot: '08:00:00',
+    endTime: '10:00:00',
+    duration: 120,
+    price: 300000,
+    status: 'UPCOMING',
+    visitorType: 'BOOKING',
+    paymentStatus: 'DEPOSIT',
+    addOns: [],
+    notes: '',
+  },
+  {
+    id: 'dummy-9',
+    bookingCode: 'BK-D009',
+    customerName: 'Reni Anggraini',
+    customerPhone: '081234561009',
+    serviceName: 'Ladies Haircut+Wash',
+    categoryName: 'Hair',
+    stylistName: 'Maya Putri',
+    stylistInitials: 'MP',
+    stylistColor: '#FF6B9D',
+    date: _TODAY,
+    timeSlot: '10:30:00',
+    endTime: '11:30:00',
+    duration: 60,
+    price: 180000,
+    status: 'UPCOMING',
+    visitorType: 'BOOKING',
+    paymentStatus: 'DEPOSIT',
+    addOns: [],
+    notes: '',
+  },
+  {
+    id: 'dummy-10',
+    bookingCode: 'BK-D010',
+    customerName: 'Tari Kuswardani',
+    customerPhone: '081234561010',
+    serviceName: 'Make Up Glamour',
+    categoryName: 'Make Up',
+    stylistName: 'Maya Putri',
+    stylistInitials: 'MP',
+    stylistColor: '#FF6B9D',
+    date: _TODAY,
+    timeSlot: '12:00:00',
+    endTime: '13:30:00',
+    duration: 90,
+    price: 450000,
+    status: 'UPCOMING',
+    visitorType: 'BOOKING',
+    paymentStatus: 'DEPOSIT',
+    addOns: [],
+    notes: '',
+  },
+  {
+    id: 'dummy-11',
+    bookingCode: 'BK-D011',
+    customerName: 'Indah Permata',
+    customerPhone: '081234561011',
+    serviceName: 'Nail Art',
+    categoryName: 'Nail',
+    stylistName: 'Maya Putri',
+    stylistInitials: 'MP',
+    stylistColor: '#FF6B9D',
+    date: _TODAY,
+    timeSlot: '14:00:00',
+    endTime: '15:00:00',
+    duration: 60,
+    price: 95000,
+    status: 'UPCOMING',
+    visitorType: 'BOOKING',
+    paymentStatus: 'DEPOSIT',
+    addOns: [],
+    notes: '',
+  },
+  {
+    id: 'dummy-12',
+    bookingCode: 'BK-D012',
+    customerName: 'Putri Handayani',
+    customerPhone: '081234561012',
+    serviceName: 'Keratin Treatment',
+    categoryName: 'Hair',
+    stylistName: 'Maya Putri',
+    stylistInitials: 'MP',
+    stylistColor: '#FF6B9D',
+    date: _TODAY,
+    timeSlot: '15:30:00',
+    endTime: '17:30:00',
+    duration: 120,
+    price: 500000,
+    status: 'UPCOMING',
+    visitorType: 'BOOKING',
+    paymentStatus: 'DEPOSIT',
+    addOns: [],
+    notes: '',
+  },
 ];
 
 const PROMO_CODES: Record<string, { type: 'percent' | 'fixed'; value: number }> = {
@@ -404,6 +509,7 @@ export default function OverviewPage() {
   const [declineDialog, setDeclineDialog] = useState<{
     bookingId: string;
     customerName: string;
+    customerPhone: string;
     reason: string;
   } | null>(null);
   const [declineReason, setDeclineReason] = useState('');
@@ -427,9 +533,11 @@ export default function OverviewPage() {
     phone: '',
     serviceId: '',
     stylistId: '',
+    time: `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`,
   });
   const [bookingCodeInput, setBookingCodeInput] = useState('');
   const [drawerServiceSearch, setDrawerServiceSearch] = useState('');
+  const [expandedStylistSlots, setExpandedStylistSlots] = useState<Record<string, boolean>>({});
   const [barcodeScannerActive, setBarcodeScannerActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -439,6 +547,8 @@ export default function OverviewPage() {
   const [lastActionTime, setLastActionTime] = useState<number>(0);
   const [showWANotif, setShowWANotif] = useState(false);
   const [waBookingData, setWaBookingData] = useState<WaBookingData | null>(null);
+  const [frozenOrder, setFrozenOrder] = useState<string[] | null>(null);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   useEffect(() => {
     setGreeting(getGreeting());
@@ -592,6 +702,7 @@ export default function OverviewPage() {
   }, [upcomingBookings]);
 
   function toggleExpand(id: string) {
+    setFrozenOrder(null); // unfreeze so list re-sorts before capturing new order
     setExpandedId((prev) => (prev === id ? null : id));
     setShowProductPicker(null);
     setEditServiceId(null);
@@ -688,14 +799,39 @@ export default function OverviewPage() {
         (b) => b.customerName.toLowerCase().includes(q) || b.customerPhone.includes(q)
       );
     }
-    list = [...list].sort((a, b) => {
-      const aTime = a.createdAt ?? '';
-      const bTime = b.createdAt ?? '';
-      const cmp = bTime.localeCompare(aTime);
-      return sortOrder === 'DESC' ? cmp : -cmp;
-    });
+    if (frozenOrder) {
+      const orderMap = new Map(frozenOrder.map((id, i) => [id, i]));
+      list = [...list].sort((a, b) => {
+        const ai = orderMap.get(a.id) ?? Infinity;
+        const bi = orderMap.get(b.id) ?? Infinity;
+        return ai - bi;
+      });
+    } else {
+      list = [...list].sort((a, b) => {
+        const effA = bookingStatusMap[a.id] ?? a.status;
+        const effB = bookingStatusMap[b.id] ?? b.status;
+        const isUpcomingA = effA === 'UPCOMING' || effA === 'pending' || effA === 'PENDING' ? 0 : 1;
+        const isUpcomingB = effB === 'UPCOMING' || effB === 'pending' || effB === 'PENDING' ? 0 : 1;
+        if (isUpcomingA !== isUpcomingB) return isUpcomingA - isUpcomingB;
+        const aTime = a.createdAt ?? a.timeSlot ?? '';
+        const bTime = b.createdAt ?? b.timeSlot ?? '';
+        const cmp = bTime.localeCompare(aTime);
+        return sortOrder === 'DESC' ? cmp : -cmp;
+      });
+    }
     return list;
-  }, [effectiveBookings, visitorTab, visitorSearch, sortOrder]);
+  }, [effectiveBookings, visitorTab, visitorSearch, sortOrder, frozenOrder, bookingStatusMap]);
+
+  // Freeze sort order while a row is expanded so status changes don't shuffle the list.
+  // When expandedId changes (open/switch/close), re-capture the current order.
+  useEffect(() => {
+    if (expandedId) {
+      setFrozenOrder(filteredVisitors.map((v) => v.id));
+    } else {
+      setFrozenOrder(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expandedId]);
 
   const visitorCounts = useMemo(
     () => ({
@@ -1760,22 +1896,52 @@ export default function OverviewPage() {
                                 minWidth: 0,
                               }}
                             >
-                              <div
-                                style={{
-                                  width: 48,
-                                  height: 48,
-                                  borderRadius: 10,
-                                  backgroundColor: avatarColor(b.customerName).bg,
-                                  color: '#1C1C1E',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontSize: getInitials(b.customerName).length > 1 ? 13 : 16,
-                                  fontWeight: 600,
-                                  flexShrink: 0,
-                                }}
-                              >
-                                {getInitials(b.customerName)}
+                              <div style={{ position: 'relative', flexShrink: 0 }}>
+                                <div
+                                  style={{
+                                    width: 48,
+                                    height: 48,
+                                    borderRadius: 10,
+                                    backgroundColor: avatarColor(b.customerName).bg,
+                                    color: '#1C1C1E',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: getInitials(b.customerName).length > 1 ? 13 : 16,
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  {getInitials(b.customerName)}
+                                </div>
+                                {(bookingStatusMap[b.id] ?? b.status) === 'UPCOMING' && (
+                                  <span
+                                    className="animate-badge-shake"
+                                    style={{
+                                      position: 'absolute',
+                                      top: -5,
+                                      right: -5,
+                                      width: 14,
+                                      height: 14,
+                                      borderRadius: '50%',
+                                      background: '#FF9500',
+                                      border: '2px solid white',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                    }}
+                                  >
+                                    <span
+                                      style={{
+                                        fontSize: 8,
+                                        fontWeight: 800,
+                                        color: 'white',
+                                        lineHeight: 1,
+                                      }}
+                                    >
+                                      !
+                                    </span>
+                                  </span>
+                                )}
                               </div>
                               <span
                                 style={{
@@ -1790,39 +1956,59 @@ export default function OverviewPage() {
                                 {b.customerName}
                               </span>
                             </div>
-                            {/* STATUS (payment) */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              <span
-                                style={{
-                                  width: 8,
-                                  height: 8,
-                                  borderRadius: '50%',
-                                  flexShrink: 0,
-                                  backgroundColor:
-                                    b.paymentStatus === 'PAID'
-                                      ? '#34C759'
-                                      : b.paymentStatus === 'DEPOSIT'
-                                        ? '#FF9500'
-                                        : '#8E8E93',
-                                }}
-                              />
-                              <span
-                                style={{
-                                  fontSize: 13,
-                                  color:
-                                    b.paymentStatus === 'PAID'
-                                      ? '#34C759'
-                                      : b.paymentStatus === 'DEPOSIT'
-                                        ? '#FF9500'
-                                        : '#8E8E93',
-                                }}
-                              >
-                                {b.paymentStatus === 'PAID'
-                                  ? 'Lunas'
-                                  : b.paymentStatus === 'DEPOSIT'
-                                    ? 'DP'
-                                    : 'Belum Bayar'}
-                              </span>
+                            {/* STATUS */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                              {(bookingStatusMap[b.id] ?? b.status) === 'UPCOMING' && (
+                                <span
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 4,
+                                    fontSize: 11,
+                                    fontWeight: 600,
+                                    color: '#FF9500',
+                                    background: '#FFF7ED',
+                                    borderRadius: 6,
+                                    padding: '2px 7px',
+                                    alignSelf: 'flex-start',
+                                  }}
+                                >
+                                  ⚡ Perlu Konfirmasi
+                                </span>
+                              )}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                <span
+                                  style={{
+                                    width: 7,
+                                    height: 7,
+                                    borderRadius: '50%',
+                                    flexShrink: 0,
+                                    backgroundColor:
+                                      b.paymentStatus === 'PAID'
+                                        ? '#34C759'
+                                        : b.paymentStatus === 'DEPOSIT'
+                                          ? '#FF9500'
+                                          : '#8E8E93',
+                                  }}
+                                />
+                                <span
+                                  style={{
+                                    fontSize: 13,
+                                    color:
+                                      b.paymentStatus === 'PAID'
+                                        ? '#34C759'
+                                        : b.paymentStatus === 'DEPOSIT'
+                                          ? '#FF9500'
+                                          : '#8E8E93',
+                                  }}
+                                >
+                                  {b.paymentStatus === 'PAID'
+                                    ? 'Lunas'
+                                    : b.paymentStatus === 'DEPOSIT'
+                                      ? 'DP'
+                                      : 'Belum Bayar'}
+                                </span>
+                              </div>
                             </div>
                             {/* LAYANAN */}
                             <span
@@ -1996,90 +2182,98 @@ export default function OverviewPage() {
                                   </a>
 
                                   {/* Bukti pembayaran — hanya untuk booking reguler (bukan walk-in) */}
-                                  {b.visitorType !== 'WALK_IN' &&
-                                    (b.status === 'UPCOMING' ||
-                                      b.status === 'CONFIRMED' ||
-                                      b.status === 'pending' ||
-                                      b.status === 'PENDING' ||
-                                      b.status === 'COMPLETED' ||
-                                      b.status === 'completed' ||
-                                      b.status === 'IN_PROGRESS') && (
-                                      <div
-                                        className="mt-1 flex flex-col gap-2"
-                                        onClick={(e) => e.stopPropagation()}
+                                  {b.visitorType !== 'WALK_IN' && (
+                                    <div
+                                      className="mt-1 flex flex-col gap-2"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <p
+                                        style={{
+                                          fontSize: 11,
+                                          fontWeight: 600,
+                                          textTransform: 'uppercase',
+                                          letterSpacing: '0.05em',
+                                          color: '#8E8E93',
+                                          margin: 0,
+                                        }}
                                       >
-                                        <p
-                                          style={{
-                                            fontSize: 11,
-                                            fontWeight: 600,
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.05em',
-                                            color: '#8E8E93',
-                                            margin: 0,
-                                          }}
+                                        Bukti Pembayaran
+                                      </p>
+                                      {/* Thumbnail bukti pembayaran — dari database */}
+                                      {b.paymentProofUrl ? (
+                                        <button
+                                          onClick={() =>
+                                            setProofZoom({ bookingId: b.id, type: 'dp' })
+                                          }
+                                          className="group relative w-full overflow-hidden rounded-xl border border-[#e8e8e6] transition-colors hover:border-[#ccc]"
                                         >
-                                          Bukti Pembayaran
-                                        </p>
-                                        {/* Thumbnail bukti pembayaran — dari database */}
-                                        {b.paymentProofUrl ? (
-                                          <button
-                                            onClick={() =>
-                                              setProofZoom({ bookingId: b.id, type: 'dp' })
-                                            }
-                                            className="group relative w-full overflow-hidden rounded-xl border border-[#e8e8e6] transition-colors hover:border-[#ccc]"
-                                          >
-                                            <img
-                                              src={b.paymentProofUrl}
-                                              alt="Bukti pembayaran"
-                                              className="h-[7rem] w-full object-cover"
-                                            />
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/10">
-                                              <div className="rounded-full bg-black/50 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
-                                                <MagnifyingGlassIcon className="h-3 w-3 text-white" />
-                                              </div>
+                                          <img
+                                            src={b.paymentProofUrl}
+                                            alt="Bukti pembayaran"
+                                            className="h-[7rem] w-full object-cover"
+                                          />
+                                          <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/10">
+                                            <div className="rounded-full bg-black/50 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
+                                              <MagnifyingGlassIcon className="h-3 w-3 text-white" />
                                             </div>
-                                          </button>
-                                        ) : (
-                                          <div className="flex h-[7rem] w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#e0e0e0] bg-[#fafafa]">
-                                            <svg
-                                              width="20"
-                                              height="20"
-                                              viewBox="0 0 24 24"
-                                              fill="none"
-                                              stroke="#ccc"
-                                              strokeWidth="1.5"
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                            >
-                                              <rect x="3" y="3" width="18" height="18" rx="2" />
-                                              <circle cx="8.5" cy="8.5" r="1.5" />
-                                              <path d="M21 15l-5-5L5 21" />
-                                            </svg>
-                                            <p className="text-[0.6875rem] text-gray-400">
-                                              Belum ada bukti pembayaran
-                                            </p>
                                           </div>
-                                        )}
+                                        </button>
+                                      ) : (
+                                        <div className="flex h-[7rem] w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#e0e0e0] bg-[#fafafa]">
+                                          <svg
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="#ccc"
+                                            strokeWidth="1.5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          >
+                                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                                            <circle cx="8.5" cy="8.5" r="1.5" />
+                                            <path d="M21 15l-5-5L5 21" />
+                                          </svg>
+                                          <p className="text-[0.6875rem] text-gray-400">
+                                            Belum ada bukti pembayaran
+                                          </p>
+                                        </div>
+                                      )}
 
-                                        {/* Tombol konfirmasi & decline — hanya saat UPCOMING */}
-                                        {(b.status === 'UPCOMING' ||
-                                          b.status === 'pending' ||
-                                          b.status === 'PENDING') && (
+                                      {/* Tombol konfirmasi & decline — hanya saat UPCOMING */}
+                                      {(() => {
+                                        const eff = bookingStatusMap[b.id] ?? b.status;
+                                        return (
+                                          eff === 'UPCOMING' ||
+                                          eff === 'pending' ||
+                                          eff === 'PENDING'
+                                        );
+                                      })() &&
+                                        (confirmingId === b.id ? (
+                                          /* Skeleton saat konfirmasi sedang diproses */
+                                          <div className="flex animate-pulse gap-2">
+                                            <div className="h-9 flex-1 rounded-[10px] bg-blue-100" />
+                                            <div className="h-9 flex-1 rounded-[10px] bg-[#f0f0f0]" />
+                                          </div>
+                                        ) : (
                                           <div className="flex gap-2">
                                             <button
                                               onClick={async (e) => {
                                                 e.preventDefault();
                                                 e.stopPropagation();
                                                 const id = b.id;
+                                                setConfirmingId(id);
                                                 setBookingStatusMap((m) => ({
                                                   ...m,
                                                   [id]: 'CONFIRMED',
                                                 }));
-                                                setExpandedId(id);
-                                                await updateStatusMutation.mutateAsync({
-                                                  bookingId: id,
-                                                  status: 'CONFIRMED',
-                                                });
+                                                if (!id.startsWith('dummy-')) {
+                                                  await updateStatusMutation.mutateAsync({
+                                                    bookingId: id,
+                                                    status: 'CONFIRMED',
+                                                  });
+                                                }
+                                                setConfirmingId(null);
                                                 setWaBookingData({
                                                   customerName: b.customerName,
                                                   customerPhone: b.customerPhone,
@@ -2117,6 +2311,7 @@ export default function OverviewPage() {
                                                 setDeclineDialog({
                                                   bookingId: b.id,
                                                   customerName: b.customerName,
+                                                  customerPhone: b.customerPhone,
                                                   reason: '',
                                                 });
                                                 setDeclineReason('');
@@ -2153,42 +2348,75 @@ export default function OverviewPage() {
                                               Tolak
                                             </button>
                                           </div>
-                                        )}
+                                        ))}
 
-                                        {/* Status confirmed — tampil di bawah gambar */}
-                                        {b.status === 'CONFIRMED' && (
-                                          <div
-                                            style={{
-                                              display: 'flex',
-                                              height: 36,
-                                              width: '100%',
-                                              alignItems: 'center',
-                                              justifyContent: 'center',
-                                              gap: 6,
-                                              borderRadius: 10,
-                                              background: '#2563eb',
-                                              fontSize: 13,
-                                              fontWeight: 600,
-                                              color: 'white',
-                                            }}
+                                      {/* Status ditolak */}
+                                      {(bookingStatusMap[b.id] ?? b.status) === 'CANCELLED' && (
+                                        <div
+                                          style={{
+                                            display: 'flex',
+                                            height: 36,
+                                            width: '100%',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: 6,
+                                            borderRadius: 10,
+                                            background: '#ef4444',
+                                            fontSize: 13,
+                                            fontWeight: 600,
+                                            color: 'white',
+                                          }}
+                                        >
+                                          <svg
+                                            width="13"
+                                            height="13"
+                                            viewBox="0 0 16 16"
+                                            fill="none"
+                                            stroke="white"
+                                            strokeWidth="2.5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
                                           >
-                                            <svg
-                                              width="14"
-                                              height="14"
-                                              viewBox="0 0 16 16"
-                                              fill="none"
-                                              stroke="white"
-                                              strokeWidth="2.5"
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                            >
-                                              <path d="M3 8l3 3 7-7" />
-                                            </svg>
-                                            Terkonfirmasi
-                                          </div>
-                                        )}
-                                      </div>
-                                    )}
+                                            <path d="M3 3l10 10M13 3L3 13" />
+                                          </svg>
+                                          Ditolak
+                                        </div>
+                                      )}
+
+                                      {/* Status confirmed — tampil di bawah gambar */}
+                                      {b.status === 'CONFIRMED' && (
+                                        <div
+                                          style={{
+                                            display: 'flex',
+                                            height: 36,
+                                            width: '100%',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: 6,
+                                            borderRadius: 10,
+                                            background: '#2563eb',
+                                            fontSize: 13,
+                                            fontWeight: 600,
+                                            color: 'white',
+                                          }}
+                                        >
+                                          <svg
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 16 16"
+                                            fill="none"
+                                            stroke="white"
+                                            strokeWidth="2.5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          >
+                                            <path d="M3 8l3 3 7-7" />
+                                          </svg>
+                                          Terkonfirmasi
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
 
                                 {/* Col 2: Layanan + Pembayaran */}
@@ -4150,94 +4378,192 @@ export default function OverviewPage() {
       {declineDialog &&
         (() => {
           const d = declineDialog;
+          const waPhone = d.customerPhone.replace(/^0/, '62').replace(/\D/g, '');
+          const waMsg = encodeURIComponent(
+            `Halo ${d.customerName}, kami dari Rara Beauty mohon maaf atas ketidaknyamanannya. Dengan berat hati kami harus menginformasikan bahwa booking Anda tidak dapat kami konfirmasi saat ini. Kami memohon maaf yang sebesar-besarnya dan berharap dapat melayani Anda di lain waktu. 🙏`
+          );
+          const waUrl = `https://wa.me/${waPhone}?text=${waMsg}`;
           return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:hidden">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
               {/* Backdrop */}
               <div
                 className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
                 onClick={() => setDeclineDialog(null)}
               />
               {/* Card */}
-              <div className="relative flex w-full max-w-[22rem] flex-col gap-5 rounded-2xl bg-white p-4 shadow-[0_24px_64px_rgba(0,0,0,0.18)] sm:w-[22rem] sm:p-6">
-                {/* Header with close button */}
+              <div className="relative flex w-full max-w-[22rem] flex-col gap-4 rounded-2xl bg-white p-5 shadow-[0_24px_64px_rgba(0,0,0,0.18)]">
+                {/* Header */}
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-wider text-gray-500">
+                    <p
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        color: '#8E8E93',
+                        margin: '0 0 4px 0',
+                      }}
+                    >
                       Tolak Booking
                     </p>
-                    <p className="text-[1.125rem] font-bold text-[#1a1a1a]">{d.customerName}</p>
+                    <p style={{ fontSize: 17, fontWeight: 700, color: '#1C1C1E', margin: 0 }}>
+                      {d.customerName}
+                    </p>
                   </div>
                   <button
                     onClick={() => setDeclineDialog(null)}
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-[#f5f5f3] hover:text-[#444]"
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '50%',
+                      border: 'none',
+                      background: '#F2F2F7',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
                   >
                     <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 16 16"
+                      width="10"
+                      height="10"
+                      viewBox="0 0 10 10"
                       fill="none"
-                      stroke="currentColor"
+                      stroke="#8E8E93"
                       strokeWidth="2.5"
                       strokeLinecap="round"
                     >
-                      <path d="M3 3l10 10M13 3L3 13" />
+                      <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
                     </svg>
                   </button>
                 </div>
-                {/* Reason input */}
-                <div className="flex flex-col gap-2">
-                  <label className="text-[0.8125rem] font-medium text-[#555]">
+
+                {/* Alasan */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      color: '#8E8E93',
+                    }}
+                  >
                     Alasan Penolakan
                   </label>
                   <textarea
+                    autoFocus
                     value={declineReason}
                     onChange={(e) => setDeclineReason(e.target.value)}
-                    className="w-full resize-none rounded-xl border border-[#e8e8e8] px-3.5 py-2.5 text-[0.8125rem] text-[#1a1a1a] transition-colors placeholder:text-[#ccc] focus:border-[#ef4444] focus:outline-none focus:ring-1 focus:ring-[#fecaca]"
+                    placeholder="Tulis alasan penolakan..."
                     rows={3}
+                    style={{
+                      resize: 'none',
+                      borderRadius: 10,
+                      border: '1px solid #E5E5EA',
+                      padding: '10px 12px',
+                      fontSize: 13,
+                      color: '#1C1C1E',
+                      outline: 'none',
+                      fontFamily: 'inherit',
+                    }}
                   />
                 </div>
+
+                {/* WA Apology */}
+                <a
+                  href={waUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '10px 14px',
+                    borderRadius: 10,
+                    background: '#F0FDF4',
+                    border: '1px solid #BBF7D0',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#25d366">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                  </svg>
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: '#16a34a', margin: 0 }}>
+                      Kirim Permintaan Maaf via WA
+                    </p>
+                    <p style={{ fontSize: 11, color: '#4ade80', margin: 0 }}>
+                      Buka chat ke {d.customerName}
+                    </p>
+                  </div>
+                </a>
+
                 {/* Actions */}
-                <div className="flex gap-2.5">
+                <div style={{ display: 'flex', gap: 10 }}>
                   <button
                     onClick={() => {
                       setDeclineDialog(null);
                       setDeclineReason('');
                     }}
-                    className="h-10 flex-1 rounded-xl border border-[#e8e8e8] text-[0.875rem] font-medium text-[#555] transition-colors hover:bg-[#f5f5f3]"
+                    style={{
+                      flex: 1,
+                      height: 40,
+                      borderRadius: 10,
+                      border: '1px solid #E5E5EA',
+                      background: 'transparent',
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: '#3C3C43',
+                      cursor: 'pointer',
+                    }}
                   >
                     Batal
                   </button>
                   <button
                     onClick={async (e) => {
                       e.stopPropagation();
-                      if (!d.customerName) return;
                       const bookingId = d.bookingId;
-                      const stylistName =
-                        allBookings.find((b) => b.id === bookingId)?.stylistName ?? 'Stylist';
-                      setLastActionTime(Date.now());
-                      setConfirmDialog(null);
                       setDeclineDialog(null);
                       setDeclineReason('');
                       setBookingStatusMap((m) => ({ ...m, [bookingId]: 'CANCELLED' }));
                       setExpandedId(bookingId);
-                      await updateStatusMutation.mutateAsync({
-                        bookingId,
-                        status: 'CANCELLED',
-                        cancellationReason: `Maaf, stylist ${stylistName} sudah memiliki booking lain pada jam tersebut.`,
-                      });
+                      if (!bookingId.startsWith('dummy-')) {
+                        await updateStatusMutation.mutateAsync({
+                          bookingId,
+                          status: 'CANCELLED',
+                          cancellationReason: declineReason.trim() || 'Booking ditolak oleh salon.',
+                        });
+                      }
                     }}
                     disabled={!declineReason.trim()}
-                    className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#ef4444] text-[0.875rem] font-semibold text-white transition-colors hover:bg-[#dc2626] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#ef4444]"
+                    style={{
+                      flex: 1,
+                      height: 40,
+                      borderRadius: 10,
+                      border: 'none',
+                      background: declineReason.trim() ? '#ef4444' : '#F2F2F7',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: declineReason.trim() ? 'white' : '#C7C7CC',
+                      cursor: declineReason.trim() ? 'pointer' : 'not-allowed',
+                      transition: 'all 0.15s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
+                    }}
                   >
                     <svg
-                      width="13"
-                      height="13"
+                      width="11"
+                      height="11"
                       viewBox="0 0 16 16"
                       fill="none"
-                      stroke="white"
+                      stroke="currentColor"
                       strokeWidth="2.5"
                       strokeLinecap="round"
-                      strokeLinejoin="round"
                     >
                       <path d="M3 3l10 10M13 3L3 13" />
                     </svg>
@@ -4342,119 +4668,248 @@ export default function OverviewPage() {
 
       {/* Left drawer — Add customer */}
       {addDrawer !== 'CLOSED' && (
-        <div className="fixed inset-0 z-50 flex justify-end">
+        <div className="fixed inset-0 z-50 flex items-center justify-end p-4">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/25 backdrop-blur-[2px]"
+            className="absolute inset-0 bg-black/30 backdrop-blur-[3px]"
             onClick={() => setAddDrawer('CLOSED')}
           />
-          {/* Drawer */}
-          <div className="relative z-10 flex h-full w-full flex-col bg-white shadow-[-4px_0_32px_rgba(0,0,0,0.12)] sm:w-[32rem]">
+          {/* Floating side panel — full height, rounded, floating */}
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 10,
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              maxWidth: '28rem',
+              height: '100%',
+              background: 'white',
+              borderRadius: 20,
+              boxShadow: '-8px 0 48px rgba(0,0,0,0.18)',
+              overflow: 'hidden',
+            }}
+          >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-[#f0f0f0] px-4 pb-4 pt-4 sm:px-6 sm:pt-6">
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '20px 24px 16px',
+                borderBottom: '1px solid #F2F2F7',
+                flexShrink: 0,
+              }}
+            >
               <div>
-                <p className="mb-0.5 text-[0.6875rem] font-medium uppercase tracking-wider text-gray-500">
+                <p
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#8E8E93',
+                    margin: '0 0 2px 0',
+                  }}
+                >
                   Tambah Kunjungan
                 </p>
-                <h3 className="text-[1.0625rem] font-bold text-[#1a1a1a]">
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1C1C1E', margin: 0 }}>
                   {addDrawer === 'WALK_IN' ? 'Walk-in' : 'Booking Online'}
                 </h3>
               </div>
               <button
                 onClick={() => setAddDrawer('CLOSED')}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-[#f5f5f3] hover:text-[#444]"
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: '#F2F2F7',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
                 <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 16 16"
+                  width="10"
+                  height="10"
+                  viewBox="0 0 10 10"
                   fill="none"
-                  stroke="currentColor"
+                  stroke="#8E8E93"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                 >
-                  <path d="M3 3l10 10M13 3L3 13" />
+                  <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
                 </svg>
               </button>
             </div>
 
             {/* Form content */}
-            <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 20,
+                overflowY: 'auto',
+                padding: '20px 24px',
+              }}
+            >
               {addDrawer === 'WALK_IN' && (
                 <>
-                  {/* Nama */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[0.75rem] font-semibold uppercase tracking-wider text-[#444]">
-                      Nama Pelanggan <span className="text-[#ef4444]">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Masukkan nama lengkap"
-                      value={walkInForm.name}
-                      onChange={(e) => setWalkInForm((f) => ({ ...f, name: e.target.value }))}
-                      className="h-10 rounded-xl border border-[#e8e8e8] px-3.5 text-[0.9375rem] text-[#1a1a1a] transition-colors placeholder:text-[#ccc] focus:border-[#bbb] focus:outline-none"
-                    />
+                  {/* Nama + HP — side by side */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <label
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          color: '#8E8E93',
+                        }}
+                      >
+                        Nama <span style={{ color: '#ef4444' }}>*</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Nama lengkap"
+                        value={walkInForm.name}
+                        onChange={(e) => setWalkInForm((f) => ({ ...f, name: e.target.value }))}
+                        style={{
+                          height: 40,
+                          borderRadius: 10,
+                          border: '1px solid #E5E5EA',
+                          background: '#F9F9FB',
+                          padding: '0 14px',
+                          fontSize: 14,
+                          color: '#1C1C1E',
+                          outline: 'none',
+                          fontFamily: 'inherit',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <label
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          color: '#8E8E93',
+                        }}
+                      >
+                        Nomor HP
+                      </label>
+                      <input
+                        type="tel"
+                        inputMode="numeric"
+                        placeholder="08xxxxxxxxxx"
+                        value={walkInForm.phone}
+                        onChange={(e) =>
+                          setWalkInForm((f) => ({ ...f, phone: e.target.value.replace(/\D/g, '') }))
+                        }
+                        style={{
+                          height: 40,
+                          borderRadius: 10,
+                          border: '1px solid #E5E5EA',
+                          background: '#F9F9FB',
+                          padding: '0 14px',
+                          fontSize: 14,
+                          color: '#1C1C1E',
+                          outline: 'none',
+                          fontFamily: 'inherit',
+                        }}
+                      />
+                    </div>
                   </div>
-                  {/* Nomor HP */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[0.75rem] font-semibold uppercase tracking-wider text-[#444]">
-                      Nomor HP
+
+                  {/* Layanan */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <label
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        color: '#8E8E93',
+                      }}
+                    >
+                      Layanan <span style={{ color: '#ef4444' }}>*</span>
                     </label>
-                    <input
-                      type="tel"
-                      inputMode="numeric"
-                      placeholder="08xxxxxxxxxx"
-                      value={walkInForm.phone}
-                      onChange={(e) =>
-                        setWalkInForm((f) => ({ ...f, phone: e.target.value.replace(/\D/g, '') }))
-                      }
-                      className="h-10 rounded-xl border border-[#e8e8e8] px-3.5 text-[0.9375rem] text-[#1a1a1a] transition-colors placeholder:text-[#ccc] focus:border-[#bbb] focus:outline-none"
-                    />
-                  </div>
-                  {/* Layanan — searchable */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[0.75rem] font-semibold uppercase tracking-wider text-[#444]">
-                      Layanan <span className="text-[#ef4444]">*</span>
-                    </label>
-                    <div className="relative">
-                      {/* Trigger */}
+                    <div style={{ position: 'relative' }}>
                       <button
                         type="button"
                         onClick={() => setDrawerServiceOpen((o) => !o)}
-                        className="flex h-10 w-full items-center justify-between rounded-xl border border-[#e8e8e8] bg-white px-3.5 text-left text-[0.9375rem] transition-colors focus:border-[#bbb] focus:outline-none"
+                        style={{
+                          display: 'flex',
+                          width: '100%',
+                          height: 40,
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          borderRadius: 10,
+                          border: '1px solid #E5E5EA',
+                          background: '#F9F9FB',
+                          padding: '0 14px',
+                          fontSize: 14,
+                          color: walkInForm.serviceId ? '#1C1C1E' : '#C7C7CC',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          fontFamily: 'inherit',
+                        }}
                       >
-                        <span className={walkInForm.serviceId ? 'text-[#1a1a1a]' : 'text-[#ccc]'}>
+                        <span>
                           {walkInForm.serviceId
                             ? (realServices as AnyService[]).find(
                                 (s: AnyService) => s.id === walkInForm.serviceId
                               )?.name
                             : 'Pilih layanan...'}
                         </span>
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 16 16"
-                          fill="none"
-                          stroke="#aaa"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          className={`transition-transform ${drawerServiceOpen ? 'rotate-180' : ''}`}
-                        >
-                          <path d="M4 6l4 4 4-4" />
-                        </svg>
+                        <CaretDown
+                          size={12}
+                          weight="bold"
+                          color="#8E8E93"
+                          style={{
+                            flexShrink: 0,
+                            transform: drawerServiceOpen ? 'rotate(180deg)' : 'none',
+                            transition: 'transform 0.15s',
+                          }}
+                        />
                       </button>
-                      {/* Dropdown */}
                       {drawerServiceOpen && (
-                        <div className="absolute left-0 right-0 top-11 z-20 overflow-hidden rounded-xl border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.1)]">
-                          {/* Search */}
-                          <div className="flex items-center gap-2 border-b border-[#f0f0f0] px-3 py-2">
+                        <div
+                          style={{
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                            top: 'calc(100% + 6px)',
+                            zIndex: 30,
+                            background: 'white',
+                            borderRadius: 14,
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 8,
+                              padding: '8px 12px',
+                              background: '#F2F2F7',
+                              margin: 8,
+                              borderRadius: 10,
+                            }}
+                          >
                             <svg
                               width="13"
                               height="13"
                               viewBox="0 0 16 16"
                               fill="none"
-                              stroke="#bbb"
-                              strokeWidth="1.8"
+                              stroke="#8E8E93"
+                              strokeWidth="2"
                               strokeLinecap="round"
                             >
                               <circle cx="7" cy="7" r="5" />
@@ -4466,29 +4921,18 @@ export default function OverviewPage() {
                               placeholder="Cari layanan..."
                               value={drawerServiceSearch}
                               onChange={(e) => setDrawerServiceSearch(e.target.value)}
-                              className="flex-1 bg-transparent text-[0.875rem] text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
+                              style={{
+                                flex: 1,
+                                background: 'transparent',
+                                border: 'none',
+                                outline: 'none',
+                                fontSize: 13,
+                                color: '#1C1C1E',
+                                fontFamily: 'inherit',
+                              }}
                             />
-                            {drawerServiceSearch && (
-                              <button
-                                onClick={() => setDrawerServiceSearch('')}
-                                className="text-[#ccc] hover:text-[#888]"
-                              >
-                                <svg
-                                  width="11"
-                                  height="11"
-                                  viewBox="0 0 16 16"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2.5"
-                                  strokeLinecap="round"
-                                >
-                                  <path d="M3 3l10 10M13 3L3 13" />
-                                </svg>
-                              </button>
-                            )}
                           </div>
-                          {/* List */}
-                          <div className="max-h-[14rem] overflow-y-auto">
+                          <div style={{ maxHeight: 220, overflowY: 'auto', paddingBottom: 8 }}>
                             {(() => {
                               const q = drawerServiceSearch.toLowerCase();
                               const filtered = (realServices as AnyService[]).filter(
@@ -4501,7 +4945,14 @@ export default function OverviewPage() {
                               );
                               if (filtered.length === 0)
                                 return (
-                                  <p className="px-3 py-3 text-[0.875rem] text-[#555]">
+                                  <p
+                                    style={{
+                                      fontSize: 13,
+                                      color: '#8E8E93',
+                                      padding: '12px 16px',
+                                      margin: 0,
+                                    }}
+                                  >
                                     Layanan tidak ditemukan
                                   </p>
                                 );
@@ -4516,27 +4967,72 @@ export default function OverviewPage() {
                               return Object.entries(grouped).map(([cat, svcs]) => (
                                 <div key={cat}>
                                   {!drawerServiceSearch && (
-                                    <p className="px-3 pb-1 pt-2.5 text-[0.6875rem] font-semibold uppercase tracking-wider text-[#555]">
+                                    <p
+                                      style={{
+                                        fontSize: 11,
+                                        fontWeight: 600,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.08em',
+                                        color: '#8E8E93',
+                                        padding: '10px 16px 4px',
+                                        margin: 0,
+                                      }}
+                                    >
                                       {cat}
                                     </p>
                                   )}
-                                  {svcs.map((s) => (
-                                    <button
-                                      key={s.id}
-                                      onClick={() => {
-                                        setWalkInForm((f) => ({ ...f, serviceId: s.id }));
-                                        setDrawerServiceOpen(false);
-                                        setDrawerServiceSearch('');
-                                      }}
-                                      className={`flex w-full items-center justify-between px-3 py-2.5 text-left transition-colors hover:bg-[#f8f8f6] ${walkInForm.serviceId === s.id ? 'bg-[#f8f8f6]' : ''}`}
-                                    >
-                                      <span
-                                        className={`text-[0.875rem] ${walkInForm.serviceId === s.id ? 'font-semibold text-[#1a1a1a]' : 'text-[#333]'}`}
+                                  {svcs.map((s) => {
+                                    const isActive = walkInForm.serviceId === s.id;
+                                    return (
+                                      <button
+                                        key={s.id}
+                                        onClick={() => {
+                                          setWalkInForm((f) => ({ ...f, serviceId: s.id }));
+                                          setDrawerServiceOpen(false);
+                                          setDrawerServiceSearch('');
+                                        }}
+                                        style={{
+                                          display: 'flex',
+                                          width: '100%',
+                                          alignItems: 'center',
+                                          justifyContent: 'space-between',
+                                          padding: '10px 16px',
+                                          border: 'none',
+                                          background: isActive ? '#F0F4FF' : 'transparent',
+                                          cursor: 'pointer',
+                                          fontFamily: 'inherit',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          if (!isActive)
+                                            e.currentTarget.style.background = '#F5F5F7';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          if (!isActive)
+                                            e.currentTarget.style.background = 'transparent';
+                                        }}
                                       >
-                                        {s.name}
-                                      </span>
-                                    </button>
-                                  ))}
+                                        <span
+                                          style={{
+                                            fontSize: 14,
+                                            fontWeight: isActive ? 600 : 400,
+                                            color: isActive ? '#2563eb' : '#1C1C1E',
+                                          }}
+                                        >
+                                          {s.name}
+                                        </span>
+                                        <span
+                                          style={{
+                                            fontSize: 12,
+                                            color: '#8E8E93',
+                                            flexShrink: 0,
+                                            marginLeft: 12,
+                                          }}
+                                        >
+                                          {formatRupiah(s.price)}
+                                        </span>
+                                      </button>
+                                    );
+                                  })}
                                 </div>
                               ));
                             })()}
@@ -4545,13 +5041,35 @@ export default function OverviewPage() {
                       )}
                     </div>
                   </div>
-                  {/* Stylist */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[0.75rem] font-semibold uppercase tracking-wider text-[#444]">
-                      Stylist / Terapis <span className="text-[#ef4444]">*</span>
+
+                  {/* Stylist + Time Slots — same pattern as customer app */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <label
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        color: '#8E8E93',
+                      }}
+                    >
+                      Stylist &amp; Jam <span style={{ color: '#ef4444' }}>*</span>
                     </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {(realStylists as AnyStylist[]).map((s: AnyService) => {
+                    {(() => {
+                      const today = new Date().toISOString().slice(0, 10);
+                      // Generate 30-min slots 08:00–20:00
+                      const allSlots: string[] = [];
+                      for (let h = 8; h < 20; h++) {
+                        allSlots.push(`${String(h).padStart(2, '0')}:00`);
+                        allSlots.push(`${String(h).padStart(2, '0')}:30`);
+                      }
+                      const svcDuration = (() => {
+                        const svc = (realServices as AnyService[]).find(
+                          (s: AnyService) => s.id === walkInForm.serviceId
+                        );
+                        return svc?.duration ?? 60;
+                      })();
+                      return (realStylists as AnyStylist[]).map((s: AnyService) => {
                         const name = s.user?.full_name ?? s.name ?? 'Stylist';
                         const initials = name
                           .split(' ')
@@ -4559,25 +5077,230 @@ export default function OverviewPage() {
                           .join('')
                           .toUpperCase()
                           .slice(0, 2);
-                        return (
-                          <button
-                            key={s.id}
-                            onClick={() => setWalkInForm((f) => ({ ...f, stylistId: s.id }))}
-                            className={`flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition-colors ${walkInForm.stylistId === s.id ? 'border-[#1a1a1a] bg-[#f8f8f6]' : 'border-[#e8e8e8] hover:border-[#bbb]'}`}
-                          >
-                            <div
-                              className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[0.6875rem] font-bold"
-                              style={{ backgroundColor: '#c8ede2' }}
-                            >
-                              {initials}
-                            </div>
-                            <span className="text-[0.8125rem] font-medium leading-tight text-[#1a1a1a]">
-                              {name.split(' ')[0]}
-                            </span>
-                          </button>
+                        const isSelected = walkInForm.stylistId === s.id;
+                        const todayBookings = effectiveBookings.filter(
+                          (b) =>
+                            b.stylistName === name &&
+                            b.date === today &&
+                            (bookingStatusMap[b.id] ?? b.status) !== 'CANCELLED'
                         );
-                      })}
-                    </div>
+                        const slots = allSlots.map((time) => {
+                          const [h, m] = time.split(':').map(Number);
+                          const start = h * 60 + m;
+                          const end = start + svcDuration;
+                          const booked = todayBookings.some((b) => {
+                            const [bh, bm] = (b.timeSlot || '00:00').split(':').map(Number);
+                            const [eh, em] = (b.endTime || '00:00').split(':').map(Number);
+                            return start < eh * 60 + em && end > bh * 60 + bm;
+                          });
+                          return { time, available: !booked };
+                        });
+                        const availableSlots = slots.filter((sl) => sl.available);
+                        const isFullyBooked = availableSlots.length === 0;
+                        return (
+                          <div
+                            key={s.id}
+                            style={{
+                              borderRadius: 16,
+                              border: isSelected ? '2px solid #1C1C1E' : '1px solid #F0F0F3',
+                              background: 'white',
+                              opacity: isFullyBooked ? 0.45 : 1,
+                              overflow: 'hidden',
+                              transition: 'border 0.15s',
+                            }}
+                          >
+                            {/* Row: avatar + name + slots */}
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                gap: 12,
+                                padding: '14px 16px',
+                              }}
+                            >
+                              {/* Avatar */}
+                              <div
+                                style={{
+                                  width: 40,
+                                  height: 40,
+                                  borderRadius: '50%',
+                                  background: '#c8ede2',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: 13,
+                                  fontWeight: 700,
+                                  color: '#1C1C1E',
+                                  flexShrink: 0,
+                                }}
+                              >
+                                {initials}
+                              </div>
+                              {/* Name + chips */}
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    marginBottom: 8,
+                                  }}
+                                >
+                                  <p
+                                    style={{
+                                      fontSize: 14,
+                                      fontWeight: 600,
+                                      color: '#1C1C1E',
+                                      margin: 0,
+                                    }}
+                                  >
+                                    {name}
+                                  </p>
+                                  {isFullyBooked ? (
+                                    <span
+                                      style={{ fontSize: 11, color: '#ef4444', fontWeight: 500 }}
+                                    >
+                                      Penuh
+                                    </span>
+                                  ) : (
+                                    <span style={{ fontSize: 11, color: '#8E8E93' }}>
+                                      {availableSlots.length} slot
+                                    </span>
+                                  )}
+                                </div>
+                                {!isFullyBooked && (
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 6,
+                                      flexWrap: 'wrap',
+                                    }}
+                                  >
+                                    {/* 3 preview chips or selected chip */}
+                                    {(isSelected
+                                      ? [{ time: walkInForm.time, available: true }]
+                                      : availableSlots.slice(0, 3)
+                                    ).map((sl) => (
+                                      <button
+                                        key={sl.time}
+                                        type="button"
+                                        onClick={() =>
+                                          setWalkInForm((f) => ({
+                                            ...f,
+                                            stylistId: s.id,
+                                            time: sl.time,
+                                          }))
+                                        }
+                                        style={{
+                                          padding: '6px 13px',
+                                          borderRadius: 999,
+                                          border: 'none',
+                                          fontSize: 13,
+                                          fontWeight: 600,
+                                          background: isSelected ? '#1C1C1E' : '#F2F2F7',
+                                          color: isSelected ? 'white' : '#1C1C1E',
+                                          cursor: 'pointer',
+                                          transition: 'all 0.12s',
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        {sl.time}
+                                      </button>
+                                    ))}
+                                    {/* Lihat semua — text link */}
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setExpandedStylistSlots((p) => ({ ...p, [s.id]: !p[s.id] }))
+                                      }
+                                      style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        fontSize: 12,
+                                        fontWeight: 500,
+                                        color: '#007AFF',
+                                        cursor: 'pointer',
+                                        padding: '6px 2px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 3,
+                                        flexShrink: 0,
+                                      }}
+                                    >
+                                      {expandedStylistSlots[s.id] ? 'Sembunyikan' : 'Lihat semua'}
+                                      <CaretDown
+                                        size={9}
+                                        weight="bold"
+                                        color="#007AFF"
+                                        style={{
+                                          transform: expandedStylistSlots[s.id]
+                                            ? 'rotate(180deg)'
+                                            : 'none',
+                                          transition: 'transform 0.15s',
+                                        }}
+                                      />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            {/* Accordion: full slot grid */}
+                            {!isFullyBooked && expandedStylistSlots[s.id] && (
+                              <div
+                                style={{
+                                  borderTop: '1px solid #F2F2F7',
+                                  padding: '12px 16px',
+                                  display: 'flex',
+                                  flexWrap: 'wrap',
+                                  gap: 8,
+                                }}
+                              >
+                                {slots.map((sl) => {
+                                  const isChipSelected = isSelected && walkInForm.time === sl.time;
+                                  return (
+                                    <button
+                                      key={sl.time}
+                                      type="button"
+                                      disabled={!sl.available}
+                                      onClick={() =>
+                                        setWalkInForm((f) => ({
+                                          ...f,
+                                          stylistId: s.id,
+                                          time: sl.time,
+                                        }))
+                                      }
+                                      style={{
+                                        padding: '6px 13px',
+                                        borderRadius: 999,
+                                        border: 'none',
+                                        fontSize: 13,
+                                        fontWeight: 600,
+                                        cursor: sl.available ? 'pointer' : 'default',
+                                        background: isChipSelected
+                                          ? '#1C1C1E'
+                                          : sl.available
+                                            ? '#F2F2F7'
+                                            : '#F5F5F7',
+                                        color: isChipSelected
+                                          ? 'white'
+                                          : sl.available
+                                            ? '#1C1C1E'
+                                            : '#C7C7CC',
+                                        textDecoration: sl.available ? 'none' : 'line-through',
+                                        transition: 'all 0.12s',
+                                      }}
+                                    >
+                                      {sl.time}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
                 </>
               )}
@@ -4635,7 +5358,7 @@ export default function OverviewPage() {
 
             {/* Footer CTA */}
             {addDrawer === 'WALK_IN' && (
-              <div className="border-t border-[#f0f0f0] px-4 py-3 sm:px-6 sm:py-4">
+              <div style={{ padding: '16px 24px', borderTop: '1px solid #F2F2F7', flexShrink: 0 }}>
                 <button
                   disabled={!walkInForm.name || !walkInForm.serviceId || !walkInForm.stylistId}
                   onClick={async () => {
@@ -4646,18 +5369,64 @@ export default function OverviewPage() {
                       (s: AnyService) => s.id === walkInForm.stylistId
                     );
                     if (!svc || !stylist) return;
-
                     const now = new Date();
-                    const timeSlot = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-                    const totalMin = now.getHours() * 60 + now.getMinutes() + (svc.duration || 60);
+                    const timeSlot =
+                      walkInForm.time ||
+                      `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                    const [h, m] = timeSlot.split(':').map(Number);
+                    const totalMin = h * 60 + m + (svc.duration || 60);
                     const endTime = `${String(Math.floor(totalMin / 60) % 24).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`;
-
-                    try {
-                      await createBookingMutation.mutateAsync({
+                    const stylistName = stylist.user?.full_name ?? stylist.name ?? 'Stylist';
+                    const stylistInitials = stylistName
+                      .split(' ')
+                      .map((n: string) => n[0])
+                      .join('')
+                      .toUpperCase()
+                      .slice(0, 2);
+                    const newId = `walkin-${Date.now()}`;
+                    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                    // Optimistic: add immediately to manualBookings
+                    setManualBookings((prev) => [
+                      {
+                        id: newId,
+                        bookingCode: `WI-${newId.slice(-6).toUpperCase()}`,
+                        customerName: walkInForm.name,
+                        customerPhone: walkInForm.phone || '-',
+                        customerEmail: '',
+                        serviceName: svc.name,
+                        categoryName: svc.categoryName ?? svc.category?.name ?? '',
+                        stylistName,
+                        stylistInitials,
+                        stylistColor: '#c8ede2',
+                        date: today,
+                        timeSlot,
+                        endTime,
+                        duration: svc.duration || 60,
+                        price: svc.price,
+                        status: 'IN_PROGRESS',
+                        visitorType: 'WALK_IN',
+                        paymentStatus: 'PAID',
+                        addOns: [],
+                        notes: 'Walk-in',
+                        createdAt: now.toISOString(),
+                      },
+                      ...prev,
+                    ]);
+                    setWalkInForm({
+                      name: '',
+                      phone: '',
+                      serviceId: '',
+                      stylistId: '',
+                      time: timeSlot,
+                    });
+                    setAddDrawer('CLOSED');
+                    // Save to DB in background
+                    createBookingMutation
+                      .mutateAsync({
                         salonId: SALON_ID,
                         serviceId: svc.id,
                         stylistId: stylist.id,
-                        bookingDate: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`,
+                        bookingDate: today,
                         startTime: timeSlot,
                         endTime,
                         customerName: walkInForm.name,
@@ -4665,15 +5434,30 @@ export default function OverviewPage() {
                         customerEmail: '',
                         notes: 'Walk-in',
                         paymentStatus: 'lunas',
-                      });
-                    } catch (e) {
-                      console.error('Failed to create walk-in booking:', e);
-                    }
-
-                    setWalkInForm({ name: '', phone: '', serviceId: '', stylistId: '' });
-                    setAddDrawer('CLOSED');
+                      })
+                      .catch((e) => console.error('Failed to save walk-in to DB:', e));
                   }}
-                  className="h-11 w-full rounded-xl bg-[#1a1a1a] text-[0.9375rem] font-semibold text-white transition-colors hover:bg-[#333] disabled:cursor-not-allowed disabled:opacity-35"
+                  style={{
+                    width: '100%',
+                    height: 44,
+                    borderRadius: 10,
+                    border: 'none',
+                    background:
+                      !walkInForm.name || !walkInForm.serviceId || !walkInForm.stylistId
+                        ? '#F2F2F7'
+                        : '#1C1C1E',
+                    color:
+                      !walkInForm.name || !walkInForm.serviceId || !walkInForm.stylistId
+                        ? '#C7C7CC'
+                        : 'white',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor:
+                      !walkInForm.name || !walkInForm.serviceId || !walkInForm.stylistId
+                        ? 'not-allowed'
+                        : 'pointer',
+                    transition: 'all 0.15s',
+                  }}
                 >
                   Tambahkan ke Daftar
                 </button>
