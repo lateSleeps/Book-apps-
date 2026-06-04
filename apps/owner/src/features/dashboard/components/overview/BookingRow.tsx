@@ -30,7 +30,6 @@ interface BookingRowProps {
   booking: DashboardBooking;
   isExpanded: boolean;
   isLoading: boolean;
-  confirmingId: string | null;
   effectiveStatus: BookingStatus;
   onToggle: () => void;
   onDelete: () => void;
@@ -56,12 +55,29 @@ export function BookingRowColumnHeaders() {
         <span
           key={h}
           style={{
-            fontSize: '0.8125rem',
+            fontSize: 13,
             fontWeight: 500,
-            color: '#8E8E93',
-            textAlign: i === 5 ? 'right' : 'left',
+            color: '#8A8A8E',
+            display: 'flex',
+            alignItems: 'center',
+            position: 'relative',
           }}
         >
+          {i > 0 && (
+            <span
+              style={{
+                position: 'absolute',
+                left: -10,
+                color: '#D1D1D6',
+                fontWeight: 300,
+                fontSize: 14,
+                lineHeight: 1,
+                userSelect: 'none',
+              }}
+            >
+              |
+            </span>
+          )}
           {h}
         </span>
       ))}
@@ -73,7 +89,6 @@ export function BookingRow({
   booking: b,
   isExpanded,
   isLoading,
-  confirmingId,
   effectiveStatus,
   onToggle,
   onDelete,
@@ -235,52 +250,66 @@ export function BookingRow({
         </span>
 
         {/* Col 6: Type + actions */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10 }}>
+        <div
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}
+        >
           <span
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 5,
-              fontSize: 11,
-              fontWeight: 600,
+              gap: 4,
+              padding: '4px 12px',
+              borderRadius: 20,
+              fontSize: 12,
+              fontWeight: 500,
+              backgroundColor: vm.bg,
               color: vm.color,
-              background: vm.bg,
-              borderRadius: 9999,
-              padding: '3px 8px',
+              whiteSpace: 'nowrap',
+              border: 'none',
             }}
           >
-            <span style={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: vm.color }} />
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                backgroundColor: vm.color,
+                flexShrink: 0,
+              }}
+            />
             {vm.label}
           </span>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
-            className="flex h-7 w-7 items-center justify-center rounded-r6 text-tx-muted transition-colors hover:bg-red-50 hover:text-st-cancelled"
-            title="Hapus booking"
-          >
-            <Trash size={14} weight="duotone" />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 'auto' }}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="flex h-7 w-7 items-center justify-center rounded-r6 text-tx-muted transition-colors hover:bg-red-50 hover:text-st-cancelled"
+              title="Hapus booking"
+            >
+              <Trash size={14} weight="duotone" />
+            </button>
 
-          {/* Chevron */}
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-            stroke="#ccc"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            style={{
-              transition: 'transform 0.2s',
-              transform: isExpanded ? 'rotate(90deg)' : 'none',
-              flexShrink: 0,
-            }}
-          >
-            <path d="M5.5 3l4.5 4-4.5 4" />
-          </svg>
+            {/* Chevron */}
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              stroke="#ccc"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              style={{
+                transition: 'transform 0.2s',
+                transform: isExpanded ? 'rotate(90deg)' : 'none',
+                flexShrink: 0,
+              }}
+            >
+              <path d="M5.5 3l4.5 4-4.5 4" />
+            </svg>
+          </div>
         </div>
       </div>
 

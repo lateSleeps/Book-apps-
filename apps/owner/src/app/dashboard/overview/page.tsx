@@ -234,7 +234,6 @@ export default function OverviewPage() {
                     booking={b}
                     isExpanded={list.expandedId === b.id}
                     isLoading={status.loadingBookingId === b.id}
-                    confirmingId={status.confirmingId}
                     effectiveStatus={list.getEffectiveStatus(b.id) ?? b.status}
                     onToggle={() => list.toggleExpand(b.id)}
                     onDelete={() =>
