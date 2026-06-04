@@ -23,6 +23,7 @@ export const bookingsRouter = router({
         status,
         notes,
         payment_proof_url,
+        settlement_proof_url,
         payment_status,
         promo_code,
         addons,
@@ -69,6 +70,7 @@ export const bookingsRouter = router({
         status: booking.status,
         notes: booking.notes,
         paymentProofUrl: booking.payment_proof_url,
+        settlementProofUrl: booking.settlement_proof_url ?? null,
         paymentStatus: (() => {
           const raw = (booking.payment_status || '').toLowerCase();
           if (raw === 'paid') return 'PAID';
@@ -172,6 +174,7 @@ export const bookingsRouter = router({
         paymentMethod: z.enum(['cash', 'transfer', 'qris']),
         amountReceived: z.number().int().min(0),
         servicePrice: z.number().int().min(0),
+        paymentProofUrl: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -190,6 +193,7 @@ export const bookingsRouter = router({
           paid_at: new Date().toISOString(),
           status: 'COMPLETED',
           updated_at: new Date().toISOString(),
+          ...(input.paymentProofUrl ? { settlement_proof_url: input.paymentProofUrl } : {}),
         })
         .eq('id', input.bookingId)
         .select('id, payment_status, status')

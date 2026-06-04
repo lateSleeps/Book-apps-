@@ -205,7 +205,7 @@ export function DashboardSidebar() {
                   right: 10,
                   fontSize: 11,
                   color: '#8E8E93',
-                  background: '#E5E5EA',
+                  background: '#F0F0F3',
                   borderRadius: 4,
                   padding: '2px 6px',
                   pointerEvents: 'none',
@@ -256,7 +256,7 @@ export function DashboardSidebar() {
             ))}
           </div>
 
-          <div style={{ height: 1, background: '#E5E5EA', margin: '10px 12px' }} />
+          <div style={{ height: 1, background: '#F0F0F3', margin: '10px 12px' }} />
 
           {/* MANAJEMEN */}
           <div>
@@ -291,7 +291,7 @@ export function DashboardSidebar() {
 
           {/* PENGATURAN */}
           <div style={{ paddingBottom: 8 }}>
-            <div style={{ height: 1, background: '#E5E5EA', margin: '0 12px 10px' }} />
+            <div style={{ height: 1, background: '#F0F0F3', margin: '0 12px 10px' }} />
             {!collapsed && (
               <p
                 style={{

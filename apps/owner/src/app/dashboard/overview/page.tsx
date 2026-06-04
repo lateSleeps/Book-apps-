@@ -9,7 +9,16 @@ import {
   UserIcon,
   CogIcon,
 } from '@heroicons/react/24/solid';
-import { CaretDown, Trash } from '@phosphor-icons/react';
+import {
+  CaretDown,
+  Trash,
+  Users,
+  CheckCircle,
+  XCircle,
+  TrendUp,
+  PersonSimpleWalk,
+  CalendarCheck,
+} from '@phosphor-icons/react';
 import Link from 'next/link';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { SkeletonRow } from '@/components/SkeletonLoader';
@@ -205,7 +214,155 @@ export default function OverviewPage() {
   } | null>(null);
   const [manualBookings, setManualBookings] = useState<
     import('@/features/dashboard/types/dashboard.types').DashboardBooking[]
-  >([]);
+  >([
+    {
+      id: 'dummy-1',
+      bookingCode: 'BK-D001',
+      customerName: 'Siti Rahayu',
+      customerPhone: '081234561001',
+      serviceName: 'Haircut & Blow Dry',
+      categoryName: 'Hair',
+      stylistName: 'Maya Putri',
+      stylistInitials: 'MP',
+      stylistColor: '#FF6B9D',
+      date: new Date().toISOString().slice(0, 10),
+      timeSlot: '09:00:00',
+      endTime: '10:00:00',
+      duration: 60,
+      price: 85000,
+      status: 'CONFIRMED',
+      visitorType: 'BOOKING',
+      paymentStatus: 'DEPOSIT',
+      addOns: [],
+      notes: '',
+    },
+    {
+      id: 'dummy-2',
+      bookingCode: 'BK-D002',
+      customerName: 'Dewi Kusuma',
+      customerPhone: '081234561002',
+      serviceName: 'Make Up Natural',
+      categoryName: 'Make Up',
+      stylistName: 'Maya Putri',
+      stylistInitials: 'MP',
+      stylistColor: '#FF6B9D',
+      date: new Date().toISOString().slice(0, 10),
+      timeSlot: '10:00:00',
+      endTime: '11:00:00',
+      duration: 60,
+      price: 200000,
+      status: 'UPCOMING',
+      visitorType: 'BOOKING',
+      paymentStatus: 'DEPOSIT',
+      addOns: [],
+      notes: '',
+    },
+    {
+      id: 'dummy-3',
+      bookingCode: 'WI-D003',
+      customerName: 'Rina Marlina',
+      customerPhone: '081234561003',
+      serviceName: 'Creambath',
+      categoryName: 'Hair',
+      stylistName: 'Maya Putri',
+      stylistInitials: 'MP',
+      stylistColor: '#FF6B9D',
+      date: new Date().toISOString().slice(0, 10),
+      timeSlot: '11:00:00',
+      endTime: '12:00:00',
+      duration: 60,
+      price: 120000,
+      status: 'IN_PROGRESS',
+      visitorType: 'WALK_IN',
+      paymentStatus: 'UNPAID',
+      addOns: [],
+      notes: 'Walk-in',
+    },
+    {
+      id: 'dummy-4',
+      bookingCode: 'WI-D004',
+      customerName: 'Aulia Putri',
+      customerPhone: '081234561004',
+      serviceName: 'Facial Basic',
+      categoryName: 'Face',
+      stylistName: 'Maya Putri',
+      stylistInitials: 'MP',
+      stylistColor: '#FF6B9D',
+      date: new Date().toISOString().slice(0, 10),
+      timeSlot: '13:00:00',
+      endTime: '14:00:00',
+      duration: 60,
+      price: 150000,
+      status: 'CONFIRMED',
+      visitorType: 'WALK_IN',
+      paymentStatus: 'UNPAID',
+      addOns: [],
+      notes: 'Walk-in',
+    },
+    {
+      id: 'dummy-5',
+      bookingCode: 'BK-D005',
+      customerName: 'Nisa Amalia',
+      customerPhone: '081234561005',
+      serviceName: 'Keratin Treatment',
+      categoryName: 'Hair',
+      stylistName: 'Maya Putri',
+      stylistInitials: 'MP',
+      stylistColor: '#FF6B9D',
+      date: new Date().toISOString().slice(0, 10),
+      timeSlot: '14:00:00',
+      endTime: '16:00:00',
+      duration: 120,
+      price: 350000,
+      status: 'COMPLETED',
+      visitorType: 'BOOKING',
+      paymentStatus: 'PAID',
+      addOns: [],
+      notes: '',
+    },
+    {
+      id: 'dummy-6',
+      bookingCode: 'BK-D006',
+      customerName: 'Mega Wulandari',
+      customerPhone: '081234561006',
+      serviceName: 'Nail Art',
+      categoryName: 'Nail',
+      stylistName: 'Maya Putri',
+      stylistInitials: 'MP',
+      stylistColor: '#FF6B9D',
+      date: new Date().toISOString().slice(0, 10),
+      timeSlot: '15:00:00',
+      endTime: '16:00:00',
+      duration: 60,
+      price: 95000,
+      status: 'UPCOMING',
+      visitorType: 'BOOKING',
+      paymentStatus: 'DEPOSIT',
+      addOns: [],
+      notes: '',
+    },
+    {
+      id: 'dummy-7',
+      bookingCode: 'WI-D007',
+      customerName: 'Fitri Handayani',
+      customerPhone: '081234561007',
+      serviceName: 'Body Massage',
+      categoryName: 'Massage',
+      stylistName: 'Maya Putri',
+      stylistInitials: 'MP',
+      stylistColor: '#FF6B9D',
+      date: new Date().toISOString().slice(0, 10),
+      timeSlot: '16:00:00',
+      endTime: '17:00:00',
+      duration: 60,
+      price: 180000,
+      status: 'CONFIRMED',
+      visitorType: 'WALK_IN',
+      paymentStatus: 'UNPAID',
+      addOns: [],
+      notes: 'Walk-in',
+    },
+  ]);
   const [addOnsMap, setAddOnsMap] = useState<Record<string, AddOn[]>>({});
   const [notesMap, setNotesMap] = useState<Record<string, string>>({});
   const [serviceMap, setServiceMap] = useState<Record<string, ServiceData>>({});
@@ -249,6 +406,10 @@ export default function OverviewPage() {
     null
   );
   const [proofZoom, setProofZoom] = useState<string | null>(null);
+  const [pelunasanProofMap, setPelunasanProofMap] = useState<
+    Record<string, { file: File; preview: string } | null>
+  >({});
+  const [uploadingProof, setUploadingProof] = useState(false);
   const [visitorSearch, setVisitorSearch] = useState('');
   const [mobileSelectedId, setMobileSelectedId] = useState<string | null>(null);
   const [addDrawer, setAddDrawer] = useState<'CLOSED' | 'WALK_IN' | 'BOOKING'>('CLOSED');
@@ -702,7 +863,20 @@ export default function OverviewPage() {
                   <div className="fixed inset-0 z-30" onClick={() => setAddDropdownOpen(false)} />
                 )}
                 {addDropdownOpen && (
-                  <div className="absolute right-0 top-12 z-40 w-full max-w-xs overflow-hidden rounded-xl border border-[#efefed] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] sm:w-[13rem] sm:max-w-none">
+                  <div
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: 'calc(100% + 8px)',
+                      zIndex: 40,
+                      width: 220,
+                      background: 'white',
+                      borderRadius: 14,
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
+                      overflow: 'hidden',
+                      padding: 6,
+                    }}
+                  >
                     <button
                       onClick={() => {
                         setAddDrawer('WALK_IN');
@@ -710,17 +884,36 @@ export default function OverviewPage() {
                         setDrawerServiceOpen(false);
                         setDrawerServiceSearch('');
                       }}
-                      className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f8f8f6]"
+                      style={{
+                        display: 'flex',
+                        width: '100%',
+                        alignItems: 'center',
+                        gap: 12,
+                        padding: '10px 12px',
+                        borderRadius: 10,
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'background 0.1s',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = '#F5F5F7')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                     >
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f0f0ee]">
-                        <UserIcon className="h-3.5 w-3.5 text-[#555]" />
-                      </div>
+                      <PersonSimpleWalk
+                        size={20}
+                        weight="duotone"
+                        color="#1C1C1E"
+                        style={{ flexShrink: 0 }}
+                      />
                       <div>
-                        <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Walk-in</p>
-                        <p className="text-[0.75rem] text-gray-500">Datang langsung</p>
+                        <p style={{ fontSize: 14, fontWeight: 500, color: '#1C1C1E', margin: 0 }}>
+                          Walk-in
+                        </p>
+                        <p style={{ fontSize: 12, color: '#8E8E93', margin: 0 }}>Datang langsung</p>
                       </div>
                     </button>
-                    <div className="mx-4 h-px bg-[#f5f5f3]" />
+                    <div style={{ height: 1, background: '#F2F2F7', margin: '2px 10px' }} />
                     <button
                       onClick={() => {
                         setAddDrawer('BOOKING');
@@ -728,14 +921,35 @@ export default function OverviewPage() {
                         setDrawerServiceOpen(false);
                         setDrawerServiceSearch('');
                       }}
-                      className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f8f8f6]"
+                      style={{
+                        display: 'flex',
+                        width: '100%',
+                        alignItems: 'center',
+                        gap: 12,
+                        padding: '10px 12px',
+                        borderRadius: 10,
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'background 0.1s',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = '#F5F5F7')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                     >
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f0f0ee]">
-                        <CogIcon className="h-3.5 w-3.5 text-[#555]" />
-                      </div>
+                      <CalendarCheck
+                        size={20}
+                        weight="duotone"
+                        color="#1C1C1E"
+                        style={{ flexShrink: 0 }}
+                      />
                       <div>
-                        <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Booking Online</p>
-                        <p className="text-[0.75rem] text-gray-500">Sudah punya kode booking</p>
+                        <p style={{ fontSize: 14, fontWeight: 500, color: '#1C1C1E', margin: 0 }}>
+                          Booking Online
+                        </p>
+                        <p style={{ fontSize: 12, color: '#8E8E93', margin: 0 }}>
+                          Sudah punya kode booking
+                        </p>
                       </div>
                     </button>
                   </div>
@@ -765,23 +979,100 @@ export default function OverviewPage() {
                 justifyContent: 'space-between',
               }}
             >
+              {/* Doodle — right side only */}
               <svg
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: 20,
-                }}
-                viewBox="0 0 300 160"
+                style={{ position: 'absolute', right: 0, top: 0, height: '100%', width: '55%' }}
+                viewBox="0 0 200 160"
                 fill="none"
-                preserveAspectRatio="xMidYMid slice"
+                preserveAspectRatio="xMaxYMid meet"
               >
-                <circle cx="240" cy="30" r="60" fill="white" opacity="0.12" />
-                <circle cx="280" cy="120" r="45" fill="white" opacity="0.09" />
-                <circle cx="190" cy="140" r="35" fill="white" opacity="0.07" />
-                <polygon points="50,150 85,100 120,150" fill="white" opacity="0.07" />
-                <polygon points="200,5 225,50 175,50" fill="white" opacity="0.06" />
+                {/* Big soft circle */}
+                <circle cx="160" cy="40" r="55" fill="white" opacity="0.10" />
+                <circle cx="185" cy="110" r="38" fill="white" opacity="0.08" />
+                {/* Doodle rings */}
+                <circle
+                  cx="145"
+                  cy="30"
+                  r="18"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  opacity="0.18"
+                  fill="none"
+                  strokeDasharray="4 3"
+                />
+                <circle
+                  cx="175"
+                  cy="125"
+                  r="12"
+                  stroke="white"
+                  strokeWidth="1.2"
+                  opacity="0.15"
+                  fill="none"
+                  strokeDasharray="3 3"
+                />
+                {/* Wavy line */}
+                <path
+                  d="M80 90 Q100 75 120 90 Q140 105 160 90 Q180 75 200 90"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  opacity="0.20"
+                  fill="none"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M95 110 Q115 95 135 110 Q155 125 175 110"
+                  stroke="white"
+                  strokeWidth="1"
+                  opacity="0.12"
+                  fill="none"
+                  strokeLinecap="round"
+                />
+                {/* Small sparkle dots */}
+                <circle cx="100" cy="30" r="2.5" fill="white" opacity="0.30" />
+                <circle cx="190" cy="55" r="2" fill="white" opacity="0.25" />
+                <circle cx="130" cy="140" r="2" fill="white" opacity="0.20" />
+                <circle cx="165" cy="70" r="1.5" fill="white" opacity="0.22" />
+                {/* Plus / cross doodle */}
+                <line
+                  x1="108"
+                  y1="55"
+                  x2="108"
+                  y2="65"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  opacity="0.22"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="103"
+                  y1="60"
+                  x2="113"
+                  y2="60"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  opacity="0.22"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="185"
+                  y1="80"
+                  x2="185"
+                  y2="88"
+                  stroke="white"
+                  strokeWidth="1.2"
+                  opacity="0.18"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="181"
+                  y1="84"
+                  x2="189"
+                  y2="84"
+                  stroke="white"
+                  strokeWidth="1.2"
+                  opacity="0.18"
+                  strokeLinecap="round"
+                />
               </svg>
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <div
@@ -804,19 +1095,7 @@ export default function OverviewPage() {
                   >
                     Pendapatan Hari Ini
                   </p>
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ opacity: 0.85 }}
-                  >
-                    <path d="M7 17L17 7M17 7H7M17 7v10" />
-                  </svg>
+                  <TrendUp size={26} weight="duotone" color="white" style={{ opacity: 0.85 }} />
                 </div>
                 <p style={{ lineHeight: 1, margin: 0 }}>
                   <span style={{ fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
@@ -835,7 +1114,7 @@ export default function OverviewPage() {
                   position: 'relative',
                   zIndex: 1,
                   fontSize: 12,
-                  color: 'rgba(255,255,255,0.65)',
+                  color: 'rgba(255,255,255,0.88)',
                   margin: '12px 0 0',
                 }}
               >
@@ -877,25 +1156,7 @@ export default function OverviewPage() {
                 >
                   Booking Hari Ini
                 </p>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect
-                    x="3"
-                    y="4"
-                    width="18"
-                    height="18"
-                    rx="3"
-                    stroke="#007AFF"
-                    strokeWidth="1.8"
-                  />
-                  <path d="M16 2v4M8 2v4M3 10h18" stroke="#007AFF" strokeWidth="1.8" />
-                </svg>
+                <Users size={26} weight="duotone" color="#007AFF" />
               </div>
               <p
                 style={{
@@ -944,17 +1205,7 @@ export default function OverviewPage() {
                 >
                   Selesai
                 </p>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="12" r="9" stroke="#34C759" strokeWidth="1.8" />
-                  <path d="M8 12l3 3 5-5" stroke="#34C759" strokeWidth="2" />
-                </svg>
+                <CheckCircle size={26} weight="duotone" color="#34C759" />
               </div>
               <p
                 style={{
@@ -1003,17 +1254,7 @@ export default function OverviewPage() {
                 >
                   Pembatalan
                 </p>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="12" r="9" stroke="#FF3B30" strokeWidth="1.8" />
-                  <path d="M9 9l6 6M15 9l-6 6" stroke="#FF3B30" strokeWidth="2" />
-                </svg>
+                <XCircle size={26} weight="duotone" color="#FF3B30" />
               </div>
               <p
                 style={{
@@ -1278,25 +1519,44 @@ export default function OverviewPage() {
                       style={{
                         display: 'grid',
                         gridTemplateColumns: '2fr 1fr 2fr 1.5fr 1fr 1.2fr',
-                        padding: '12px 24px',
-                        borderBottom: '1px solid #E5E5EA',
+                        padding: '10px 20px',
                         alignItems: 'center',
+                        background: '#F7F7F8',
+                        borderRadius: '12px 12px 0 0',
                       }}
                     >
-                      {['PELANGGAN', 'STATUS', 'LAYANAN', 'STYLIST', 'WAKTU', 'TIPE'].map((h) => (
-                        <span
-                          key={h}
-                          style={{
-                            fontSize: 11,
-                            fontWeight: 600,
-                            color: '#8E8E93',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.5px',
-                          }}
-                        >
-                          {h}
-                        </span>
-                      ))}
+                      {['Pelanggan', 'Status', 'Layanan', 'Stylist', 'Waktu', 'Tipe'].map(
+                        (h, i) => (
+                          <span
+                            key={h}
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 500,
+                              color: '#8A8A8E',
+                              display: 'flex',
+                              alignItems: 'center',
+                              position: 'relative',
+                            }}
+                          >
+                            {i > 0 && (
+                              <span
+                                style={{
+                                  position: 'absolute',
+                                  left: -10,
+                                  color: '#D1D1D6',
+                                  fontWeight: 300,
+                                  fontSize: 14,
+                                  lineHeight: 1,
+                                  userSelect: 'none',
+                                }}
+                              >
+                                |
+                              </span>
+                            )}
+                            {h}
+                          </span>
+                        )
+                      )}
                     </div>
                   )}
                   {filteredVisitors.length === 0 ? (
@@ -1454,7 +1714,7 @@ export default function OverviewPage() {
                             key={b.id}
                             style={{
                               borderBottom: '1px solid #F2F2F7',
-                              opacity: 0.5,
+                              opacity: 0.4,
                               transition: 'opacity 0.3s',
                             }}
                           >
@@ -1466,7 +1726,7 @@ export default function OverviewPage() {
                       return (
                         <div
                           key={b.id}
-                          style={{ borderBottom: '1px solid #F2F2F7' }}
+                          style={{ borderBottom: '1px solid #EFEFEF' }}
                           className="last:border-0"
                         >
                           {/* Collapsed row — grid layout */}
@@ -1475,12 +1735,12 @@ export default function OverviewPage() {
                             style={{
                               display: 'grid',
                               gridTemplateColumns: '2fr 1fr 2fr 1.5fr 1fr 1.2fr',
-                              padding: '14px 24px',
+                              padding: '14px 20px',
                               alignItems: 'center',
                               cursor: 'pointer',
-                              transition: 'background 0.15s',
+                              transition: 'background 0.12s',
                             }}
-                            onMouseEnter={(e) => (e.currentTarget.style.background = '#F9F9FB')}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = '#F7F7F8')}
                             onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                           >
                             {/* PELANGGAN */}
@@ -1679,7 +1939,16 @@ export default function OverviewPage() {
                                 {/* Col 1: Kontak */}
                                 <div className="expanded-col-separator flex flex-col gap-3 border-b border-[#f0f0f0] pb-3 pr-0 sm:border-b sm:pb-3 sm:pr-0 md:border-b-0 md:border-l-0 md:border-r md:pb-0 md:pr-6">
                                   <div>
-                                    <p className="mb-1 text-[0.6875rem] uppercase tracking-wider text-[#555]">
+                                    <p
+                                      style={{
+                                        fontSize: 11,
+                                        fontWeight: 600,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        color: '#8E8E93',
+                                        margin: '0 0 4px 0',
+                                      }}
+                                    >
                                       Nomor HP
                                     </p>
                                     <p className="text-[0.875rem] font-medium tabular-nums text-[#1a1a1a]">
@@ -1690,8 +1959,21 @@ export default function OverviewPage() {
                                     href={waLink}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex h-8 items-center gap-1.5 self-start rounded-xl px-3 text-[0.75rem] font-medium text-white transition-opacity hover:opacity-85"
-                                    style={{ backgroundColor: '#25d366' }}
+                                    style={{
+                                      display: 'flex',
+                                      height: 36,
+                                      alignItems: 'center',
+                                      gap: 6,
+                                      alignSelf: 'flex-start',
+                                      borderRadius: 10,
+                                      padding: '0 14px',
+                                      fontSize: 13,
+                                      fontWeight: 600,
+                                      color: 'white',
+                                      backgroundColor: '#25d366',
+                                      textDecoration: 'none',
+                                      transition: 'opacity 0.15s',
+                                    }}
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     <svg
@@ -1718,7 +2000,16 @@ export default function OverviewPage() {
                                         className="mt-1 flex flex-col gap-2"
                                         onClick={(e) => e.stopPropagation()}
                                       >
-                                        <p className="text-[0.6875rem] font-semibold uppercase tracking-wider text-[#555]">
+                                        <p
+                                          style={{
+                                            fontSize: 11,
+                                            fontWeight: 600,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.05em',
+                                            color: '#8E8E93',
+                                            margin: 0,
+                                          }}
+                                        >
                                           Bukti Pembayaran
                                         </p>
                                         {/* Thumbnail bukti pembayaran — dari database */}
@@ -1789,7 +2080,22 @@ export default function OverviewPage() {
                                                 });
                                                 setShowWANotif(true);
                                               }}
-                                              className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#2563eb] text-[0.8125rem] font-semibold text-white transition-colors hover:bg-[#1d4ed8]"
+                                              style={{
+                                                display: 'flex',
+                                                height: 36,
+                                                flex: 1,
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: 6,
+                                                borderRadius: 10,
+                                                background: '#2563eb',
+                                                fontSize: 13,
+                                                fontWeight: 600,
+                                                color: 'white',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                transition: 'background 0.15s',
+                                              }}
                                             >
                                               <CheckIcon className="h-3.5 w-3.5 text-white" />
                                               Konfirmasi
@@ -1805,7 +2111,22 @@ export default function OverviewPage() {
                                                 });
                                                 setDeclineReason('');
                                               }}
-                                              className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl border border-[#e0e0e0] bg-[#f5f5f3] text-[0.8125rem] font-semibold text-[#ef4444] transition-colors hover:bg-[#efefed]"
+                                              style={{
+                                                display: 'flex',
+                                                height: 36,
+                                                flex: 1,
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: 6,
+                                                borderRadius: 10,
+                                                background: '#F9F9FB',
+                                                border: '1px solid #E5E5EA',
+                                                fontSize: 13,
+                                                fontWeight: 600,
+                                                color: '#ef4444',
+                                                cursor: 'pointer',
+                                                transition: 'background 0.15s',
+                                              }}
                                             >
                                               <svg
                                                 width="13"
@@ -1826,7 +2147,21 @@ export default function OverviewPage() {
 
                                         {/* Status confirmed — tampil di bawah gambar */}
                                         {b.status === 'CONFIRMED' && (
-                                          <div className="flex h-9 w-full items-center justify-center gap-1.5 rounded-xl bg-[#2563eb] text-[0.8125rem] font-semibold text-white">
+                                          <div
+                                            style={{
+                                              display: 'flex',
+                                              height: 36,
+                                              width: '100%',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              gap: 6,
+                                              borderRadius: 10,
+                                              background: '#2563eb',
+                                              fontSize: 13,
+                                              fontWeight: 600,
+                                              color: 'white',
+                                            }}
+                                          >
                                             <svg
                                               width="14"
                                               height="14"
@@ -1849,21 +2184,51 @@ export default function OverviewPage() {
                                 {/* Col 2: Layanan + Pembayaran */}
                                 <div className="expanded-col-separator flex flex-col gap-3 border-b border-[#f0f0f0] px-0 pb-3 pt-3 sm:border-b sm:px-3 sm:pb-3 sm:pt-3 md:border-b-0 md:border-l md:px-6 md:pb-0 md:pt-0">
                                   <div>
-                                    <p className="mb-1.5 text-[0.6875rem] uppercase tracking-wider text-[#555]">
+                                    <p
+                                      style={{
+                                        fontSize: 11,
+                                        fontWeight: 600,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        color: '#8E8E93',
+                                        margin: '0 0 6px 0',
+                                      }}
+                                    >
                                       Layanan
                                     </p>
                                     {editServiceId === b.id ? (
-                                      <div className="relative z-20">
-                                        <div className="absolute left-0 right-0 top-0 overflow-hidden rounded-xl border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
-                                          {/* Search */}
-                                          <div className="flex items-center gap-2 border-b border-[#f0f0f0] px-3 py-2">
+                                      <div style={{ position: 'relative', zIndex: 20 }}>
+                                        <div
+                                          style={{
+                                            position: 'absolute',
+                                            left: 0,
+                                            right: 0,
+                                            top: 0,
+                                            background: 'white',
+                                            borderRadius: 14,
+                                            boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
+                                            overflow: 'hidden',
+                                          }}
+                                        >
+                                          {/* Search bar */}
+                                          <div
+                                            style={{
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: 8,
+                                              padding: '10px 12px',
+                                              background: '#F2F2F7',
+                                              margin: 8,
+                                              borderRadius: 10,
+                                            }}
+                                          >
                                             <svg
                                               width="13"
                                               height="13"
                                               viewBox="0 0 16 16"
                                               fill="none"
-                                              stroke="#bbb"
-                                              strokeWidth="1.8"
+                                              stroke="#8E8E93"
+                                              strokeWidth="2"
                                               strokeLinecap="round"
                                             >
                                               <circle cx="7" cy="7" r="5" />
@@ -1877,30 +2242,54 @@ export default function OverviewPage() {
                                               onChange={(e) =>
                                                 setServiceSearchQuery(e.target.value)
                                               }
-                                              className="flex-1 bg-transparent text-[0.8125rem] text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
-                                            />
-                                            <button
-                                              onClick={() => {
-                                                setEditServiceId(null);
-                                                setServiceSearchQuery('');
+                                              style={{
+                                                flex: 1,
+                                                background: 'transparent',
+                                                border: 'none',
+                                                outline: 'none',
+                                                fontSize: 13,
+                                                color: '#1C1C1E',
                                               }}
-                                              className="flex h-5 w-5 flex-shrink-0 items-center justify-center text-[#ccc] transition-colors hover:text-[#888]"
-                                            >
-                                              <svg
-                                                width="10"
-                                                height="10"
-                                                viewBox="0 0 10 10"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                strokeWidth="2.5"
-                                                strokeLinecap="round"
+                                            />
+                                            {serviceSearchQuery && (
+                                              <button
+                                                onClick={() => setServiceSearchQuery('')}
+                                                style={{
+                                                  background: '#C7C7CC',
+                                                  border: 'none',
+                                                  borderRadius: '50%',
+                                                  width: 16,
+                                                  height: 16,
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  justifyContent: 'center',
+                                                  cursor: 'pointer',
+                                                  flexShrink: 0,
+                                                  padding: 0,
+                                                }}
                                               >
-                                                <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
-                                              </svg>
-                                            </button>
+                                                <svg
+                                                  width="8"
+                                                  height="8"
+                                                  viewBox="0 0 10 10"
+                                                  fill="none"
+                                                  stroke="white"
+                                                  strokeWidth="2.5"
+                                                  strokeLinecap="round"
+                                                >
+                                                  <path d="M2 2l6 6M8 2l-6 6" />
+                                                </svg>
+                                              </button>
+                                            )}
                                           </div>
                                           {/* Results */}
-                                          <div className="max-h-48 overflow-y-auto">
+                                          <div
+                                            style={{
+                                              maxHeight: 240,
+                                              overflowY: 'auto',
+                                              paddingBottom: 8,
+                                            }}
+                                          >
                                             {['Hair', 'Colour', 'Face', 'Nail', 'Massage'].map(
                                               (cat) => {
                                                 const catServices = MOCK_SERVICES.filter(
@@ -1914,29 +2303,79 @@ export default function OverviewPage() {
                                                 return (
                                                   <div key={cat}>
                                                     {!serviceSearchQuery && (
-                                                      <p className="px-3 pb-1 pt-2.5 text-[0.6875rem] font-semibold uppercase tracking-wider text-[#555]">
+                                                      <p
+                                                        style={{
+                                                          fontSize: 11,
+                                                          fontWeight: 600,
+                                                          textTransform: 'uppercase',
+                                                          letterSpacing: '0.08em',
+                                                          color: '#8E8E93',
+                                                          padding: '10px 16px 4px',
+                                                          margin: 0,
+                                                        }}
+                                                      >
                                                         {cat}
                                                       </p>
                                                     )}
-                                                    {catServices.map((svc) => (
-                                                      <button
-                                                        key={svc.id}
-                                                        onClick={() => {
-                                                          changeService(b.id, svc);
-                                                          setServiceSearchQuery('');
-                                                        }}
-                                                        className={`flex w-full items-center justify-between border-b border-[#f9f9f9] px-3 py-2 text-left transition-colors last:border-0 hover:bg-[#fafaf8] ${currentService.serviceName === svc.name ? 'bg-[#f5f0ff]' : ''}`}
-                                                      >
-                                                        <span
-                                                          className={`text-[0.8125rem] ${currentService.serviceName === svc.name ? 'font-semibold text-[#7a62c4]' : 'text-[#333]'}`}
+                                                    {catServices.map((svc) => {
+                                                      const isActive =
+                                                        currentService.serviceName === svc.name;
+                                                      return (
+                                                        <button
+                                                          key={svc.id}
+                                                          onClick={() => {
+                                                            changeService(b.id, svc);
+                                                            setServiceSearchQuery('');
+                                                          }}
+                                                          style={{
+                                                            display: 'flex',
+                                                            width: '100%',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'space-between',
+                                                            padding: '10px 16px',
+                                                            border: 'none',
+                                                            background: isActive
+                                                              ? '#F0F4FF'
+                                                              : 'transparent',
+                                                            cursor: 'pointer',
+                                                            textAlign: 'left',
+                                                            transition: 'background 0.1s',
+                                                          }}
+                                                          onMouseEnter={(e) => {
+                                                            if (!isActive)
+                                                              e.currentTarget.style.background =
+                                                                '#F5F5F7';
+                                                          }}
+                                                          onMouseLeave={(e) => {
+                                                            if (!isActive)
+                                                              e.currentTarget.style.background =
+                                                                'transparent';
+                                                          }}
                                                         >
-                                                          {svc.name}
-                                                        </span>
-                                                        <span className="ml-2 flex-shrink-0 text-[0.8125rem] text-[#555]">
-                                                          {formatRupiah(svc.price)}
-                                                        </span>
-                                                      </button>
-                                                    ))}
+                                                          <span
+                                                            style={{
+                                                              fontSize: 14,
+                                                              fontWeight: isActive ? 600 : 400,
+                                                              color: isActive
+                                                                ? '#2563eb'
+                                                                : '#1C1C1E',
+                                                            }}
+                                                          >
+                                                            {svc.name}
+                                                          </span>
+                                                          <span
+                                                            style={{
+                                                              fontSize: 13,
+                                                              color: '#8E8E93',
+                                                              flexShrink: 0,
+                                                              marginLeft: 12,
+                                                            }}
+                                                          >
+                                                            {formatRupiah(svc.price)}
+                                                          </span>
+                                                        </button>
+                                                      );
+                                                    })}
                                                   </div>
                                                 );
                                               }
@@ -1946,7 +2385,14 @@ export default function OverviewPage() {
                                                 .toLowerCase()
                                                 .includes(serviceSearchQuery.toLowerCase())
                                             ).length === 0 && (
-                                              <p className="px-3 py-3 text-[0.875rem] text-[#555]">
+                                              <p
+                                                style={{
+                                                  fontSize: 13,
+                                                  color: '#8E8E93',
+                                                  padding: '12px 16px',
+                                                  margin: 0,
+                                                }}
+                                              >
                                                 Layanan tidak ditemukan
                                               </p>
                                             )}
@@ -2160,7 +2606,16 @@ export default function OverviewPage() {
                                 {/* Col 3: Add-ons + Catatan Terapis */}
                                 <div className="expanded-col-separator flex flex-col gap-3 border-[#f0f0f0] pl-0 pt-3 sm:pl-3 sm:pt-3 md:border-l md:pl-6 md:pt-0">
                                   <div>
-                                    <p className="mb-2 text-[0.6875rem] uppercase tracking-wider text-[#555]">
+                                    <p
+                                      style={{
+                                        fontSize: 11,
+                                        fontWeight: 600,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        color: '#8E8E93',
+                                        margin: '0 0 6px 0',
+                                      }}
+                                    >
                                       Product Add-on
                                     </p>
                                     {addOns.length === 0 && (
@@ -2320,7 +2775,16 @@ export default function OverviewPage() {
 
                                   {isTreatment && (
                                     <div>
-                                      <p className="mb-1.5 text-[0.6875rem] uppercase tracking-wider text-[#555]">
+                                      <p
+                                        style={{
+                                          fontSize: 11,
+                                          fontWeight: 600,
+                                          textTransform: 'uppercase',
+                                          letterSpacing: '0.05em',
+                                          color: '#8E8E93',
+                                          margin: '0 0 6px 0',
+                                        }}
+                                      >
                                         Catatan Terapis
                                       </p>
                                       <textarea
@@ -2330,7 +2794,12 @@ export default function OverviewPage() {
                                         }
                                         placeholder="Kondisi kulit, alergi, preferensi..."
                                         rows={3}
-                                        className="w-full resize-none rounded-xl border border-[#e8e8e8] px-3 py-2 text-[0.8125rem] leading-relaxed text-[#1a1a1a] placeholder:text-[#ccc] focus:border-[#bbb] focus:outline-none"
+                                        className="w-full resize-none border px-3 py-2 text-[0.8125rem] leading-relaxed text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
+                                        style={{
+                                          borderRadius: 10,
+                                          borderColor: '#E5E5EA',
+                                          outline: 'none',
+                                        }}
                                       />
                                     </div>
                                   )}
@@ -2344,18 +2813,18 @@ export default function OverviewPage() {
                                   <div
                                     style={{
                                       borderRadius: 12,
-                                      border: '1px solid #E5E5EA',
                                       background: 'white',
                                       padding: 16,
                                       display: 'flex',
                                       flexDirection: 'column',
                                       gap: 12,
+                                      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                                     }}
                                   >
                                     <div
                                       style={{
                                         display: 'flex',
-                                        alignItems: 'center',
+                                        alignItems: 'flex-start',
                                         justifyContent: 'space-between',
                                       }}
                                     >
@@ -2495,7 +2964,13 @@ export default function OverviewPage() {
                                       );
                                     })()}
                                     {/* Kode Promo — inside Status Pembayaran */}
-                                    <div style={{ borderTop: '1px solid #F2F2F7', paddingTop: 12 }}>
+                                    <div
+                                      style={{
+                                        borderTop: '1px solid #F2F2F7',
+                                        paddingTop: 12,
+                                        marginTop: 'auto',
+                                      }}
+                                    >
                                       <p
                                         style={{
                                           fontSize: 11,
@@ -2514,7 +2989,7 @@ export default function OverviewPage() {
                                             display: 'flex',
                                             alignItems: 'center',
                                             gap: 8,
-                                            borderRadius: 8,
+                                            borderRadius: 10,
                                             border: '1px solid #BBF7D0',
                                             background: '#F0FDF4',
                                             padding: '8px 12px',
@@ -2568,11 +3043,11 @@ export default function OverviewPage() {
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 gap: 8,
-                                                height: 40,
-                                                borderRadius: 9999,
+                                                height: 36,
+                                                borderRadius: 10,
                                                 border: '1px solid #E5E5EA',
-                                                background: 'white',
-                                                padding: '0 14px',
+                                                background: '#F9F9FB',
+                                                padding: '0 12px',
                                               }}
                                             >
                                               <svg
@@ -2616,12 +3091,12 @@ export default function OverviewPage() {
                                               onClick={() => applyPromo(b.id, totalPrice)}
                                               style={{
                                                 height: 40,
-                                                borderRadius: 9999,
+                                                borderRadius: 10,
                                                 background: '#1C1C1E',
                                                 color: 'white',
                                                 border: 'none',
                                                 cursor: 'pointer',
-                                                padding: '0 20px',
+                                                padding: '0 16px',
                                                 fontSize: 13,
                                                 fontWeight: 600,
                                                 flexShrink: 0,
@@ -2651,12 +3126,12 @@ export default function OverviewPage() {
                                     className="md:col-span-2"
                                     style={{
                                       borderRadius: 12,
-                                      border: '1px solid #E5E5EA',
                                       background: 'white',
                                       padding: 16,
                                       display: 'flex',
                                       flexDirection: 'column',
                                       gap: 12,
+                                      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                                     }}
                                   >
                                     <p
@@ -2674,68 +3149,245 @@ export default function OverviewPage() {
                                         : 'Input Pembayaran'}
                                     </p>
                                     {b.paymentStatus === 'PAID' ? (
-                                      <div className="flex items-center gap-2 rounded-lg bg-[#f0fdf4] px-3 py-2.5">
-                                        <svg
-                                          width="14"
-                                          height="14"
-                                          viewBox="0 0 16 16"
-                                          fill="none"
-                                          stroke="#16a34a"
-                                          strokeWidth="2.5"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
+                                      <>
+                                        {/* Status lunas */}
+                                        <div
+                                          style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 8,
+                                            background: '#F0FDF4',
+                                            borderRadius: 10,
+                                            padding: '10px 14px',
+                                          }}
                                         >
-                                          <path d="M3 8l3 3 7-7" />
-                                        </svg>
-                                        <span className="text-[0.8125rem] font-semibold text-[#16a34a]">
-                                          Lunas · {formatRupiah(finalTotal)}
-                                        </span>
-                                      </div>
+                                          <svg
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 16 16"
+                                            fill="none"
+                                            stroke="#16a34a"
+                                            strokeWidth="2.5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          >
+                                            <path d="M3 8l3 3 7-7" />
+                                          </svg>
+                                          <span
+                                            style={{
+                                              fontSize: 13,
+                                              fontWeight: 600,
+                                              color: '#16a34a',
+                                            }}
+                                          >
+                                            Lunas · {formatRupiah(finalTotal)}
+                                          </span>
+                                        </div>
+                                        {/* Bukti pelunasan — button kecil */}
+                                        {b.settlementProofUrl ? (
+                                          <button
+                                            onClick={() => setProofZoom(`settlement_${b.id}`)}
+                                            style={{
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: 6,
+                                              alignSelf: 'flex-start',
+                                              height: 36,
+                                              borderRadius: 10,
+                                              border: '1px solid #E5E5EA',
+                                              background: 'transparent',
+                                              padding: '0 14px',
+                                              fontSize: 13,
+                                              fontWeight: 500,
+                                              color: '#1C1C1E',
+                                              cursor: 'pointer',
+                                            }}
+                                          >
+                                            <svg
+                                              width="14"
+                                              height="14"
+                                              viewBox="0 0 24 24"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              strokeWidth="2"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            >
+                                              <rect x="3" y="3" width="18" height="18" rx="2" />
+                                              <circle cx="8.5" cy="8.5" r="1.5" />
+                                              <path d="M21 15l-5-5L5 21" />
+                                            </svg>
+                                            Lihat Bukti Pelunasan
+                                          </button>
+                                        ) : (
+                                          <span style={{ fontSize: 12, color: '#8E8E93' }}>
+                                            Belum ada bukti pelunasan
+                                          </span>
+                                        )}
+                                      </>
                                     ) : (
                                       <>
-                                        {/* Method pills */}
-                                        <div className="flex items-center gap-2">
-                                          {(['CASH', 'TRANSFER', 'QRIS'] as const).map((m) => (
-                                            <button
-                                              key={m}
-                                              onClick={() =>
-                                                setPaymentMethodMap((p) => ({ ...p, [b.id]: m }))
-                                              }
-                                              className={`h-7 rounded-lg border px-3 text-[0.75rem] transition-colors ${
-                                                (paymentMethodMap[b.id] ?? 'CASH') === m
-                                                  ? 'border-[#1a1a1a] bg-[#1a1a1a] text-white'
-                                                  : 'border-[#e8e8e8] bg-white text-[#555] hover:border-[#bbb]'
-                                              }`}
+                                        {/* Method tabs — matches top filter tabs */}
+                                        <div
+                                          style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: 2,
+                                            borderRadius: 12,
+                                            padding: 4,
+                                            backgroundColor: '#F2F2F7',
+                                            alignSelf: 'flex-start',
+                                          }}
+                                        >
+                                          {(['CASH', 'TRANSFER', 'QRIS'] as const).map((m) => {
+                                            const active = (paymentMethodMap[b.id] ?? 'CASH') === m;
+                                            return (
+                                              <button
+                                                key={m}
+                                                onClick={() =>
+                                                  setPaymentMethodMap((p) => ({ ...p, [b.id]: m }))
+                                                }
+                                                style={{
+                                                  whiteSpace: 'nowrap',
+                                                  padding: '6px 14px',
+                                                  borderRadius: 10,
+                                                  border: 'none',
+                                                  cursor: 'pointer',
+                                                  fontSize: 13,
+                                                  fontWeight: active ? 600 : 400,
+                                                  transition: 'all 0.15s',
+                                                  backgroundColor: active
+                                                    ? '#FFFFFF'
+                                                    : 'transparent',
+                                                  color: active ? '#1C1C1E' : '#8E8E93',
+                                                  boxShadow: active
+                                                    ? '0 1px 4px rgba(0,0,0,0.1)'
+                                                    : 'none',
+                                                }}
+                                              >
+                                                {m === 'CASH'
+                                                  ? 'Cash'
+                                                  : m === 'TRANSFER'
+                                                    ? 'Transfer'
+                                                    : 'QRIS'}
+                                              </button>
+                                            );
+                                          })}
+                                        </div>
+                                        {/* Nominal input — hanya untuk CASH */}
+                                        {(paymentMethodMap[b.id] ?? 'CASH') === 'CASH' && (
+                                          <div
+                                            style={{
+                                              display: 'flex',
+                                              height: 36,
+                                              alignItems: 'center',
+                                              gap: 8,
+                                              borderRadius: 10,
+                                              border: '1px solid #E5E5EA',
+                                              background: '#F9F9FB',
+                                              padding: '0 12px',
+                                            }}
+                                          >
+                                            <span
+                                              style={{
+                                                flexShrink: 0,
+                                                fontSize: 13,
+                                                color: '#8E8E93',
+                                              }}
                                             >
-                                              {m === 'CASH'
-                                                ? 'Cash'
-                                                : m === 'TRANSFER'
-                                                  ? 'Transfer'
-                                                  : 'QRIS'}
-                                            </button>
-                                          ))}
-                                        </div>
-                                        {/* Nominal input */}
-                                        <div className="flex h-9 items-center gap-2 rounded-lg bg-[#f8f8f6] px-3 transition-all focus-within:ring-1 focus-within:ring-[#ddd]">
-                                          <span className="shrink-0 text-[0.875rem] text-gray-500">
-                                            {(paymentMethodMap[b.id] ?? 'CASH') === 'CASH'
-                                              ? 'Uang diterima  Rp'
-                                              : 'Nominal  Rp'}
-                                          </span>
-                                          <input
-                                            type="text"
-                                            inputMode="numeric"
-                                            placeholder="0"
-                                            value={paymentAmountMap[b.id] ?? ''}
-                                            onChange={(e) =>
-                                              setPaymentAmountMap((p) => ({
-                                                ...p,
-                                                [b.id]: e.target.value.replace(/\D/g, ''),
-                                              }))
-                                            }
-                                            className="flex-1 bg-transparent text-[0.875rem] font-medium text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
-                                          />
-                                        </div>
+                                              Uang diterima Rp
+                                            </span>
+                                            <input
+                                              type="text"
+                                              inputMode="numeric"
+                                              placeholder="0"
+                                              value={paymentAmountMap[b.id] ?? ''}
+                                              onChange={(e) =>
+                                                setPaymentAmountMap((p) => ({
+                                                  ...p,
+                                                  [b.id]: e.target.value.replace(/\D/g, ''),
+                                                }))
+                                              }
+                                              style={{
+                                                flex: 1,
+                                                background: 'transparent',
+                                                border: 'none',
+                                                outline: 'none',
+                                                fontSize: 13,
+                                                fontWeight: 500,
+                                                color: '#1C1C1E',
+                                              }}
+                                            />
+                                          </div>
+                                        )}
+                                        {/* Total Tagihan + Kembalian */}
+                                        {(() => {
+                                          const method = paymentMethodMap[b.id] ?? 'CASH';
+                                          const raw =
+                                            parseInt(paymentAmountMap[b.id] ?? '0', 10) || 0;
+                                          const kembalian = raw - finalTotal;
+                                          const showKembalian = method === 'CASH' && raw > 0;
+                                          return (
+                                            <>
+                                              <div
+                                                style={{
+                                                  display: 'flex',
+                                                  justifyContent: 'space-between',
+                                                  alignItems: 'center',
+                                                  padding: '8px 12px',
+                                                  background: '#F9F9FB',
+                                                  borderRadius: 10,
+                                                  border: '1px solid #E5E5EA',
+                                                }}
+                                              >
+                                                <span style={{ fontSize: 13, color: '#6B6B6B' }}>
+                                                  Total Tagihan
+                                                </span>
+                                                <span
+                                                  style={{
+                                                    fontSize: 14,
+                                                    fontWeight: 700,
+                                                    color: '#1C1C1E',
+                                                  }}
+                                                >
+                                                  {formatRupiah(finalTotal)}
+                                                </span>
+                                              </div>
+                                              {showKembalian && (
+                                                <div
+                                                  style={{
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                    padding: '8px 12px',
+                                                    background:
+                                                      kembalian >= 0 ? '#F0FDF4' : '#FFF1F0',
+                                                    borderRadius: 10,
+                                                    border: `1px solid ${kembalian >= 0 ? '#BBF7D0' : '#FECACA'}`,
+                                                  }}
+                                                >
+                                                  <span
+                                                    style={{
+                                                      fontSize: 13,
+                                                      color: kembalian >= 0 ? '#16a34a' : '#ef4444',
+                                                    }}
+                                                  >
+                                                    {kembalian >= 0 ? 'Kembalian' : 'Kurang'}
+                                                  </span>
+                                                  <span
+                                                    style={{
+                                                      fontSize: 14,
+                                                      fontWeight: 700,
+                                                      color: kembalian >= 0 ? '#16a34a' : '#ef4444',
+                                                    }}
+                                                  >
+                                                    {formatRupiah(Math.abs(kembalian))}
+                                                  </span>
+                                                </div>
+                                              )}
+                                            </>
+                                          );
+                                        })()}
                                         {/* Error + Proses Pembayaran */}
                                         <div
                                           style={{
@@ -2750,66 +3402,133 @@ export default function OverviewPage() {
                                               {paymentError.message}
                                             </p>
                                           )}
-                                          <button
-                                            disabled={
-                                              b.paymentStatus === 'PAID' ||
-                                              processPaymentMutation.isPending
-                                            }
-                                            onClick={() => {
-                                              setPaymentError(null);
-                                              const method = paymentMethodMap[b.id] ?? 'CASH';
-                                              const rawAmount = paymentAmountMap[b.id] ?? '';
-                                              const amountReceived =
-                                                method !== 'CASH'
-                                                  ? finalTotal
-                                                  : parseInt(rawAmount, 10);
-                                              if (method === 'CASH' && !rawAmount) {
-                                                setPaymentError({
-                                                  bookingId: b.id,
-                                                  message: 'Masukkan jumlah uang diterima',
-                                                });
-                                                return;
-                                              }
-                                              if (
-                                                method === 'CASH' &&
-                                                amountReceived < finalTotal
-                                              ) {
-                                                setPaymentError({
-                                                  bookingId: b.id,
-                                                  message: 'Uang tidak cukup',
-                                                });
-                                                return;
-                                              }
-                                              setConfirmDialog({
-                                                bookingId: b.id,
-                                                customerName: b.customerName,
-                                                serviceName: currentService.serviceName,
-                                                amount: amountReceived,
-                                                method,
-                                                finalTotal,
-                                              });
-                                            }}
+                                          <div
                                             style={{
-                                              height: 44,
-                                              borderRadius: 9999,
-                                              border: 'none',
-                                              background: '#34C759',
-                                              color: 'white',
-                                              fontSize: 14,
-                                              fontWeight: 600,
-                                              cursor: processPaymentMutation.isPending
-                                                ? 'not-allowed'
-                                                : 'pointer',
-                                              opacity: processPaymentMutation.isPending ? 0.6 : 1,
-                                              transition: 'opacity 0.15s',
-                                              padding: '0 28px',
-                                              alignSelf: 'flex-end',
+                                              display: 'flex',
+                                              gap: 8,
+                                              alignItems: 'center',
+                                              justifyContent: 'space-between',
                                             }}
                                           >
-                                            {processPaymentMutation.isPending
-                                              ? 'Memproses...'
-                                              : 'Proses Pembayaran'}
-                                          </button>
+                                            {/* Bukti Pelunasan — hanya untuk TRANSFER / QRIS */}
+                                            {(paymentMethodMap[b.id] ?? 'CASH') !== 'CASH' ? (
+                                              <label
+                                                style={{
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  gap: 6,
+                                                  height: 40,
+                                                  borderRadius: 10,
+                                                  border: '1px solid #E5E5EA',
+                                                  background: 'transparent',
+                                                  padding: '0 14px',
+                                                  fontSize: 13,
+                                                  fontWeight: 500,
+                                                  color: pelunasanProofMap[b.id]
+                                                    ? '#16a34a'
+                                                    : '#8E8E93',
+                                                  cursor: 'pointer',
+                                                  flexShrink: 0,
+                                                  whiteSpace: 'nowrap',
+                                                }}
+                                              >
+                                                <svg
+                                                  width="14"
+                                                  height="14"
+                                                  viewBox="0 0 24 24"
+                                                  fill="none"
+                                                  stroke="currentColor"
+                                                  strokeWidth="2"
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                >
+                                                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                                                  <circle cx="8.5" cy="8.5" r="1.5" />
+                                                  <path d="M21 15l-5-5L5 21" />
+                                                </svg>
+                                                {pelunasanProofMap[b.id]
+                                                  ? 'Bukti Dipilih ✓'
+                                                  : 'Bukti Pelunasan'}
+                                                <input
+                                                  type="file"
+                                                  accept="image/*"
+                                                  capture="environment"
+                                                  style={{ display: 'none' }}
+                                                  onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (!file) return;
+                                                    const preview = URL.createObjectURL(file);
+                                                    setPelunasanProofMap((p) => ({
+                                                      ...p,
+                                                      [b.id]: { file, preview },
+                                                    }));
+                                                  }}
+                                                />
+                                              </label>
+                                            ) : (
+                                              <div />
+                                            )}
+                                            <button
+                                              disabled={
+                                                b.paymentStatus === 'PAID' ||
+                                                processPaymentMutation.isPending
+                                              }
+                                              onClick={() => {
+                                                setPaymentError(null);
+                                                const method = paymentMethodMap[b.id] ?? 'CASH';
+                                                const rawAmount = paymentAmountMap[b.id] ?? '';
+                                                const amountReceived =
+                                                  method !== 'CASH'
+                                                    ? finalTotal
+                                                    : parseInt(rawAmount, 10);
+                                                if (method === 'CASH' && !rawAmount) {
+                                                  setPaymentError({
+                                                    bookingId: b.id,
+                                                    message: 'Masukkan jumlah uang diterima',
+                                                  });
+                                                  return;
+                                                }
+                                                if (
+                                                  method === 'CASH' &&
+                                                  amountReceived < finalTotal
+                                                ) {
+                                                  setPaymentError({
+                                                    bookingId: b.id,
+                                                    message: 'Uang tidak cukup',
+                                                  });
+                                                  return;
+                                                }
+                                                setConfirmDialog({
+                                                  bookingId: b.id,
+                                                  customerName: b.customerName,
+                                                  serviceName: currentService.serviceName,
+                                                  amount: amountReceived,
+                                                  method,
+                                                  finalTotal,
+                                                });
+                                              }}
+                                              style={{
+                                                height: 40,
+                                                borderRadius: 10,
+                                                border: 'none',
+                                                background: '#34C759',
+                                                color: 'white',
+                                                fontSize: 13,
+                                                fontWeight: 600,
+                                                cursor: processPaymentMutation.isPending
+                                                  ? 'not-allowed'
+                                                  : 'pointer',
+                                                opacity: processPaymentMutation.isPending ? 0.6 : 1,
+                                                transition: 'opacity 0.15s',
+                                                padding: '0 24px',
+                                                alignSelf: 'flex-end',
+                                              }}
+                                            >
+                                              {processPaymentMutation.isPending
+                                                ? 'Memproses...'
+                                                : 'Proses Pembayaran'}
+                                            </button>
+                                          </div>
                                         </div>
                                       </>
                                     )}
@@ -3243,6 +3962,115 @@ export default function OverviewPage() {
                     </>
                   )}
                 </div>
+                {/* Bukti Transfer — preview untuk TRANSFER/QRIS */}
+                {(d.method === 'TRANSFER' || d.method === 'QRIS') && (
+                  <div>
+                    <p
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        color: '#8E8E93',
+                        margin: '0 0 8px 0',
+                      }}
+                    >
+                      Bukti Transfer
+                    </p>
+                    {pelunasanProofMap[d.bookingId]?.preview ? (
+                      <div style={{ position: 'relative' }}>
+                        <img
+                          src={pelunasanProofMap[d.bookingId]!.preview}
+                          alt="Bukti"
+                          style={{
+                            width: '100%',
+                            height: 140,
+                            objectFit: 'cover',
+                            borderRadius: 10,
+                            border: '1px solid #E5E5EA',
+                          }}
+                        />
+                        <label
+                          style={{
+                            position: 'absolute',
+                            bottom: 8,
+                            right: 8,
+                            background: 'rgba(0,0,0,0.5)',
+                            borderRadius: 8,
+                            padding: '4px 10px',
+                            fontSize: 11,
+                            color: 'white',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Ganti
+                          <input
+                            type="file"
+                            accept="image/*"
+                            capture="environment"
+                            style={{ display: 'none' }}
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const preview = URL.createObjectURL(file);
+                              setPelunasanProofMap((p) => ({
+                                ...p,
+                                [d.bookingId]: { file, preview },
+                              }));
+                            }}
+                          />
+                        </label>
+                      </div>
+                    ) : (
+                      <label
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 8,
+                          height: 100,
+                          borderRadius: 10,
+                          border: '2px dashed #E5E5EA',
+                          background: '#F9F9FB',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#8E8E93"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                          <circle cx="12" cy="13" r="4" />
+                        </svg>
+                        <span style={{ fontSize: 12, color: '#8E8E93' }}>
+                          Ambil foto / pilih dari galeri
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          style={{ display: 'none' }}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const preview = URL.createObjectURL(file);
+                            setPelunasanProofMap((p) => ({
+                              ...p,
+                              [d.bookingId]: { file, preview },
+                            }));
+                          }}
+                        />
+                      </label>
+                    )}
+                  </div>
+                )}
                 {/* Actions */}
                 <div className="flex gap-2.5">
                   <button
@@ -3252,24 +4080,46 @@ export default function OverviewPage() {
                     Batal
                   </button>
                   <button
-                    disabled={processPaymentMutation.isPending}
+                    disabled={processPaymentMutation.isPending || uploadingProof}
                     onClick={async () => {
                       const method = d.method.toLowerCase() as 'cash' | 'transfer' | 'qris';
                       try {
+                        let proofUrl: string | undefined;
+                        const proof = pelunasanProofMap[d.bookingId];
+                        if (proof && method !== 'cash') {
+                          setUploadingProof(true);
+                          const form = new FormData();
+                          form.append('file', proof.file);
+                          form.append('bookingId', d.bookingId);
+                          const res = await fetch('/api/upload-proof', {
+                            method: 'POST',
+                            body: form,
+                          });
+                          const json = await res.json();
+                          proofUrl = json.url;
+                          setUploadingProof(false);
+                        }
                         await processPaymentMutation.mutateAsync({
                           bookingId: d.bookingId,
                           paymentMethod: method,
                           amountReceived: d.amount,
                           servicePrice: d.finalTotal,
+                          paymentProofUrl: proofUrl,
                         });
                         setConfirmDialog(null);
+                        setPelunasanProofMap((p) => ({ ...p, [d.bookingId]: null }));
                       } catch (e) {
+                        setUploadingProof(false);
                         console.error('processPayment error:', e);
                       }
                     }}
                     className="h-10 flex-1 rounded-xl bg-[#16a34a] text-[0.875rem] font-semibold text-white transition-colors hover:bg-[#15803d] disabled:opacity-50"
                   >
-                    Ya, Proses ✓
+                    {uploadingProof
+                      ? 'Mengupload...'
+                      : processPaymentMutation.isPending
+                        ? 'Memproses...'
+                        : 'Ya, Proses ✓'}
                   </button>
                 </div>
               </div>
@@ -3383,10 +4233,13 @@ export default function OverviewPage() {
       {/* Proof zoom modal */}
       {proofZoom &&
         (() => {
+          const isSettlement = proofZoom.startsWith('settlement_');
+          const bookingId = isSettlement ? proofZoom.replace('settlement_', '') : proofZoom;
           const booking =
-            allBookings.find((b) => b.id === proofZoom) ??
-            manualBookings.find((b) => b.id === proofZoom);
-          const proofUrl = booking?.paymentProofUrl;
+            allBookings.find((b) => b.id === bookingId) ??
+            manualBookings.find((b) => b.id === bookingId);
+          const proofUrl = isSettlement ? booking?.settlementProofUrl : booking?.paymentProofUrl;
+          const title = isSettlement ? 'Bukti Pelunasan' : 'Bukti Pembayaran (DP)';
           return (
             <div
               className="fixed inset-0 z-[70] flex items-center justify-center p-4"
@@ -3402,7 +4255,7 @@ export default function OverviewPage() {
                   <div className="flex items-center justify-between border-b border-[#f0f0f0] px-5 py-4">
                     <div>
                       <p className="text-[0.75rem] font-semibold uppercase tracking-wider text-gray-500">
-                        Bukti Pembayaran
+                        {title}
                       </p>
                       <p className="mt-0.5 text-[0.9375rem] font-bold text-[#1a1a1a]">
                         {booking?.customerName}
