@@ -32,7 +32,7 @@ export function BookingTableHeader({ list }: BookingTableHeaderProps) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '16px 20px 8px',
+        padding: '16px 20px 16px',
       }}
     >
       {/* Segmented tabs */}
@@ -135,14 +135,14 @@ export function BookingTableHeader({ list }: BookingTableHeaderProps) {
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            height: 32,
-            padding: '0 10px',
-            borderRadius: 8,
+            height: 36,
+            padding: '0 12px',
+            borderRadius: 10,
             background: '#F2F2F7',
-            width: 160,
+            width: 220,
           }}
         >
-          <MagnifyingGlassIcon style={{ width: 13, height: 13, color: '#8E8E93', flexShrink: 0 }} />
+          <MagnifyingGlassIcon style={{ width: 14, height: 14, color: '#8E8E93', flexShrink: 0 }} />
           <input
             type="text"
             placeholder="Cari pelanggan..."
@@ -153,7 +153,7 @@ export function BookingTableHeader({ list }: BookingTableHeaderProps) {
               background: 'none',
               border: 'none',
               outline: 'none',
-              fontSize: 12,
+              fontSize: 13,
               color: '#1C1C1E',
             }}
           />

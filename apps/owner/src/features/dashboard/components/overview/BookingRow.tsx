@@ -45,7 +45,8 @@ export function BookingRowColumnHeaders() {
       style={{
         display: 'grid',
         gridTemplateColumns: GRID,
-        padding: '0.625rem 1.25rem',
+        columnGap: 20,
+        padding: '10px 20px',
         alignItems: 'center',
         background: '#F7F7F8',
         borderRadius: '0.75rem 0.75rem 0 0',
@@ -116,7 +117,8 @@ export function BookingRow({
         style={{
           display: 'grid',
           gridTemplateColumns: GRID,
-          padding: '0.875rem 1.25rem',
+          columnGap: 20,
+          padding: '14px 20px',
           alignItems: 'center',
           cursor: 'pointer',
           transition: 'background 0.12s',
@@ -280,16 +282,24 @@ export function BookingRow({
             {vm.label}
           </span>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginLeft: 'auto' }}>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete();
               }}
-              className="flex h-7 w-7 items-center justify-center rounded-r6 text-tx-muted transition-colors hover:bg-red-50 hover:text-st-cancelled"
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px 6px',
+                display: 'flex',
+                alignItems: 'center',
+                borderRadius: 6,
+              }}
               title="Hapus booking"
             >
-              <Trash size={14} weight="duotone" />
+              <Trash size={16} weight="duotone" color="#FF3B30" />
             </button>
 
             {/* Chevron */}
