@@ -222,12 +222,7 @@ export default function OverviewPage() {
               padding: '0 0 4px',
             }}
           >
-            <BookingTableHeader
-              list={list}
-              addDropdownOpen={walkIn.addDropdownOpen}
-              setAddDropdownOpen={walkIn.setAddDropdownOpen}
-              onOpenDrawer={walkIn.openDrawer}
-            />
+            <BookingTableHeader list={list} />
             <BookingRowColumnHeaders />
             <div>
               {list.bookings.length === 0 ? (

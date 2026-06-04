@@ -1,25 +1,6 @@
-/**
- * @responsibility
- * Booking table header: segmented filter tabs, sort button, search input,
- * and the "+" add button with Walk-in/Booking dropdown.
- *
- * @usedBy
- * BookingTable.tsx
- *
- * @notes
- * - Presentation only — no local state.
- * - All state lives in use-booking-list and use-walk-in-flow via controller.
- */
-
 'use client';
 
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/solid';
-import {
-  CaretDown,
-  PersonSimpleWalk,
-  CalendarCheck,
-  PlusIcon as PhPlusIcon,
-} from '@phosphor-icons/react';
 import type { BookingListState } from '../../hooks/overview/use-booking-list';
 import type { VisitorTab } from '../../types/overview.types';
 
@@ -42,24 +23,16 @@ interface BookingTableHeaderProps {
     | 'sortOrder'
     | 'setSortOrder'
   >;
-  addDropdownOpen: boolean;
-  setAddDropdownOpen: (open: boolean) => void;
-  onOpenDrawer: (type: 'WALK_IN' | 'BOOKING') => void;
 }
 
-export function BookingTableHeader({
-  list,
-  addDropdownOpen,
-  setAddDropdownOpen,
-  onOpenDrawer,
-}: BookingTableHeaderProps) {
+export function BookingTableHeader({ list }: BookingTableHeaderProps) {
   return (
     <div
       style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '1rem 1.25rem 0.5rem',
+        padding: '16px 20px 8px',
       }}
     >
       {/* Segmented tabs */}
@@ -68,8 +41,8 @@ export function BookingTableHeader({
           display: 'inline-flex',
           alignItems: 'center',
           gap: 2,
-          borderRadius: '0.75rem',
-          padding: '0.25rem',
+          borderRadius: 12,
+          padding: 4,
           backgroundColor: '#F2F2F7',
         }}
       >
@@ -82,11 +55,11 @@ export function BookingTableHeader({
                 onClick={() => list.setActiveTab(key)}
                 style={{
                   whiteSpace: 'nowrap',
-                  padding: '0.375rem 0.875rem',
-                  borderRadius: '0.625rem',
+                  padding: '6px 14px',
+                  borderRadius: 10,
                   border: 'none',
                   cursor: 'pointer',
-                  fontSize: '0.8125rem',
+                  fontSize: 13,
                   fontWeight: active ? 600 : 400,
                   transition: 'all 0.15s',
                   backgroundColor: active ? '#FFFFFF' : 'transparent',
@@ -111,12 +84,25 @@ export function BookingTableHeader({
         })}
       </div>
 
-      {/* Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      {/* Controls: sort + search */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         {/* Sort button */}
         <button
           onClick={() => list.setSortOrder(list.sortOrder === 'ASC' ? 'DESC' : 'ASC')}
-          className="flex h-8 items-center gap-1.5 rounded-r8 border border-bd-card bg-bg-card px-2.5 text-ts-cap1 font-medium text-tx-secondary transition-colors hover:bg-bg-surface"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            height: 32,
+            padding: '0 12px',
+            borderRadius: 8,
+            background: '#F2F2F7',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: 13,
+            fontWeight: 500,
+            color: '#3C3C43',
+          }}
         >
           <svg
             width="12"
@@ -126,11 +112,12 @@ export function BookingTableHeader({
             stroke="currentColor"
             strokeWidth="1.8"
             strokeLinecap="round"
+            strokeLinejoin="round"
           >
-            {list.sortOrder === 'DESC' ? (
+            {list.sortOrder === 'ASC' ? (
               <>
                 <path d="M4 3v10M4 13l-2.5-3M4 13l2.5-3" />
-                <path d="M9 5h3M9 8h4M9 11h5" opacity="0.5" />
+                <path d="M9 5h5M9 8h4M9 11h3" opacity="0.5" />
               </>
             ) : (
               <>
@@ -144,8 +131,16 @@ export function BookingTableHeader({
 
         {/* Search */}
         <div
-          className="flex h-8 items-center gap-1.5 rounded-r8 border border-bd-card bg-bg-control px-2.5"
-          style={{ width: 160 }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            height: 32,
+            padding: '0 10px',
+            borderRadius: 8,
+            background: '#F2F2F7',
+            width: 160,
+          }}
         >
           <MagnifyingGlassIcon style={{ width: 13, height: 13, color: '#8E8E93', flexShrink: 0 }} />
           <input
@@ -153,80 +148,31 @@ export function BookingTableHeader({
             placeholder="Cari pelanggan..."
             value={list.searchQuery}
             onChange={(e) => list.setSearchQuery(e.target.value)}
-            className="flex-1 bg-transparent text-ts-cap1 text-tx-primary outline-none placeholder:text-tx-secondary"
+            style={{
+              flex: 1,
+              background: 'none',
+              border: 'none',
+              outline: 'none',
+              fontSize: 12,
+              color: '#1C1C1E',
+            }}
           />
           {list.searchQuery && (
-            <button onClick={() => list.setSearchQuery('')} className="flex p-0">
+            <button
+              onClick={() => list.setSearchQuery('')}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                display: 'flex',
+              }}
+            >
               <XMarkIcon style={{ width: 12, height: 12, color: '#8E8E93' }} />
             </button>
-          )}
-        </div>
-
-        {/* Add button */}
-        <div style={{ position: 'relative' }}>
-          <button
-            onClick={() => setAddDropdownOpen(!addDropdownOpen)}
-            className="flex h-8 items-center gap-1 rounded-r8 bg-tx-primary px-3 text-ts-cap1 font-semibold text-white transition-colors hover:opacity-90"
-          >
-            <svg
-              width="11"
-              height="11"
-              viewBox="0 0 11 11"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-            >
-              <path d="M5.5 1v9M1 5.5h9" />
-            </svg>
-            Tambah
-            <CaretDown
-              size={10}
-              weight="bold"
-              color="white"
-              className={`transition-transform ${addDropdownOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
-
-          {addDropdownOpen && (
-            <>
-              <div className="fixed inset-0 z-30" onClick={() => setAddDropdownOpen(false)} />
-              <div className="absolute right-0 top-full z-40 mt-1 w-52 overflow-hidden rounded-r12 border border-bd-card bg-white shadow-card">
-                <button
-                  onClick={() => {
-                    onOpenDrawer('WALK_IN');
-                    setAddDropdownOpen(false);
-                  }}
-                  className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-bg-surface"
-                >
-                  <PersonSimpleWalk size={18} weight="duotone" color="#1C1C1E" />
-                  <div>
-                    <p className="text-ts-fn font-medium text-tx-primary">Datang Langsung</p>
-                    <p className="text-ts-cap1 text-tx-secondary">Walk-in baru</p>
-                  </div>
-                </button>
-                <div className="mx-2.5 h-px bg-bd-row" />
-                <button
-                  onClick={() => {
-                    onOpenDrawer('BOOKING');
-                    setAddDropdownOpen(false);
-                  }}
-                  className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-bg-surface"
-                >
-                  <CalendarCheck size={18} weight="duotone" color="#1C1C1E" />
-                  <div>
-                    <p className="text-ts-fn font-medium text-tx-primary">Booking Online</p>
-                    <p className="text-ts-cap1 text-tx-secondary">Sudah punya kode booking</p>
-                  </div>
-                </button>
-              </div>
-            </>
           )}
         </div>
       </div>
     </div>
   );
 }
-
-// suppress unused import warning
-void PhPlusIcon;
