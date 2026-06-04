@@ -50,6 +50,7 @@ export function PaymentSection({
       <PaymentStatusCard
         booking={booking}
         finalTotal={finalTotal}
+        promo={promo}
         onViewDpProof={
           booking.paymentProofUrl
             ? () => payment.openProofZoom({ url: booking.paymentProofUrl!, label: 'Bukti DP' })
@@ -65,7 +66,7 @@ export function PaymentSection({
             : undefined
         }
       />
-      <PaymentInputCard booking={booking} finalTotal={finalTotal} payment={payment} promo={promo} />
+      <PaymentInputCard booking={booking} finalTotal={finalTotal} payment={payment} />
     </div>
   );
 }

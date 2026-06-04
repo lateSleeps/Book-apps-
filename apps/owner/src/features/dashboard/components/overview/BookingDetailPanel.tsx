@@ -126,23 +126,23 @@ export function BookingDetailPanel({
                   onClick={() =>
                     payment.openProofZoom({ url: b.paymentProofUrl!, label: 'Bukti DP' })
                   }
-                  className="group relative h-20 w-full overflow-hidden rounded-r10 border border-bd-card"
+                  className="group relative w-full overflow-hidden rounded-xl border border-[#e8e8e6] transition-colors hover:border-[#ccc]"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={b.paymentProofUrl}
                     alt="Bukti DP"
-                    className="h-full w-full object-cover"
+                    className="h-[7rem] w-full object-cover"
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
                     <span className="text-ts-cap1 font-semibold text-white">Lihat</span>
                   </div>
                 </button>
               ) : (
-                <div className="flex h-16 items-center justify-center gap-2 rounded-r10 border border-dashed border-bd-card">
+                <div className="flex h-[7rem] w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#e0e0e0] bg-[#fafafa]">
                   <svg
-                    width="16"
-                    height="16"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="#8E8E93"
@@ -153,7 +153,7 @@ export function BookingDetailPanel({
                     <circle cx="8.5" cy="8.5" r="1.5" />
                     <path d="M21 15l-5-5L5 21" />
                   </svg>
-                  <p className="text-ts-cap2 text-tx-secondary">Belum ada bukti pembayaran</p>
+                  <p className="text-[0.6875rem] text-gray-400">Belum ada bukti pembayaran</p>
                 </div>
               )}
 

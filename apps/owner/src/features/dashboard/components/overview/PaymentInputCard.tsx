@@ -1,7 +1,6 @@
 'use client';
 
 import type { BookingPaymentState } from '../../hooks/overview/use-booking-payment';
-import type { BookingPromoState } from '../../hooks/overview/use-booking-promo';
 import type { DashboardBooking } from '../../types/dashboard.types';
 import type { PaymentMethod } from '../../types/overview.types';
 import { formatRupiah } from '@/shared/lib/format';
@@ -21,28 +20,30 @@ interface PaymentInputCardProps {
     | 'openConfirmDialog'
     | 'openProofZoom'
   >;
-  promo: Pick<
-    BookingPromoState,
-    'promoInput' | 'setPromoInput' | 'promoData' | 'applyPromo' | 'removePromo' | 'getDiscount'
-  >;
 }
 
 const PAYMENT_METHODS: PaymentMethod[] = ['CASH', 'TRANSFER', 'QRIS'];
 
-export function PaymentInputCard({
-  booking: b,
-  finalTotal,
-  payment,
-  promo,
-}: PaymentInputCardProps) {
+export function PaymentInputCard({ booking: b, finalTotal, payment }: PaymentInputCardProps) {
   const method = payment.paymentMethodMap[b.id] ?? 'CASH';
   const rawAmount = payment.paymentAmountMap[b.id] ?? '';
   const amountReceived = parseInt(rawAmount.replace(/\D/g, ''), 10) || 0;
-  const discount = promo.getDiscount(b.id);
-  const promoData = promo.promoData[b.id];
   const proof = payment.pelunasanProofMap[b.id];
   const isPaid = b.paymentStatus === 'PAID';
   const kembalian = method === 'CASH' ? amountReceived - finalTotal : null;
+
+  function handleProses() {
+    if (method === 'CASH' && !rawAmount) return;
+    if (method === 'CASH' && amountReceived < finalTotal) return;
+    payment.openConfirmDialog({
+      bookingId: b.id,
+      customerName: b.customerName,
+      serviceName: b.serviceName,
+      amount: method !== 'CASH' ? finalTotal : amountReceived,
+      method,
+      finalTotal,
+    });
+  }
 
   return (
     <div
@@ -237,26 +238,6 @@ export function PaymentInputCard({
             </span>
           </div>
 
-          {/* Diskon row */}
-          {discount > 0 && (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '8px 12px',
-                background: '#F0FDF4',
-                borderRadius: 10,
-                border: '1px solid #BBF7D0',
-              }}
-            >
-              <span style={{ fontSize: 13, color: '#16a34a' }}>Diskon</span>
-              <span style={{ fontSize: 14, fontWeight: 700, color: '#16a34a' }}>
-                −{formatRupiah(discount)}
-              </span>
-            </div>
-          )}
-
           {/* Kembalian / Kekurangan */}
           {method === 'CASH' && amountReceived > 0 && (
             <div
@@ -285,110 +266,18 @@ export function PaymentInputCard({
             </div>
           )}
 
-          {/* Kode Promo */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <p
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                color: '#8E8E93',
-                margin: 0,
-              }}
-            >
-              Kode Promo
-            </p>
-            {promoData?.appliedCode ? (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  borderRadius: 10,
-                  border: '1px solid #BBF7D0',
-                  background: '#F0FDF4',
-                  padding: '8px 12px',
-                }}
-              >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  stroke="#16a34a"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="8" cy="8" r="6.5" />
-                  <path d="M5 8l2 2 4-4" />
-                </svg>
-                <span style={{ fontSize: 13, fontWeight: 500, color: '#16a34a' }}>
-                  {promoData.appliedCode}
-                </span>
-                <span style={{ fontSize: 12, color: '#4ade80' }}>−{formatRupiah(discount)}</span>
-                <button
-                  onClick={() => promo.removePromo(b.id)}
-                  style={{
-                    marginLeft: 'auto',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: 12,
-                    color: '#ef4444',
-                  }}
-                >
-                  Hapus
-                </button>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', gap: 8 }}>
-                <input
-                  type="text"
-                  placeholder="Kode promo..."
-                  value={promo.promoInput[b.id] ?? ''}
-                  onChange={(e) => promo.setPromoInput(b.id, e.target.value.toUpperCase())}
-                  style={{
-                    flex: 1,
-                    height: 36,
-                    borderRadius: 10,
-                    border: '1px solid #E5E5EA',
-                    background: '#F9F9FB',
-                    padding: '0 12px',
-                    fontSize: 13,
-                    color: '#1C1C1E',
-                    outline: 'none',
-                    textTransform: 'uppercase',
-                    fontFamily: 'inherit',
-                  }}
-                />
-                <button
-                  onClick={() => promo.applyPromo(b.id, finalTotal)}
-                  style={{
-                    height: 36,
-                    borderRadius: 10,
-                    border: '1px solid #E5E5EA',
-                    background: 'white',
-                    padding: '0 16px',
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: '#1C1C1E',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Pakai
-                </button>
-              </div>
-            )}
-            {promoData?.error && (
-              <p style={{ fontSize: 11, color: '#ef4444', margin: 0 }}>{promoData.error}</p>
-            )}
-          </div>
-
-          {/* Bukti Pelunasan upload — hanya untuk TRANSFER/QRIS */}
-          {method !== 'CASH' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Bottom row: Bukti Pelunasan (left) + Proses Pembayaran (right) */}
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: 4,
+            }}
+          >
+            {/* Bukti pelunasan upload — hanya TRANSFER/QRIS */}
+            {method !== 'CASH' ? (
               <label
                 style={{
                   display: 'flex',
@@ -431,64 +320,35 @@ export function PaymentInputCard({
                     const file = e.target.files?.[0];
                     if (!file) return;
                     if (proof?.preview) URL.revokeObjectURL(proof.preview);
-                    payment.setSettlementProof(b.id, {
-                      file,
-                      preview: URL.createObjectURL(file),
-                    });
+                    payment.setSettlementProof(b.id, { file, preview: URL.createObjectURL(file) });
                   }}
                 />
               </label>
-              {proof?.preview && (
-                <button
-                  onClick={() => payment.openProofZoom({ url: proof.preview!, label: 'Preview' })}
-                  style={{
-                    height: 36,
-                    borderRadius: 10,
-                    border: '1px solid #E5E5EA',
-                    background: 'transparent',
-                    padding: '0 12px',
-                    fontSize: 12,
-                    color: '#007AFF',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Preview
-                </button>
-              )}
-            </div>
-          )}
+            ) : (
+              <div />
+            )}
 
-          {/* Selesaikan button */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+            {/* Proses Pembayaran button */}
             <button
               disabled={payment.isProcessingPayment}
-              onClick={() =>
-                payment.openConfirmDialog({
-                  bookingId: b.id,
-                  customerName: b.customerName,
-                  serviceName: b.serviceName,
-                  amount: method !== 'CASH' ? finalTotal : amountReceived,
-                  method,
-                  finalTotal,
-                })
-              }
+              onClick={handleProses}
               style={{
                 height: 40,
                 borderRadius: 10,
                 border: 'none',
-                background: payment.isProcessingPayment ? '#E5E5EA' : '#34C759',
-                color: payment.isProcessingPayment ? '#8E8E93' : 'white',
+                background: '#34C759',
+                color: 'white',
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: payment.isProcessingPayment ? 'not-allowed' : 'pointer',
-                transition: 'all 0.15s',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 6,
+                opacity: payment.isProcessingPayment ? 0.6 : 1,
+                transition: 'opacity 0.15s',
+                padding: '0 24px',
+                alignSelf: 'flex-end',
+                whiteSpace: 'nowrap',
               }}
             >
-              {payment.isProcessingPayment ? 'Memproses...' : 'Selesaikan'}
+              {payment.isProcessingPayment ? 'Memproses...' : 'Proses Pembayaran'}
             </button>
           </div>
         </>
