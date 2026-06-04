@@ -39,15 +39,31 @@
 
 ## Urutan Pengerjaan (Disepakati)
 
-1. ~~Placeholder pages (addons, recap, activity, help)~~ ✅ **Done — PR #?**
-2. `DashboardSidebar.tsx` — bersihkan inline style, token lama
-3. `dashboard/layout.tsx`
-4. `StatCard.tsx` + `TodayPanel.tsx`
-5. `bookings/page.tsx`
-6. `clients/page.tsx`
-7. `schedule/page.tsx`
-8. `settings/page.tsx` + semua section components
-9. `overview/page.tsx` — terakhir, terbesar
+1. ~~Placeholder pages (addons, recap, activity, help)~~ ✅ **Done**
+2. `overview/page.tsx` refactor — **SEDANG DIKERJAKAN** di `feat/clean-overview`
+3. `DashboardSidebar.tsx` — bersihkan inline style, token lama
+4. `dashboard/layout.tsx`
+5. `StatCard.tsx` + `TodayPanel.tsx`
+6. `bookings/page.tsx`
+7. `clients/page.tsx`
+8. `schedule/page.tsx`
+9. `settings/page.tsx` + semua section components
+
+## Overview Refactor — Sub-Steps
+
+| Step | Isi                                                                                   | Status  |
+| ---- | ------------------------------------------------------------------------------------- | ------- |
+| 1    | Shared utils (avatar, greeting, format)                                               | ✅ Done |
+| 2    | Constants (booking-status, mock-data)                                                 | ✅ Done |
+| 3    | Types (overview.types.ts)                                                             | ✅ Done |
+| 4    | Services (booking.service.ts)                                                         | ✅ Done |
+| 5    | Hook: use-booking-list + utils                                                        | ✅ Done |
+| 6    | Hooks: use-booking-status, detail, promo, payment, walk-in                            | ✅ Done |
+| 7    | Controller: use-overview-controller                                                   | ✅ Done |
+| 8a   | Dialogs (5 focused components) + StatCardsRow                                         | ✅ Done |
+| 8b   | Mobile: MobileBookingCard, List, Sheet                                                | ✅ Done |
+| 9    | Organisms: BookingTable, BookingRow, BookingDetailPanel, PaymentSection, WalkInDrawer | 🔜 Next |
+| 10   | Slim page.tsx → <200 lines                                                            | 🔜 Next |
 
 ---
 
