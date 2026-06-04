@@ -2,7 +2,11 @@
 
 ## ⚠️ BACA INI DULU SEBELUM MELAKUKAN APAPUN
 
-Sebelum membuat atau memodifikasi UI apapun di `apps/owner`, **wajib baca**:
+**Step 1 — Cek progress terkini:**
+
+- `docs/PROGRESS.md` — status tiap halaman, apa yang sudah/belum dikerjakan, urutan berikutnya
+
+**Step 2 — Sebelum sentuh UI apapun di `apps/owner`, baca:**
 
 1. `docs/design-system/DESIGN_SYSTEM.md` — atomic design system, token mapping, aturan wajib
 2. `docs/design-system/tokens.md` — semua nilai token aktual (warna, tipografi, spacing)
