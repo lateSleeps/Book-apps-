@@ -57,6 +57,60 @@ function Label({ children }: { children: string }) {
   );
 }
 
+// ── Picker search row (service + product pickers share identical structure) ────
+function PickerSearchRow({
+  placeholder,
+  value,
+  onChange,
+  onClose,
+}: {
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-2 border-b border-[#f0f0f0] px-3 py-2">
+      <svg
+        width="13"
+        height="13"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="#bbb"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      >
+        <circle cx="7" cy="7" r="5" />
+        <path d="M11 11l3 3" />
+      </svg>
+      <input
+        autoFocus
+        type="text"
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="flex-1 bg-transparent text-[0.8125rem] text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
+      />
+      <button
+        onClick={onClose}
+        className="flex h-5 w-5 flex-shrink-0 items-center justify-center text-[#ccc] transition-colors hover:text-[#888]"
+      >
+        <svg
+          width="10"
+          height="10"
+          viewBox="0 0 10 10"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        >
+          <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 export function BookingDetailPanel({
   booking: b,
   detail,
@@ -583,47 +637,15 @@ export function BookingDetailPanel({
             {detail.showServicePicker === b.id ? (
               <div className="relative z-20 mt-2">
                 <div className="absolute left-0 right-0 top-0 overflow-hidden rounded-xl border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
-                  <div className="flex items-center gap-2 border-b border-[#f0f0f0] px-3 py-2">
-                    <svg
-                      width="13"
-                      height="13"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      stroke="#bbb"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    >
-                      <circle cx="7" cy="7" r="5" />
-                      <path d="M11 11l3 3" />
-                    </svg>
-                    <input
-                      autoFocus
-                      type="text"
-                      placeholder="Cari layanan..."
-                      value={detail.serviceSearchQuery}
-                      onChange={(e) => detail.setServiceSearchQuery(e.target.value)}
-                      className="flex-1 bg-transparent text-[0.8125rem] text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
-                    />
-                    <button
-                      onClick={() => {
-                        detail.setShowServicePicker(null);
-                        detail.setServiceSearchQuery('');
-                      }}
-                      className="flex h-5 w-5 flex-shrink-0 items-center justify-center text-[#ccc] transition-colors hover:text-[#888]"
-                    >
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 10 10"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                      >
-                        <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
-                      </svg>
-                    </button>
-                  </div>
+                  <PickerSearchRow
+                    placeholder="Cari layanan..."
+                    value={detail.serviceSearchQuery}
+                    onChange={(v) => detail.setServiceSearchQuery(v)}
+                    onClose={() => {
+                      detail.setShowServicePicker(null);
+                      detail.setServiceSearchQuery('');
+                    }}
+                  />
                   <div className="max-h-44 overflow-y-auto">
                     {availableServices.filter((s) =>
                       s.name.toLowerCase().includes(detail.serviceSearchQuery.toLowerCase())
@@ -763,47 +785,15 @@ export function BookingDetailPanel({
             {detail.showProductPicker === b.id ? (
               <div className="relative z-20 mt-2">
                 <div className="absolute left-0 right-0 top-0 overflow-hidden rounded-xl border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
-                  <div className="flex items-center gap-2 border-b border-[#f0f0f0] px-3 py-2">
-                    <svg
-                      width="13"
-                      height="13"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      stroke="#bbb"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    >
-                      <circle cx="7" cy="7" r="5" />
-                      <path d="M11 11l3 3" />
-                    </svg>
-                    <input
-                      autoFocus
-                      type="text"
-                      placeholder="Cari produk..."
-                      value={detail.productSearchQuery}
-                      onChange={(e) => detail.setProductSearchQuery(e.target.value)}
-                      className="flex-1 bg-transparent text-[0.8125rem] text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
-                    />
-                    <button
-                      onClick={() => {
-                        detail.setShowProductPicker(null);
-                        detail.setProductSearchQuery('');
-                      }}
-                      className="flex h-5 w-5 flex-shrink-0 items-center justify-center text-[#ccc] transition-colors hover:text-[#888]"
-                    >
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 10 10"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                      >
-                        <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
-                      </svg>
-                    </button>
-                  </div>
+                  <PickerSearchRow
+                    placeholder="Cari produk..."
+                    value={detail.productSearchQuery}
+                    onChange={(v) => detail.setProductSearchQuery(v)}
+                    onClose={() => {
+                      detail.setShowProductPicker(null);
+                      detail.setProductSearchQuery('');
+                    }}
+                  />
                   <div className="max-h-44 overflow-y-auto">
                     {(() => {
                       const filtered = availableProducts.filter((p) =>
