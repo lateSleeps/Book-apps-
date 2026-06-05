@@ -4,6 +4,17 @@ import { MagnifyingGlassIcon, XMarkIcon, ArrowPathIcon } from '@heroicons/react/
 import type { BookingListState } from '../../hooks/overview/use-booking-list';
 import type { VisitorTab } from '../../types/overview.types';
 
+// Shared base style for the refresh and sort control buttons
+const CTRL_BTN_BASE = {
+  display: 'flex',
+  alignItems: 'center',
+  height: 32,
+  borderRadius: 8,
+  background: '#F2F2F7',
+  border: 'none',
+  color: '#3C3C43',
+} as const;
+
 const TABS: { key: VisitorTab; label: string }[] = [
   { key: 'ALL', label: 'Semua' },
   { key: 'BOOKING', label: 'Booking' },
@@ -95,14 +106,9 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
           disabled={isRefreshing}
           title="Refresh data"
           style={{
-            display: 'flex',
-            alignItems: 'center',
+            ...CTRL_BTN_BASE,
             justifyContent: 'center',
-            height: 32,
             width: 32,
-            borderRadius: 8,
-            background: '#F2F2F7',
-            border: 'none',
             cursor: isRefreshing ? 'not-allowed' : 'pointer',
             opacity: isRefreshing ? 0.5 : 1,
             transition: 'opacity 0.15s',
@@ -122,18 +128,12 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
         <button
           onClick={() => list.setSortOrder(list.sortOrder === 'ASC' ? 'DESC' : 'ASC')}
           style={{
-            display: 'flex',
-            alignItems: 'center',
+            ...CTRL_BTN_BASE,
             gap: 6,
-            height: 32,
             padding: '0 12px',
-            borderRadius: 8,
-            background: '#F2F2F7',
-            border: 'none',
             cursor: 'pointer',
             fontSize: 13,
             fontWeight: 500,
-            color: '#3C3C43',
           }}
         >
           <svg
