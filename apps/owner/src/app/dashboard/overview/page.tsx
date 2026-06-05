@@ -1,7 +1,7 @@
 'use client';
 
 import { PlusIcon } from '@heroicons/react/24/solid';
-import { CalendarCheck, PersonSimpleWalk } from '@phosphor-icons/react';
+import { CalendarCheck, PersonSimpleWalk, House } from '@phosphor-icons/react';
 import { SkeletonRow } from '@/components/SkeletonLoader';
 import { useCurrentUser } from '@/features/auth/hooks/useAuth';
 import { BookingDetailPanel } from '@/features/dashboard/components/overview/BookingDetailPanel';
@@ -82,23 +82,10 @@ export default function OverviewPage() {
             <div className="greeting-text-mobile flex flex-col" style={{ gap: '2rem' }}>
               {/* Breadcrumb */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                {/* Home icon */}
-                <svg
-                  width="13"
-                  height="13"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#8E8E93"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                  <polyline points="9 22 9 12 15 12 15 22" />
-                </svg>
-                <span style={{ fontSize: 12, color: '#8E8E93' }}>Dashboard</span>
-                <span style={{ fontSize: 12, color: '#C7C7CC' }}>/</span>
-                <span style={{ fontSize: 12, fontWeight: 500, color: '#1C1C1E' }}>Overview</span>
+                <House size={14} weight="regular" color="#8E8E93" />
+                <span style={{ fontSize: 13, color: '#8E8E93', fontWeight: 400 }}>Dashboard</span>
+                <span style={{ fontSize: 13, color: '#C7C7CC', fontWeight: 300 }}>/</span>
+                <span style={{ fontSize: 13, fontWeight: 500, color: '#3C3C43' }}>Overview</span>
               </div>
               {/* Greeting */}
               <h1
