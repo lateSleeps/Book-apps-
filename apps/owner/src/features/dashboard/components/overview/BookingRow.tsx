@@ -68,7 +68,7 @@ export function BookingRowColumnHeaders() {
             <span
               style={{
                 position: 'absolute',
-                left: -10,
+                left: -16,
                 color: '#D1D1D6',
                 fontWeight: 300,
                 fontSize: 14,
