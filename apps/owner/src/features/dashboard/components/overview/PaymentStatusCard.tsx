@@ -16,6 +16,43 @@ interface PaymentStatusCardProps {
   onViewSettlementProof?: () => void;
 }
 
+// ── Internal component ────────────────────────────────────────────────────────
+
+function ProofViewButton({ label, onClick }: { label: string; onClick?: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        padding: 0,
+        fontSize: 12,
+        color: '#007AFF',
+        fontFamily: 'inherit',
+      }}
+    >
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      >
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+        <path d="M21 15l-5-5L5 21" />
+      </svg>
+      {label}
+    </button>
+  );
+}
+
 export function PaymentStatusCard({
   booking: b,
   finalTotal,
@@ -112,69 +149,9 @@ export function PaymentStatusCard({
       {/* Proof view buttons */}
       {(b.paymentProofUrl || b.settlementProofUrl || status === 'DEPOSIT') && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {b.paymentProofUrl && (
-            <button
-              onClick={onViewDpProof}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                fontSize: 12,
-                color: '#007AFF',
-                fontFamily: 'inherit',
-              }}
-            >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <path d="M21 15l-5-5L5 21" />
-              </svg>
-              Lihat bukti DP
-            </button>
-          )}
+          {b.paymentProofUrl && <ProofViewButton label="Lihat bukti DP" onClick={onViewDpProof} />}
           {b.settlementProofUrl ? (
-            <button
-              onClick={onViewSettlementProof}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                fontSize: 12,
-                color: '#007AFF',
-                fontFamily: 'inherit',
-              }}
-            >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <path d="M21 15l-5-5L5 21" />
-              </svg>
-              Lihat bukti pelunasan
-            </button>
+            <ProofViewButton label="Lihat bukti pelunasan" onClick={onViewSettlementProof} />
           ) : (
             status === 'DEPOSIT' && (
               <span style={{ fontSize: 12, color: '#8E8E93' }}>Belum ada bukti pelunasan</span>
