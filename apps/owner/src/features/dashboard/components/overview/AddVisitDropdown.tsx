@@ -2,7 +2,6 @@
 
 import { PlusIcon } from '@heroicons/react/24/solid';
 import { CalendarCheck, PersonSimpleWalk } from '@phosphor-icons/react';
-import { cn } from '@/shared/lib/cn';
 
 interface AddVisitDropdownProps {
   addDropdownOpen: boolean;
@@ -25,21 +24,43 @@ export function AddVisitDropdown({
     openDrawer('WALK_IN');
     setDrawerServiceOpen(false);
     setDrawerServiceSearch('');
+    setAddDropdownOpen(false);
   }
 
   function openBooking() {
     openDrawer('BOOKING');
     setDrawerServiceOpen(false);
     setDrawerServiceSearch('');
+    setAddDropdownOpen(false);
   }
 
   return (
-    <div className="relative hidden shrink-0 sm:block">
+    <div
+      style={{ position: 'relative', flexShrink: 0, display: 'block' }}
+      className="hidden sm:block"
+    >
+      {/* Trigger button */}
       <button
         onClick={() => setAddDropdownOpen(!addDropdownOpen)}
-        className="flex h-10 items-center gap-s8 rounded-r12 bg-tx-body px-s16 text-ts-t14 font-medium text-white transition-colors hover:bg-[#333333]"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          height: 40,
+          padding: '0 16px',
+          borderRadius: 12,
+          background: '#1a1a1a',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: 14,
+          fontWeight: 500,
+          color: 'white',
+          transition: 'background 0.15s',
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = '#333333')}
+        onMouseLeave={(e) => (e.currentTarget.style.background = '#1a1a1a')}
       >
-        <PlusIcon className="h-3.5 w-3.5" />
+        <PlusIcon style={{ width: 14, height: 14 }} />
         <span>Tambah Pelanggan</span>
         <svg
           width="12"
@@ -50,62 +71,107 @@ export function AddVisitDropdown({
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={cn('transition-transform', addDropdownOpen && 'rotate-180')}
+          style={{
+            transition: 'transform 0.15s',
+            transform: addDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+          }}
         >
           <path d="M4 6l4 4 4-4" />
         </svg>
       </button>
 
+      {/* Dropdown panel */}
       {addDropdownOpen && (
         <>
+          {/* Backdrop — tutup dropdown saat klik di luar (mobile) */}
           {isMobile && (
-            <div className="fixed inset-0 z-30" onClick={() => setAddDropdownOpen(false)} />
+            <div
+              style={{ position: 'fixed', inset: 0, zIndex: 30 }}
+              onClick={() => setAddDropdownOpen(false)}
+            />
           )}
-          <div className="absolute right-0 top-[calc(100%+8px)] z-40 w-[220px] overflow-hidden rounded-r14 bg-bg-card p-1.5 shadow-dropdown">
-            <DropdownItem
-              icon={
-                <PersonSimpleWalk size={20} weight="duotone" className="shrink-0 text-tx-primary" />
-              }
-              label="Walk-in"
-              sublabel="Datang langsung"
+          <div
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 'calc(100% + 8px)',
+              zIndex: 40,
+              width: 220,
+              background: 'white',
+              borderRadius: 14,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
+              overflow: 'hidden',
+              padding: 6,
+            }}
+          >
+            {/* Walk-in */}
+            <button
               onClick={openWalkIn}
-            />
-            <div className="mx-2.5 my-0.5 h-px bg-bd-row" />
-            <DropdownItem
-              icon={
-                <CalendarCheck size={20} weight="duotone" className="shrink-0 text-tx-primary" />
-              }
-              label="Booking Online"
-              sublabel="Sudah punya kode booking"
+              style={{
+                display: 'flex',
+                width: '100%',
+                alignItems: 'center',
+                gap: 12,
+                padding: '10px 12px',
+                borderRadius: 10,
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'background 0.1s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#F5F5F7')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            >
+              <PersonSimpleWalk
+                size={20}
+                weight="duotone"
+                color="#1C1C1E"
+                style={{ flexShrink: 0 }}
+              />
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 500, color: '#1C1C1E', margin: 0 }}>
+                  Walk-in
+                </p>
+                <p style={{ fontSize: 12, color: '#8E8E93', margin: 0 }}>Datang langsung</p>
+              </div>
+            </button>
+
+            {/* Divider */}
+            <div style={{ height: 1, background: '#F2F2F7', margin: '2px 10px' }} />
+
+            {/* Booking Online */}
+            <button
               onClick={openBooking}
-            />
+              style={{
+                display: 'flex',
+                width: '100%',
+                alignItems: 'center',
+                gap: 12,
+                padding: '10px 12px',
+                borderRadius: 10,
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'background 0.1s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#F5F5F7')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            >
+              <CalendarCheck size={20} weight="duotone" color="#1C1C1E" style={{ flexShrink: 0 }} />
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 500, color: '#1C1C1E', margin: 0 }}>
+                  Booking Online
+                </p>
+                <p style={{ fontSize: 12, color: '#8E8E93', margin: 0 }}>
+                  Sudah punya kode booking
+                </p>
+              </div>
+            </button>
           </div>
         </>
       )}
     </div>
-  );
-}
-
-// ── Internal ──────────────────────────────────────────────────────────────────
-
-interface DropdownItemProps {
-  icon: React.ReactNode;
-  label: string;
-  sublabel: string;
-  onClick: () => void;
-}
-
-function DropdownItem({ icon, label, sublabel, onClick }: DropdownItemProps) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex w-full cursor-pointer items-center gap-s12 rounded-r10 border-none bg-transparent px-s12 py-[10px] text-left transition-colors hover:bg-bg-hover"
-    >
-      {icon}
-      <div>
-        <p className="m-0 text-ts-t14 font-medium text-tx-primary">{label}</p>
-        <p className="m-0 text-ts-cap1 text-tx-secondary">{sublabel}</p>
-      </div>
-    </button>
   );
 }
