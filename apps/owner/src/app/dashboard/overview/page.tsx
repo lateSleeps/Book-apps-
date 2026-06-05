@@ -79,9 +79,23 @@ export default function OverviewPage() {
         <div className="flex w-full flex-col gap-5 px-4 py-5 sm:gap-7 sm:px-6 sm:py-7 md:gap-10 md:px-8 md:py-10">
           {/* ── Greeting + Tambah Pelanggan ──────────────────────────────── */}
           <div className="greeting-section-mobile flex items-center justify-between gap-4">
-            <div className="greeting-text-mobile flex flex-col gap-1">
+            <div className="greeting-text-mobile flex flex-col" style={{ gap: '2rem' }}>
               {/* Breadcrumb */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                {/* Home icon */}
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#8E8E93"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
                 <span style={{ fontSize: 12, color: '#8E8E93' }}>Dashboard</span>
                 <span style={{ fontSize: 12, color: '#C7C7CC' }}>/</span>
                 <span style={{ fontSize: 12, fontWeight: 500, color: '#1C1C1E' }}>Overview</span>
@@ -238,7 +252,7 @@ export default function OverviewPage() {
           >
             {/* List kunjungan heading */}
             <div style={{ padding: '20px 20px 0' }}>
-              <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1C1C1E', margin: 0 }}>
+              <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1C1C1E', margin: 0 }}>
                 List kunjungan
               </h2>
             </div>
