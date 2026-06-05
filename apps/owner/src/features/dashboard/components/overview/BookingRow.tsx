@@ -37,7 +37,7 @@ interface BookingRowProps {
 }
 
 const COLUMN_LABELS = ['Pelanggan', 'Status', 'Layanan', 'Stylist', 'Waktu', 'Tipe'];
-const GRID = '2fr 1fr 2fr 1.5fr 1fr 1.2fr';
+const GRID = '2fr 1.5fr 2fr 1.5fr 1fr 1.2fr';
 
 export function BookingRowColumnHeaders() {
   return (
