@@ -38,6 +38,7 @@ const config: Config = {
         'bg-header': '#F7F7F8', // table header row
         'bg-control': '#F2F2F7', // segmented tab container, icon buttons
         'bg-input': '#F9F9FB', // secondary button, input bg
+        'bg-hover': '#F5F5F7', // list item / row hover state
 
         // Text
         'tx-primary': '#1C1C1E', // judul, angka, nama customer (iOS label)
@@ -114,6 +115,7 @@ const config: Config = {
         // ── Legacy aliases — backwards compat ────────────────────────────────
         t12: ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.015em' }],
         t14: ['0.875rem', { lineHeight: '1.5' }],
+        'ts-t14': ['0.875rem', { lineHeight: '1.5' }],
         t16: ['1rem', { lineHeight: '1.5' }],
         t18: ['1.125rem', { lineHeight: '1.4' }],
         t20: ['1.25rem', { lineHeight: '1.2', letterSpacing: '-0.015em' }],
@@ -154,6 +156,7 @@ const config: Config = {
         drawer: '-8px 0 48px rgba(0,0,0,0.18)', // walk-in drawer
         dialog: '0 24px 64px rgba(0,0,0,0.18)', // modals
         tab: '0 1px 4px rgba(0,0,0,0.1)', // tab button aktif
+        dropdown: '0 8px 32px rgba(0,0,0,0.14)', // floating dropdowns
       },
       keyframes: {
         sIn: {
