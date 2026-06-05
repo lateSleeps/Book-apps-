@@ -81,11 +81,11 @@ export default function OverviewPage() {
           <div className="greeting-section-mobile flex items-center justify-between gap-4">
             <div className="greeting-text-mobile flex flex-col" style={{ gap: '2rem' }}>
               {/* Breadcrumb */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <House size={14} weight="regular" color="#8E8E93" />
-                <span style={{ fontSize: 13, color: '#8E8E93', fontWeight: 400 }}>Dashboard</span>
-                <span style={{ fontSize: 13, color: '#C7C7CC', fontWeight: 300 }}>/</span>
-                <span style={{ fontSize: 13, fontWeight: 500, color: '#3C3C43' }}>Overview</span>
+              <div className="flex items-center gap-1.5">
+                <House size={18} weight="duotone" color="#8E8E93" />
+                <span className="text-ts-fn text-tx-secondary">Dashboard</span>
+                <span className="text-ts-fn text-tx-muted">/</span>
+                <span className="text-ts-fn font-medium text-tx-subtle">Overview</span>
               </div>
               {/* Greeting */}
               <h1
