@@ -3,6 +3,7 @@
 import { PlusIcon } from '@heroicons/react/24/solid';
 import { CalendarCheck, PersonSimpleWalk } from '@phosphor-icons/react';
 import { SkeletonRow } from '@/components/SkeletonLoader';
+import { useCurrentUser } from '@/features/auth/hooks/useAuth';
 import { BookingDetailPanel } from '@/features/dashboard/components/overview/BookingDetailPanel';
 import {
   BookingRow,
@@ -28,6 +29,7 @@ const SALON_ID = '5cdb0848-1b43-44f6-be29-b2ead49ff65a';
 
 export default function OverviewPage() {
   const { list, status, detail, promo, payment, walkIn, ui, stats } = useOverviewController();
+  const currentUser = useCurrentUser();
   const { services: realServices } = useServices(SALON_ID);
   const { stylists: realStylists } = useStylists(SALON_ID);
 
@@ -77,12 +79,24 @@ export default function OverviewPage() {
         <div className="flex w-full flex-col gap-5 px-4 py-5 sm:gap-7 sm:px-6 sm:py-7 md:gap-10 md:px-8 md:py-10">
           {/* ── Greeting + Tambah Pelanggan ──────────────────────────────── */}
           <div className="greeting-section-mobile flex items-center justify-between gap-4">
-            <div className="greeting-text-mobile flex flex-col gap-0">
-              <p className="text-[0.75rem] font-medium uppercase tracking-widest text-[#8E8E93]">
-                {ui.dateLabel}
-              </p>
-              <h1 className="text-[1.25rem] font-semibold tracking-tight text-[#1C1C1E] sm:text-[1.5rem] md:text-[1.75rem]">
-                {ui.greeting || 'Halo'}, Rara ✦
+            <div className="greeting-text-mobile flex flex-col gap-1">
+              {/* Breadcrumb */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 12, color: '#8E8E93' }}>Dashboard</span>
+                <span style={{ fontSize: 12, color: '#C7C7CC' }}>/</span>
+                <span style={{ fontSize: 12, fontWeight: 500, color: '#1C1C1E' }}>Overview</span>
+              </div>
+              {/* Greeting */}
+              <h1
+                style={{
+                  fontSize: '2rem',
+                  fontWeight: 700,
+                  color: '#1C1C1E',
+                  margin: 0,
+                  lineHeight: 1.2,
+                }}
+              >
+                {ui.greeting || 'Halo'}, {currentUser?.name?.split(' ')[0] ?? 'Owner'} 👋
               </h1>
             </div>
 
@@ -222,6 +236,12 @@ export default function OverviewPage() {
               padding: '0 0 4px',
             }}
           >
+            {/* List kunjungan heading */}
+            <div style={{ padding: '20px 20px 0' }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1C1C1E', margin: 0 }}>
+                List kunjungan
+              </h2>
+            </div>
             <BookingTableHeader list={list} />
             <BookingRowColumnHeaders />
             <div>
