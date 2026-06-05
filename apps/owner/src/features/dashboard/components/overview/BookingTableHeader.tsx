@@ -1,6 +1,6 @@
 'use client';
 
-import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { MagnifyingGlassIcon, XMarkIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
 import type { BookingListState } from '../../hooks/overview/use-booking-list';
 import type { VisitorTab } from '../../types/overview.types';
 
@@ -23,9 +23,11 @@ interface BookingTableHeaderProps {
     | 'sortOrder'
     | 'setSortOrder'
   >;
+  onRefresh: () => void;
+  isRefreshing: boolean;
 }
 
-export function BookingTableHeader({ list }: BookingTableHeaderProps) {
+export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTableHeaderProps) {
   return (
     <div
       style={{
@@ -85,8 +87,37 @@ export function BookingTableHeader({ list }: BookingTableHeaderProps) {
         })}
       </div>
 
-      {/* Controls: sort + search */}
+      {/* Controls: refresh + sort + search */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* Refresh button */}
+        <button
+          onClick={onRefresh}
+          disabled={isRefreshing}
+          title="Refresh data"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 32,
+            width: 32,
+            borderRadius: 8,
+            background: '#F2F2F7',
+            border: 'none',
+            cursor: isRefreshing ? 'not-allowed' : 'pointer',
+            opacity: isRefreshing ? 0.5 : 1,
+            transition: 'opacity 0.15s',
+          }}
+        >
+          <ArrowPathIcon
+            style={{
+              width: 14,
+              height: 14,
+              color: '#3C3C43',
+              animation: isRefreshing ? 'spin 1s linear infinite' : 'none',
+            }}
+          />
+        </button>
+
         {/* Sort button */}
         <button
           onClick={() => list.setSortOrder(list.sortOrder === 'ASC' ? 'DESC' : 'ASC')}

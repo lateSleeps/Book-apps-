@@ -28,7 +28,8 @@ import { useStylists } from '@/hooks/useStylists';
 const SALON_ID = '5cdb0848-1b43-44f6-be29-b2ead49ff65a';
 
 export default function OverviewPage() {
-  const { list, status, detail, promo, payment, walkIn, ui, stats } = useOverviewController();
+  const { list, status, detail, promo, payment, walkIn, ui, stats, isRefreshing, refreshData } =
+    useOverviewController();
   const currentUser = useCurrentUser();
   const { services: realServices } = useServices(SALON_ID);
   const { stylists: realStylists } = useStylists(SALON_ID);
@@ -37,6 +38,7 @@ export default function OverviewPage() {
     <>
       {/* ── Responsive CSS ──────────────────────────────────────────────── */}
       <style suppressHydrationWarning>{`
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @media (max-width: 1023px) {
           .payment-grid-tablet { gap: 2.5rem !important; }
         }
@@ -243,10 +245,12 @@ export default function OverviewPage() {
                 List kunjungan
               </h2>
             </div>
-            <BookingTableHeader list={list} />
+            <BookingTableHeader list={list} onRefresh={refreshData} isRefreshing={isRefreshing} />
             <BookingRowColumnHeaders />
             <div>
-              {list.bookings.length === 0 ? (
+              {isRefreshing ? (
+                Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
+              ) : list.bookings.length === 0 ? (
                 <SkeletonRow />
               ) : (
                 list.bookings.map((b) => (

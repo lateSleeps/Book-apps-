@@ -26,6 +26,7 @@
 
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import { useBookingDetail } from '../hooks/overview/use-booking-detail';
 import { useBookingList } from '../hooks/overview/use-booking-list';
 import { useBookingPayment } from '../hooks/overview/use-booking-payment';
@@ -34,6 +35,9 @@ import { useBookingStatus } from '../hooks/overview/use-booking-status';
 import { useDashboardUi } from '../hooks/overview/use-dashboard-ui';
 import { useWalkInFlow } from '../hooks/overview/use-walk-in-flow';
 import { useDashboardData } from '../hooks/use-dashboard-data';
+
+const AUTO_REFRESH_INTERVAL_MS = 10 * 60 * 1000; // 10 menit
+const SKELETON_DURATION_MS = 800; // 0.8 detik
 
 export interface OverviewController {
   list: ReturnType<typeof useBookingList>;
@@ -44,11 +48,28 @@ export interface OverviewController {
   walkIn: ReturnType<typeof useWalkInFlow>;
   ui: ReturnType<typeof useDashboardUi>;
   stats: ReturnType<typeof useDashboardData>['stats'];
+  isRefreshing: boolean;
+  refreshData: () => void;
 }
 
 export function useOverviewController(): OverviewController {
   // ── Base data ───────────────────────────────────────────────────────────────
-  const { stats } = useDashboardData();
+  const { stats, refetch } = useDashboardData();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // ── Refresh handler — shows 0.8s skeleton then refetches ───────────────────
+  const refreshData = useCallback(() => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      void refetch().finally(() => setIsRefreshing(false));
+    }, SKELETON_DURATION_MS);
+  }, [refetch]);
+
+  // ── Auto-refresh every 10 minutes ──────────────────────────────────────────
+  useEffect(() => {
+    const interval = setInterval(refreshData, AUTO_REFRESH_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [refreshData]);
 
   // ── Base layer: owns shared booking state ───────────────────────────────────
   const list = useBookingList();
@@ -76,5 +97,5 @@ export function useOverviewController(): OverviewController {
   const promo = useBookingPromo();
   const ui = useDashboardUi();
 
-  return { list, status, detail, promo, payment, walkIn, ui, stats };
+  return { list, status, detail, promo, payment, walkIn, ui, stats, isRefreshing, refreshData };
 }
