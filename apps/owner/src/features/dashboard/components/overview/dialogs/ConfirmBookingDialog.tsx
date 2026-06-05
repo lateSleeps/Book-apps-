@@ -1,22 +1,25 @@
 /**
  * @responsibility
- * Payment confirmation dialog shown before finalizing a booking payment.
- * Displays amount summary, method, kembalian (change), and proof upload for
- * non-cash methods.
+ * Payment confirmation dialog — shows amount summary, method, kembalian,
+ * and proof upload for non-cash payments.
  *
- * @usedBy
- * app/dashboard/overview/page.tsx (via controller)
- *
- * @notes
- * - Presentation only — no local state.
- * - Proof upload state lives in use-booking-payment (pelunasanProofMap).
- * - onConfirm triggers use-booking-payment.processPayment().
+ * @usedBy overview/page.tsx via controller
+ * @notes Presentation only. onConfirm triggers use-booking-payment.processPayment().
  */
 
 'use client';
 
 import type { SettlementProof } from '../../../hooks/overview/use-booking-payment';
 import type { ConfirmPaymentDialogData } from '../../../types/overview.types';
+import {
+  BaseDialog,
+  DialogHeader,
+  DialogContent,
+  DialogFooter,
+  DialogIcon,
+  DialogPrimaryButton,
+  DialogSecondaryButton,
+} from '@/shared/components/ui/dialog';
 import { formatRupiah } from '@/shared/lib/format';
 
 interface ConfirmBookingDialogProps {
@@ -27,6 +30,54 @@ interface ConfirmBookingDialogProps {
   onConfirm: () => Promise<void>;
   onCancel: () => void;
 }
+
+function CheckIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    >
+      <path d="M20 6L9 17l-5-5" />
+    </svg>
+  );
+}
+
+function ImageUploadIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    >
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <circle cx="8.5" cy="8.5" r="1.5" />
+      <path d="M21 15l-5-5L5 21" />
+    </svg>
+  );
+}
+
+// Input style matching WalkInNamePhoneFields
+const inputStyle: React.CSSProperties = {
+  height: 40,
+  borderRadius: 10,
+  border: '1px solid #E5E5EA',
+  background: '#F9F9FB',
+  padding: '0 14px',
+  fontSize: 14,
+  color: '#1C1C1E',
+  outline: 'none',
+  fontFamily: 'inherit',
+  width: '100%',
+};
 
 export function ConfirmBookingDialog({
   data,
@@ -40,93 +91,93 @@ export function ConfirmBookingDialog({
   const isCash = data.method === 'CASH';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" onClick={onCancel} />
+    <BaseDialog zIndex="z-50" onBackdropClick={onCancel}>
+      <DialogHeader
+        icon={
+          <DialogIcon variant="success">
+            <CheckIcon />
+          </DialogIcon>
+        }
+        title="Konfirmasi Pembayaran"
+        description={`${data.customerName} · ${data.serviceName}`}
+        onClose={onCancel}
+      />
 
-      {/* Card */}
-      <div className="relative flex w-full max-w-[22rem] flex-col gap-5 rounded-r20 bg-white p-4 shadow-dialog sm:w-[22rem] sm:p-6">
-        {/* Header */}
-        <div>
-          <div className="mb-1 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#16a34a"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              >
-                <path d="M20 6L9 17l-5-5" />
-              </svg>
-            </div>
-            <p className="text-ts-fn font-semibold text-tx-primary">Konfirmasi Pembayaran</p>
-          </div>
-          <p className="text-ts-cap1 text-tx-secondary">
-            {data.customerName} · {data.serviceName}
-          </p>
-        </div>
-
-        {/* Summary */}
-        <div className="flex flex-col gap-2 rounded-r12 bg-bg-surface p-3">
-          <div className="flex items-baseline justify-between">
-            <span className="text-ts-fn text-tx-secondary">Total tagihan</span>
-            <span className="text-ts-fn font-semibold text-tx-primary">
-              {formatRupiah(data.finalTotal)}
-            </span>
-          </div>
-          <div className="flex items-baseline justify-between">
-            <span className="text-ts-fn text-tx-secondary">Metode</span>
-            <span className="text-ts-fn font-medium text-tx-primary">{data.method}</span>
-          </div>
+      <DialogContent>
+        {/* Payment summary */}
+        <div
+          style={{
+            borderRadius: 10,
+            border: '1px solid #E5E5EA',
+            background: '#F9F9FB',
+            overflow: 'hidden',
+          }}
+        >
+          <SummaryRow label="Total tagihan" value={formatRupiah(data.finalTotal)} bold />
+          <div style={{ height: 1, background: '#F2F2F7' }} />
+          <SummaryRow label="Metode" value={data.method} />
           {isCash && (
             <>
-              <div className="flex items-baseline justify-between">
-                <span className="text-ts-fn text-tx-secondary">Uang diterima</span>
-                <span className="text-ts-fn font-medium text-tx-primary">
-                  {formatRupiah(data.amount)}
-                </span>
-              </div>
-              <div className="h-px bg-bd-card" />
-              <div className="flex items-baseline justify-between">
-                <span className="text-ts-fn font-semibold text-tx-primary">
-                  {(kembalian ?? 0) >= 0 ? 'Kembalian' : 'Kekurangan'}
-                </span>
-                <span
-                  className={`text-ts-fn font-semibold ${(kembalian ?? 0) >= 0 ? 'text-st-in-progress' : 'text-st-cancelled'}`}
-                >
-                  {(kembalian ?? 0) >= 0
+              <div style={{ height: 1, background: '#F2F2F7' }} />
+              <SummaryRow label="Uang diterima" value={formatRupiah(data.amount)} />
+              <div style={{ height: 1, background: '#E5E5EA' }} />
+              <SummaryRow
+                label={(kembalian ?? 0) >= 0 ? 'Kembalian' : 'Kekurangan'}
+                value={
+                  (kembalian ?? 0) >= 0
                     ? formatRupiah(kembalian ?? 0)
-                    : `−${formatRupiah(Math.abs(kembalian ?? 0))}`}
-                </span>
-              </div>
+                    : `−${formatRupiah(Math.abs(kembalian ?? 0))}`
+                }
+                valueColor={(kembalian ?? 0) >= 0 ? '#16a34a' : '#ef4444'}
+                bold
+              />
             </>
           )}
         </div>
 
-        {/* Proof upload for TRANSFER / QRIS */}
+        {/* Proof upload — non-cash only */}
         {!isCash && (
-          <div className="flex flex-col gap-2">
-            <p className="text-ts-cap2 font-semibold uppercase tracking-[0.05em] text-tx-secondary">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <p
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: '#8E8E93',
+                margin: 0,
+              }}
+            >
               Bukti Transfer
             </p>
             {settlementProof?.preview ? (
-              <div className="relative">
+              <div style={{ position: 'relative' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={settlementProof.preview}
                   alt="Bukti"
-                  className="h-32 w-full rounded-r10 object-cover"
+                  style={{ width: '100%', height: 128, objectFit: 'cover', borderRadius: 10 }}
                 />
-                <label className="absolute right-2 top-2 cursor-pointer rounded-r6 bg-black/60 px-2.5 py-1 text-ts-cap2 font-semibold text-white">
+                <label
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    cursor: 'pointer',
+                    borderRadius: 6,
+                    background: 'rgba(0,0,0,0.6)',
+                    padding: '3px 10px',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: '#fff',
+                  }}
+                >
                   Ganti
                   <input
                     type="file"
                     accept="image/*"
                     capture="environment"
-                    className="hidden"
+                    style={{ display: 'none' }}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
@@ -137,28 +188,40 @@ export function ConfirmBookingDialog({
                 </label>
               </div>
             ) : (
-              <label className="flex h-20 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-r10 border-2 border-dashed border-bd-card transition-colors hover:border-tx-muted hover:bg-bg-surface">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#8E8E93"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                >
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <path d="M21 15l-5-5L5 21" />
-                </svg>
-                <span className="text-ts-cap1 text-tx-secondary">
+              <label
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                  height: 80,
+                  borderRadius: 10,
+                  border: '2px dashed #E5E5EA',
+                  cursor: 'pointer',
+                  background: 'transparent',
+                  transition: 'border-color 0.15s, background 0.15s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#8E8E93';
+                  e.currentTarget.style.background = '#F9F9FB';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = '#E5E5EA';
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                <span style={{ color: '#8E8E93' }}>
+                  <ImageUploadIcon />
+                </span>
+                <span style={{ fontSize: 12, color: '#8E8E93' }}>
                   Ambil foto / pilih dari galeri
                 </span>
                 <input
                   type="file"
                   accept="image/*"
                   capture="environment"
-                  className="hidden"
+                  style={{ display: 'none' }}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
@@ -169,27 +232,44 @@ export function ConfirmBookingDialog({
             )}
           </div>
         )}
+      </DialogContent>
 
-        {/* Actions */}
-        <div className="flex gap-2.5">
-          <button
-            onClick={onCancel}
-            className="h-10 flex-1 rounded-r10 border border-bd-card text-ts-fn font-medium text-tx-subtle transition-colors hover:bg-bg-surface"
-          >
-            Batal
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={isLoading}
-            className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-r10 bg-ac-primary text-ts-fn font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-60"
-          >
-            {isLoading ? (
-              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            ) : null}
-            {isLoading ? 'Memproses...' : 'Konfirmasi'}
-          </button>
-        </div>
-      </div>
+      <DialogFooter>
+        <DialogSecondaryButton onClick={onCancel}>Batal</DialogSecondaryButton>
+        <DialogPrimaryButton variant="neutral" onClick={onConfirm} isLoading={isLoading}>
+          Konfirmasi
+        </DialogPrimaryButton>
+      </DialogFooter>
+    </BaseDialog>
+  );
+}
+
+// ── Internal helpers ──────────────────────────────────────────────────────────
+
+interface SummaryRowProps {
+  label: string;
+  value: string;
+  bold?: boolean;
+  valueColor?: string;
+}
+
+function SummaryRow({ label, value, bold, valueColor }: SummaryRowProps) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'space-between',
+        padding: '10px 14px',
+      }}
+    >
+      <span style={{ fontSize: 13, color: '#8E8E93', fontWeight: bold ? 600 : 400 }}>{label}</span>
+      <span style={{ fontSize: 13, fontWeight: bold ? 700 : 500, color: valueColor ?? '#1C1C1E' }}>
+        {value}
+      </span>
     </div>
   );
 }
+
+// inputStyle is defined above but unused directly in JSX — kept for future inline inputs
+void inputStyle;
