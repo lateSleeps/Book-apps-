@@ -39,15 +39,19 @@ interface BookingRowProps {
 const COLUMN_LABELS = ['Pelanggan', 'Status', 'Layanan', 'Stylist', 'Waktu', 'Tipe'];
 const GRID = '2fr 1.5fr 2fr 1.5fr 1fr 1.2fr';
 
+const ROW_GRID_STYLE = {
+  display: 'grid',
+  gridTemplateColumns: GRID,
+  columnGap: 20,
+  alignItems: 'center',
+} as const;
+
 export function BookingRowColumnHeaders() {
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: GRID,
-        columnGap: 20,
+        ...ROW_GRID_STYLE,
         padding: '10px 20px',
-        alignItems: 'center',
         background: '#F7F7F8',
         borderRadius: '0.75rem 0.75rem 0 0',
       }}
@@ -117,11 +121,8 @@ export function BookingRow({
       <div
         onClick={onToggle}
         style={{
-          display: 'grid',
-          gridTemplateColumns: GRID,
-          columnGap: 20,
+          ...ROW_GRID_STYLE,
           padding: '14px 20px',
-          alignItems: 'center',
           cursor: 'pointer',
           transition: 'background 0.12s',
           background: isExpanded ? '#fafaf8' : 'transparent',
