@@ -35,7 +35,7 @@ export function BookingTableHeader({ list }: BookingTableHeaderProps) {
         padding: '16px 20px 16px',
       }}
     >
-      {/* Segmented tabs */}
+      {/* Segmented tabs — marginLeft:-4 compensates inner padding so text aligns with column headers */}
       <div
         style={{
           display: 'inline-flex',
@@ -44,6 +44,7 @@ export function BookingTableHeader({ list }: BookingTableHeaderProps) {
           borderRadius: 12,
           padding: 4,
           backgroundColor: '#F2F2F7',
+          marginLeft: -4,
         }}
       >
         {TABS.map(({ key, label }) => {

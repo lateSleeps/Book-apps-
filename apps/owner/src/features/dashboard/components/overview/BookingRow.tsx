@@ -149,13 +149,12 @@ export function BookingRow({
             </div>
             {isUpcoming && (
               <span
-                className="animate-badge-shake"
                 style={{
                   position: 'absolute',
-                  top: -5,
-                  right: -5,
-                  width: 14,
-                  height: 14,
+                  top: -6,
+                  right: -6,
+                  width: 18,
+                  height: 18,
                   borderRadius: '50%',
                   background: UPCOMING_NOTIF_COLOR,
                   border: '2px solid white',
@@ -164,7 +163,7 @@ export function BookingRow({
                   justifyContent: 'center',
                 }}
               >
-                <span style={{ fontSize: 8, fontWeight: 800, color: 'white', lineHeight: 1 }}>
+                <span style={{ fontSize: 10, fontWeight: 800, color: 'white', lineHeight: 1 }}>
                   !
                 </span>
               </span>
