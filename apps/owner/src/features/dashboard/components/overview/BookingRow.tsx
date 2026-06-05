@@ -69,6 +69,8 @@ export function BookingRowColumnHeaders() {
               style={{
                 position: 'absolute',
                 left: -16,
+                top: '50%',
+                transform: 'translateY(-50%)',
                 color: '#D1D1D6',
                 fontWeight: 300,
                 fontSize: 14,
