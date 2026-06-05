@@ -34,6 +34,53 @@ input::placeholder {
   font-weight: 400;
 }
 
+/* ── Global utilities ──────────────────────────────────────────────────────── */
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Overview: responsive overrides ───────────────────────────────────────── */
+
+@media (max-width: 1023px) {
+  .payment-grid-tablet { gap: 2.5rem !important; }
+}
+
+@media (max-width: 767px) {
+  .expanded-details-mobile { grid-template-columns: 1fr !important; }
+  .expanded-col-separator {
+    border-right: none !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+  }
+  .expanded-details-mobile > div > div {
+    padding-bottom: 1rem !important;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+  }
+  .visitor-row-badges    { flex-wrap: wrap !important; gap: 0.5rem !important; }
+  .visitor-name-mobile   { font-size: 0.8125rem !important; }
+  .visitor-service-mobile { font-size: 0.75rem !important; }
+  .visitor-tabs-mobile   { gap: 0.25rem !important; }
+  .search-bar-mobile     { flex: 1 !important; width: auto !important; }
+  .visitor-header-controls { flex-direction: column !important; gap: 0.5rem !important; }
+  .sort-button-mobile    { width: 100% !important; }
+  .payment-section-mobile { grid-template-columns: 1fr !important; }
+  .button-group-mobile   { gap: 0.5rem !important; }
+  .button-group-mobile button {
+    font-size: 0.75rem !important;
+    padding: 0.5rem 0.75rem !important;
+    height: auto !important;
+  }
+  .greeting-section-mobile {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .greeting-text-mobile h1 { font-size: 1.125rem !important; }
+  .hide-on-mobile        { display: none !important; }
+  .dropdown-item-mobile  { padding: 0.75rem !important; }
+}
+
 @layer base {
   html,
   body {

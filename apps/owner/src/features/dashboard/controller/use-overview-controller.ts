@@ -26,7 +26,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useBookingDetail } from '../hooks/overview/use-booking-detail';
 import { useBookingList } from '../hooks/overview/use-booking-list';
 import { useBookingPayment } from '../hooks/overview/use-booking-payment';
@@ -35,9 +35,12 @@ import { useBookingStatus } from '../hooks/overview/use-booking-status';
 import { useDashboardUi } from '../hooks/overview/use-dashboard-ui';
 import { useWalkInFlow } from '../hooks/overview/use-walk-in-flow';
 import { useDashboardData } from '../hooks/use-dashboard-data';
+import { useServices } from '@/hooks/useServices';
+import { useStylists } from '@/hooks/useStylists';
 
 const AUTO_REFRESH_INTERVAL_MS = 10 * 60 * 1000; // 10 menit
 const SKELETON_DURATION_MS = 800; // 0.8 detik
+const SALON_ID = '5cdb0848-1b43-44f6-be29-b2ead49ff65a';
 
 export interface OverviewController {
   list: ReturnType<typeof useBookingList>;
@@ -50,6 +53,9 @@ export interface OverviewController {
   stats: ReturnType<typeof useDashboardData>['stats'];
   isRefreshing: boolean;
   refreshData: () => void;
+  realServices: ReturnType<typeof useServices>['services'];
+  realStylists: ReturnType<typeof useStylists>['stylists'];
+  bookingStatusMap: Record<string, string>;
 }
 
 export function useOverviewController(): OverviewController {
@@ -97,5 +103,33 @@ export function useOverviewController(): OverviewController {
   const promo = useBookingPromo();
   const ui = useDashboardUi();
 
-  return { list, status, detail, promo, payment, walkIn, ui, stats, isRefreshing, refreshData };
+  // ── Domain catalog data (needed by WalkInDrawer) ────────────────────────────
+  const { services: realServices } = useServices(SALON_ID);
+  const { stylists: realStylists } = useStylists(SALON_ID);
+
+  // ── Derived: booking status map (stable across renders unless bookings change)
+  const bookingStatusMap = useMemo(
+    () =>
+      Object.fromEntries(
+        list.allBookings.map((b) => [b.id, list.getEffectiveStatus(b.id) ?? b.status])
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [list.allBookings]
+  );
+
+  return {
+    list,
+    status,
+    detail,
+    promo,
+    payment,
+    walkIn,
+    ui,
+    stats,
+    isRefreshing,
+    refreshData,
+    realServices,
+    realStylists,
+    bookingStatusMap,
+  };
 }
