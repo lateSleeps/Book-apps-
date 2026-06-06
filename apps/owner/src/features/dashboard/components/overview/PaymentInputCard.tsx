@@ -1,5 +1,6 @@
 'use client';
 
+import { Check, Image as ImageIcon } from '@phosphor-icons/react';
 import type { BookingPaymentState } from '../../hooks/overview/use-booking-payment';
 import type { DashboardBooking } from '../../types/dashboard.types';
 import type { PaymentMethod } from '../../types/overview.types';
@@ -87,18 +88,7 @@ export function PaymentInputCard({ booking: b, finalTotal, payment }: PaymentInp
               padding: '10px 14px',
             }}
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="#16a34a"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M3 8l3 3 7-7" />
-            </svg>
+            <Check size={14} weight="duotone" color="#16a34a" />
             <span style={{ fontSize: 13, fontWeight: 600, color: '#16a34a' }}>
               Lunas · {formatRupiah(finalTotal)}
             </span>
@@ -126,20 +116,7 @@ export function PaymentInputCard({ booking: b, finalTotal, payment }: PaymentInp
                 cursor: 'pointer',
               }}
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <path d="M21 15l-5-5L5 21" />
-              </svg>
+              <ImageIcon size={14} weight="duotone" color="currentColor" />
               Lihat Bukti Pelunasan
             </button>
           ) : (
@@ -298,20 +275,7 @@ export function PaymentInputCard({ booking: b, finalTotal, payment }: PaymentInp
                   whiteSpace: 'nowrap',
                 }}
               >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <path d="M21 15l-5-5L5 21" />
-                </svg>
+                <ImageIcon size={14} weight="duotone" color="currentColor" />
                 {proof ? 'Bukti Dipilih ✓' : 'Bukti Pelunasan'}
                 <input
                   type="file"

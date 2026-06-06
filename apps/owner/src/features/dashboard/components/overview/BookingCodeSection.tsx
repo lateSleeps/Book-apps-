@@ -1,5 +1,7 @@
 'use client';
 
+import { Barcode } from '@phosphor-icons/react';
+
 interface BookingCodeSectionProps {
   bookingCodeInput: string;
   setBookingCodeInput: (code: string) => void;
@@ -41,20 +43,7 @@ export function BookingCodeSection({
           onClick={onScanBarcode}
           className="flex h-32 flex-col items-center justify-center gap-3 rounded-r12 border-2 border-dashed border-[#e0e0e0] text-gray-400 transition-colors hover:border-[#bbb] hover:bg-bg-surface hover:text-gray-500"
         >
-          <svg
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2" />
-            <rect x="7" y="7" width="3" height="10" rx="0.5" />
-            <rect x="14" y="7" width="3" height="10" rx="0.5" />
-          </svg>
+          <Barcode size={32} weight="duotone" />
           <span className="text-[0.8125rem] font-medium">Tap untuk scan barcode</span>
         </button>
       </div>

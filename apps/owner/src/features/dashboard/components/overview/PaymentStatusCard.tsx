@@ -1,5 +1,6 @@
 'use client';
 
+import { CheckCircle, Image as ImageIcon, Tag } from '@phosphor-icons/react';
 import { PAYMENT_STATUS_META } from '../../constants/overview/booking-status';
 import type { BookingPromoState } from '../../hooks/overview/use-booking-promo';
 import type { DashboardBooking } from '../../types/dashboard.types';
@@ -35,19 +36,7 @@ function ProofViewButton({ label, onClick }: { label: string; onClick?: () => vo
         fontFamily: 'inherit',
       }}
     >
-      <svg
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      >
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <circle cx="8.5" cy="8.5" r="1.5" />
-        <path d="M21 15l-5-5L5 21" />
-      </svg>
+      <ImageIcon size={12} weight="duotone" color="currentColor" />
       {label}
     </button>
   );
@@ -186,19 +175,7 @@ export function PaymentStatusCard({
               padding: '8px 12px',
             }}
           >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="#16a34a"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="8" cy="8" r="6.5" />
-              <path d="M5 8l2 2 4-4" />
-            </svg>
+            <CheckCircle size={12} weight="duotone" color="#16a34a" />
             <span style={{ fontSize: 13, fontWeight: 500, color: '#16a34a' }}>
               {promoData.appliedCode}
             </span>
@@ -233,19 +210,7 @@ export function PaymentStatusCard({
                   padding: '0 12px',
                 }}
               >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  stroke="#C7C7CC"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M9.5 2.5l4 4-7 7-4-4 7-7z" />
-                  <circle cx="5.5" cy="10.5" r="1" />
-                </svg>
+                <Tag size={12} weight="duotone" color="#C7C7CC" />
                 <input
                   placeholder="Kode promo"
                   value={promo.promoInput[b.id] ?? ''}

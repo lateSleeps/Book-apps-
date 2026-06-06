@@ -46,6 +46,7 @@ const config: Config = {
         'tx-secondary': '#8E8E93', // label uppercase, count (iOS system gray)
         'tx-subtle': '#555555', // deskripsi pendukung
         'tx-muted': '#C7C7CC', // disabled, placeholder extreme
+        'tx-control': '#3C3C43', // iOS tertiary control label (refresh, sort, secondary action)
 
         // Border
         'bd-card': '#E5E5EA', // card, input, modal
@@ -71,6 +72,9 @@ const config: Config = {
         'py-paid': '#34C759', // Lunas
         'py-deposit': '#FF9500', // DP
         'py-unpaid': '#8E8E93', // Belum Bayar
+        'py-paid-bg': '#DCFCE7', // Lunas badge background
+        'py-deposit-bg': '#FEF9C3', // DP badge background
+        'py-unpaid-bg': '#F5F5F5', // Belum Bayar badge background
 
         // Visitor type badge
         'vt-walkin-text': '#856404',

@@ -18,7 +18,7 @@
 
 'use client';
 
-import { Check, MagnifyingGlass, Plus } from '@phosphor-icons/react';
+import { Check, Image as ImageIcon, MagnifyingGlass, Plus, X } from '@phosphor-icons/react';
 import { MOCK_PRODUCTS, MOCK_SERVICES } from '../../constants/overview/mock-data';
 import type { BookingDetailState } from '../../hooks/overview/use-booking-detail';
 import type { BookingListState } from '../../hooks/overview/use-booking-list';
@@ -239,20 +239,7 @@ export function BookingDetailPanel({
                 </button>
               ) : (
                 <div className="flex h-[7rem] w-full flex-col items-center justify-center gap-1.5 rounded-r12 border border-dashed border-[#e0e0e0] bg-[#fafafa]">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#ccc"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <path d="M21 15l-5-5L5 21" />
-                  </svg>
+                  <ImageIcon size={20} weight="duotone" color="#ccc" />
                   <p className="text-[0.6875rem] text-gray-400">Belum ada bukti pembayaran</p>
                 </div>
               )}
@@ -392,18 +379,7 @@ export function BookingDetailPanel({
                     color: 'white',
                   }}
                 >
-                  <svg
-                    width="13"
-                    height="13"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M3 3l10 10M13 3L3 13" />
-                  </svg>
+                  <X size={13} weight="duotone" color="white" />
                   Ditolak
                 </div>
               )}
