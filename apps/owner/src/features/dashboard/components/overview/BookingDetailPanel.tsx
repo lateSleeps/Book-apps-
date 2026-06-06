@@ -57,6 +57,45 @@ function Label({ children }: { children: string }) {
   );
 }
 
+// ── Shared picker panel container class ──────────────────────────────────────
+const PICKER_PANEL_CLASS =
+  'absolute left-0 right-0 top-0 overflow-hidden rounded-r12 border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]';
+
+// ── Add-item button (service + product pickers share identical structure) ────
+function AddItemButton({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        padding: 0,
+        fontSize: 13,
+        fontWeight: 500,
+        color: '#007AFF',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+        marginTop: 8,
+      }}
+    >
+      <svg
+        width="11"
+        height="11"
+        viewBox="0 0 12 12"
+        fill="none"
+        stroke="#007AFF"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      >
+        <path d="M6 1v10M1 6h10" />
+      </svg>
+      {label}
+    </button>
+  );
+}
+
 // ── Picker search row (service + product pickers share identical structure) ────
 function PickerSearchRow({
   placeholder,
@@ -636,7 +675,7 @@ export function BookingDetailPanel({
             {/* Add service */}
             {detail.showServicePicker === b.id ? (
               <div className="relative z-20 mt-2">
-                <div className="absolute left-0 right-0 top-0 overflow-hidden rounded-r12 border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+                <div className={PICKER_PANEL_CLASS}>
                   <PickerSearchRow
                     placeholder="Cari layanan..."
                     value={detail.serviceSearchQuery}
@@ -691,35 +730,10 @@ export function BookingDetailPanel({
                 </div>
               </div>
             ) : (
-              <button
+              <AddItemButton
+                label="Tambah layanan"
                 onClick={() => detail.setShowServicePicker(b.id)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: '#007AFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  marginTop: 8,
-                }}
-              >
-                <svg
-                  width="11"
-                  height="11"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  stroke="#007AFF"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                >
-                  <path d="M6 1v10M1 6h10" />
-                </svg>
-                Tambah layanan
-              </button>
+              />
             )}
           </div>
 
@@ -784,7 +798,7 @@ export function BookingDetailPanel({
             {/* Product picker */}
             {detail.showProductPicker === b.id ? (
               <div className="relative z-20 mt-2">
-                <div className="absolute left-0 right-0 top-0 overflow-hidden rounded-r12 border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+                <div className={PICKER_PANEL_CLASS}>
                   <PickerSearchRow
                     placeholder="Cari produk..."
                     value={detail.productSearchQuery}
@@ -827,35 +841,10 @@ export function BookingDetailPanel({
                 </div>
               </div>
             ) : (
-              <button
+              <AddItemButton
+                label="Tambah add-on"
                 onClick={() => detail.setShowProductPicker(b.id)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: '#007AFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  marginTop: 8,
-                }}
-              >
-                <svg
-                  width="11"
-                  height="11"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  stroke="#007AFF"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                >
-                  <path d="M6 1v10M1 6h10" />
-                </svg>
-                Tambah add-on
-              </button>
+              />
             )}
           </div>
         </div>
