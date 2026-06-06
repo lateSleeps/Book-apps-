@@ -76,8 +76,12 @@ function CountCard({ title, value, icon }: CountCardProps) {
 }
 
 export function StatCardsRow({ stats, allBookings }: StatCardsRowProps) {
-  const completedCount = allBookings.filter((b) => b.status === 'COMPLETED').length;
-  const cancelledCount = allBookings.filter((b) => b.status === 'CANCELLED').length;
+  let completedCount = 0;
+  let cancelledCount = 0;
+  for (const b of allBookings) {
+    if (b.status === 'COMPLETED') completedCount++;
+    else if (b.status === 'CANCELLED') cancelledCount++;
+  }
 
   return (
     <div

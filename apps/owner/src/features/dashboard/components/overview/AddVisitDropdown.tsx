@@ -1,7 +1,6 @@
 'use client';
 
-import { PlusIcon } from '@heroicons/react/24/solid';
-import { CalendarCheck, PersonSimpleWalk } from '@phosphor-icons/react';
+import { CalendarCheck, PersonSimpleWalk, Plus } from '@phosphor-icons/react';
 
 interface AddVisitDropdownProps {
   addDropdownOpen: boolean;
@@ -20,25 +19,15 @@ export function AddVisitDropdown({
   setDrawerServiceSearch,
   isMobile,
 }: AddVisitDropdownProps) {
-  function openWalkIn() {
-    openDrawer('WALK_IN');
-    setDrawerServiceOpen(false);
-    setDrawerServiceSearch('');
-    setAddDropdownOpen(false);
-  }
-
-  function openBooking() {
-    openDrawer('BOOKING');
+  function openDrawerAndReset(type: 'WALK_IN' | 'BOOKING') {
+    openDrawer(type);
     setDrawerServiceOpen(false);
     setDrawerServiceSearch('');
     setAddDropdownOpen(false);
   }
 
   return (
-    <div
-      style={{ position: 'relative', flexShrink: 0, display: 'block' }}
-      className="hidden sm:block"
-    >
+    <div className="relative hidden shrink-0 sm:block">
       {/* Trigger button */}
       <button
         onClick={() => setAddDropdownOpen(!addDropdownOpen)}
@@ -60,7 +49,7 @@ export function AddVisitDropdown({
         onMouseEnter={(e) => (e.currentTarget.style.background = '#333333')}
         onMouseLeave={(e) => (e.currentTarget.style.background = '#1a1a1a')}
       >
-        <PlusIcon style={{ width: 14, height: 14 }} />
+        <Plus size={14} weight="duotone" />
         <span>Tambah Pelanggan</span>
         <svg
           width="12"
@@ -106,7 +95,7 @@ export function AddVisitDropdown({
           >
             {/* Walk-in */}
             <button
-              onClick={openWalkIn}
+              onClick={() => openDrawerAndReset('WALK_IN')}
               style={{
                 display: 'flex',
                 width: '100%',
@@ -142,7 +131,7 @@ export function AddVisitDropdown({
 
             {/* Booking Online */}
             <button
-              onClick={openBooking}
+              onClick={() => openDrawerAndReset('BOOKING')}
               style={{
                 display: 'flex',
                 width: '100%',

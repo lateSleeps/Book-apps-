@@ -18,7 +18,7 @@
 
 'use client';
 
-import { Check, MagnifyingGlass } from '@phosphor-icons/react';
+import { Check, MagnifyingGlass, Plus } from '@phosphor-icons/react';
 import { MOCK_PRODUCTS, MOCK_SERVICES } from '../../constants/overview/mock-data';
 import type { BookingDetailState } from '../../hooks/overview/use-booking-detail';
 import type { BookingListState } from '../../hooks/overview/use-booking-list';
@@ -80,17 +80,7 @@ function AddItemButton({ label, onClick }: { label: string; onClick: () => void 
         marginTop: 8,
       }}
     >
-      <svg
-        width="11"
-        height="11"
-        viewBox="0 0 12 12"
-        fill="none"
-        stroke="#007AFF"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      >
-        <path d="M6 1v10M1 6h10" />
-      </svg>
+      <Plus size={11} weight="duotone" color="#007AFF" />
       {label}
     </button>
   );
@@ -110,18 +100,7 @@ function PickerSearchRow({
 }) {
   return (
     <div className="flex items-center gap-2 border-b border-[#f0f0f0] px-3 py-2">
-      <svg
-        width="13"
-        height="13"
-        viewBox="0 0 16 16"
-        fill="none"
-        stroke="#bbb"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      >
-        <circle cx="7" cy="7" r="5" />
-        <path d="M11 11l3 3" />
-      </svg>
+      <MagnifyingGlass size={13} weight="duotone" color="#bbb" />
       <input
         autoFocus
         type="text"
