@@ -1,5 +1,6 @@
 'use client';
 
+import { X } from '@phosphor-icons/react';
 import React from 'react';
 import type { WalkInFlowState } from '../../hooks/overview/use-walk-in-flow';
 import type { DashboardBooking } from '../../types/dashboard.types';
@@ -115,17 +116,7 @@ export function WalkInDrawer({
                   justifyContent: 'center',
                 }}
               >
-                <svg
-                  width="10"
-                  height="10"
-                  viewBox="0 0 10 10"
-                  fill="none"
-                  stroke="#8E8E93"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                >
-                  <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
-                </svg>
+                <X size={10} weight="duotone" color="#8E8E93" />
               </button>
             </div>
 

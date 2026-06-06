@@ -9,6 +9,7 @@
 
 'use client';
 
+import { Check, Image } from '@phosphor-icons/react';
 import type { SettlementProof } from '../../../hooks/overview/use-booking-payment';
 import type { ConfirmPaymentDialogData } from '../../../types/overview.types';
 import {
@@ -29,40 +30,6 @@ interface ConfirmBookingDialogProps {
   onSetProof: (proof: SettlementProof | null) => void;
   onConfirm: () => Promise<void>;
   onCancel: () => void;
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    >
-      <path d="M20 6L9 17l-5-5" />
-    </svg>
-  );
-}
-
-function ImageUploadIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    >
-      <rect x="3" y="3" width="18" height="18" rx="2" />
-      <circle cx="8.5" cy="8.5" r="1.5" />
-      <path d="M21 15l-5-5L5 21" />
-    </svg>
-  );
 }
 
 // Input style matching WalkInNamePhoneFields
@@ -95,7 +62,7 @@ export function ConfirmBookingDialog({
       <DialogHeader
         icon={
           <DialogIcon variant="success">
-            <CheckIcon />
+            <Check size={16} weight="duotone" />
           </DialogIcon>
         }
         title="Konfirmasi Pembayaran"
@@ -212,7 +179,7 @@ export function ConfirmBookingDialog({
                 }}
               >
                 <span style={{ color: '#8E8E93' }}>
-                  <ImageUploadIcon />
+                  <Image size={20} weight="duotone" />
                 </span>
                 <span style={{ fontSize: 12, color: '#8E8E93' }}>
                   Ambil foto / pilih dari galeri

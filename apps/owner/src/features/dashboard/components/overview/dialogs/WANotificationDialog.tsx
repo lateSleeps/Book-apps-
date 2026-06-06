@@ -9,6 +9,7 @@
 
 'use client';
 
+import { Check } from '@phosphor-icons/react';
 import { buildWAMessage } from '@/lib/wa-message';
 import type { WaBookingData } from '@/lib/wa-message';
 import {
@@ -26,22 +27,6 @@ interface WANotificationDialogProps {
   onDismiss: () => void;
 }
 
-function CheckIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    >
-      <path d="M20 6L9 17l-5-5" />
-    </svg>
-  );
-}
-
 function WAIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -56,7 +41,7 @@ export function WANotificationDialog({ waBookingData, onDismiss }: WANotificatio
       <DialogHeader
         icon={
           <DialogIcon variant="success">
-            <CheckIcon />
+            <Check size={16} weight="duotone" />
           </DialogIcon>
         }
         title="Booking dikonfirmasi!"

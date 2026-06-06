@@ -9,6 +9,7 @@
 
 'use client';
 
+import { X } from '@phosphor-icons/react';
 import type { DeclineDialogData } from '../../../types/overview.types';
 import {
   BaseDialog,
@@ -27,22 +28,6 @@ interface DeclineBookingDialogProps {
   onSubmit: () => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
-}
-
-function XIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 10 10"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    >
-      <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
-    </svg>
-  );
 }
 
 function WAIcon() {
@@ -92,7 +77,7 @@ export function DeclineBookingDialog({
       <DialogHeader
         icon={
           <DialogIcon variant="danger">
-            <XIcon />
+            <X size={14} weight="duotone" />
           </DialogIcon>
         }
         eyebrow="Tolak Booking"

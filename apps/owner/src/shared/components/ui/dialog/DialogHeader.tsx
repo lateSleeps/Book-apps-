@@ -1,5 +1,6 @@
 'use client';
 
+import { X } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
 
 interface DialogHeaderProps {
@@ -30,17 +31,7 @@ function CloseButton({ onClick }: { onClick: () => void }) {
         marginLeft: 12,
       }}
     >
-      <svg
-        width="10"
-        height="10"
-        viewBox="0 0 10 10"
-        fill="none"
-        stroke="#8E8E93"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      >
-        <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
-      </svg>
+      <X size={10} weight="duotone" color="#8E8E93" />
     </button>
   );
 }
