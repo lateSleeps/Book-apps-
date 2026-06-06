@@ -24,9 +24,9 @@ export function BookingCodeSection({
             placeholder="RB-2025-XXX"
             value={bookingCodeInput}
             onChange={(e) => setBookingCodeInput(e.target.value.toUpperCase())}
-            className="h-10 flex-1 rounded-xl border border-[#e8e8e8] px-3.5 text-[0.9375rem] uppercase tracking-wider text-[#1a1a1a] transition-colors placeholder:text-[#ccc] focus:border-[#bbb] focus:outline-none"
+            className="h-10 flex-1 rounded-r12 border border-[#e8e8e8] px-3.5 text-[0.9375rem] uppercase tracking-wider text-[#1a1a1a] transition-colors placeholder:text-[#ccc] focus:border-[#bbb] focus:outline-none"
           />
-          <button className="h-10 shrink-0 rounded-xl bg-[#1a1a1a] px-4 text-[0.8125rem] font-medium text-white transition-colors hover:bg-[#333]">
+          <button className="h-10 shrink-0 rounded-r12 bg-[#1a1a1a] px-4 text-[0.8125rem] font-medium text-white transition-colors hover:bg-[#333]">
             Cari
           </button>
         </div>
@@ -39,7 +39,7 @@ export function BookingCodeSection({
         </label>
         <button
           onClick={onScanBarcode}
-          className="flex h-32 flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-[#e0e0e0] text-gray-400 transition-colors hover:border-[#bbb] hover:bg-[#fafaf8] hover:text-gray-500"
+          className="flex h-32 flex-col items-center justify-center gap-3 rounded-r12 border-2 border-dashed border-[#e0e0e0] text-gray-400 transition-colors hover:border-[#bbb] hover:bg-[#fafaf8] hover:text-gray-500"
         >
           <svg
             width="32"

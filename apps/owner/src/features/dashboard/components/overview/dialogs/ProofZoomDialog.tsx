@@ -36,7 +36,7 @@ export function ProofZoomDialog({ url, label, onClose }: ProofZoomDialogProps) {
           <p className="text-ts-fn font-semibold text-white">{label}</p>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/30"
+            className="flex h-8 w-8 items-center justify-center rounded-rF bg-white/20 text-white transition-colors hover:bg-white/30"
           >
             <X size={14} weight="duotone" />
           </button>

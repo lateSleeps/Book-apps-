@@ -33,13 +33,12 @@ interface CountCardProps {
 function CountCard({ title, value, icon }: CountCardProps) {
   return (
     <div
-      className="transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+      className="shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
       style={{
         backgroundColor: '#FFFFFF',
         border: '1px solid #E5E5EA',
         borderRadius: '1.25rem',
         padding: '1.25rem',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -252,13 +251,12 @@ export function StatCardsRow({ stats, allBookings }: StatCardsRowProps) {
 
       {/* Pembatalan */}
       <div
-        className="transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+        className="shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
         style={{
           backgroundColor: '#FFFFFF',
           border: '1px solid #E5E5EA',
           borderRadius: '1.25rem',
           padding: '1.25rem',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',

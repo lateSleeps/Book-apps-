@@ -91,6 +91,7 @@ export function AddVisitDropdown({
             />
           )}
           <div
+            className="shadow-dropdown"
             style={{
               position: 'absolute',
               right: 0,
@@ -99,7 +100,6 @@ export function AddVisitDropdown({
               width: 220,
               background: 'white',
               borderRadius: 14,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
               overflow: 'hidden',
               padding: 6,
             }}

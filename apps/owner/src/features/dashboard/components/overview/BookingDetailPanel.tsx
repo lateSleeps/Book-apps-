@@ -18,7 +18,7 @@
 
 'use client';
 
-import { CheckIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
+import { Check, MagnifyingGlass } from '@phosphor-icons/react';
 import { MOCK_PRODUCTS, MOCK_SERVICES } from '../../constants/overview/mock-data';
 import type { BookingDetailState } from '../../hooks/overview/use-booking-detail';
 import type { BookingListState } from '../../hooks/overview/use-booking-list';
@@ -205,7 +205,7 @@ export function BookingDetailPanel({
                   onClick={() =>
                     payment.openProofZoom({ url: b.paymentProofUrl!, label: 'Bukti DP' })
                   }
-                  className="group relative w-full overflow-hidden rounded-xl border border-[#e8e8e6] transition-colors hover:border-[#ccc]"
+                  className="group relative w-full overflow-hidden rounded-r12 border border-[#e8e8e6] transition-colors hover:border-[#ccc]"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -214,13 +214,13 @@ export function BookingDetailPanel({
                     className="h-[7rem] w-full object-cover"
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/10">
-                    <div className="rounded-full bg-black/50 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
-                      <MagnifyingGlassIcon className="h-3 w-3 text-white" />
+                    <div className="rounded-rF bg-black/50 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
+                      <MagnifyingGlass size={12} weight="duotone" color="white" />
                     </div>
                   </div>
                 </button>
               ) : (
-                <div className="flex h-[7rem] w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#e0e0e0] bg-[#fafafa]">
+                <div className="flex h-[7rem] w-full flex-col items-center justify-center gap-1.5 rounded-r12 border border-dashed border-[#e0e0e0] bg-[#fafafa]">
                   <svg
                     width="20"
                     height="20"
@@ -279,7 +279,7 @@ export function BookingDetailPanel({
                         transition: 'background 0.15s',
                       }}
                     >
-                      <CheckIcon className="h-3.5 w-3.5 text-white" />
+                      <Check size={14} weight="duotone" color="white" />
                       Konfirmasi
                     </button>
                     <button
@@ -401,6 +401,7 @@ export function BookingDetailPanel({
               /* Edit service picker */
               <div style={{ position: 'relative', zIndex: 20 }}>
                 <div
+                  className="shadow-dropdown"
                   style={{
                     position: 'absolute',
                     left: 0,
@@ -408,7 +409,6 @@ export function BookingDetailPanel({
                     top: 0,
                     background: 'white',
                     borderRadius: 14,
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
                     overflow: 'hidden',
                   }}
                 >
@@ -586,7 +586,7 @@ export function BookingDetailPanel({
                 </div>
                 <button
                   onClick={() => detail.setEditServiceId(b.id)}
-                  className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#f0f0ee] text-gray-500 transition-colors hover:bg-[#e2e2df] hover:text-[#444]"
+                  className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-rF bg-[#f0f0ee] text-gray-500 transition-colors hover:bg-[#e2e2df] hover:text-[#444]"
                 >
                   <svg
                     width="14"
@@ -616,7 +616,7 @@ export function BookingDetailPanel({
                 </div>
                 <button
                   onClick={() => detail.removeAdditionalService(b.id, idx)}
-                  className="flex h-6 w-6 items-center justify-center rounded-full text-tx-muted transition-colors hover:bg-red-50 hover:text-st-cancelled"
+                  className="flex h-6 w-6 items-center justify-center rounded-rF text-tx-muted transition-colors hover:bg-red-50 hover:text-st-cancelled"
                 >
                   <svg
                     width="10"
@@ -636,7 +636,7 @@ export function BookingDetailPanel({
             {/* Add service */}
             {detail.showServicePicker === b.id ? (
               <div className="relative z-20 mt-2">
-                <div className="absolute left-0 right-0 top-0 overflow-hidden rounded-xl border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+                <div className="absolute left-0 right-0 top-0 overflow-hidden rounded-r12 border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
                   <PickerSearchRow
                     placeholder="Cari layanan..."
                     value={detail.serviceSearchQuery}
@@ -763,7 +763,7 @@ export function BookingDetailPanel({
                   </span>
                   <button
                     onClick={() => detail.removeAddOn(b.id, i)}
-                    className="flex h-5 w-5 items-center justify-center rounded-full text-[#ccc] transition-colors hover:bg-[#fef2f2] hover:text-[#ef4444]"
+                    className="flex h-5 w-5 items-center justify-center rounded-rF text-[#ccc] transition-colors hover:bg-[#fef2f2] hover:text-[#ef4444]"
                   >
                     <svg
                       width="10"
@@ -784,7 +784,7 @@ export function BookingDetailPanel({
             {/* Product picker */}
             {detail.showProductPicker === b.id ? (
               <div className="relative z-20 mt-2">
-                <div className="absolute left-0 right-0 top-0 overflow-hidden rounded-xl border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+                <div className="absolute left-0 right-0 top-0 overflow-hidden rounded-r12 border border-[#e0e0e0] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
                   <PickerSearchRow
                     placeholder="Cari produk..."
                     value={detail.productSearchQuery}

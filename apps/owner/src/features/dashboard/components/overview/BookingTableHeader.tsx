@@ -1,6 +1,6 @@
 'use client';
 
-import { MagnifyingGlassIcon, XMarkIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
+import { ArrowClockwise, MagnifyingGlass, X } from '@phosphor-icons/react';
 import type { BookingListState } from '../../hooks/overview/use-booking-list';
 import type { VisitorTab } from '../../types/overview.types';
 
@@ -89,7 +89,7 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
                 </span>
               </button>
               {showBadge && (
-                <span className="animate-badge-shake pointer-events-none absolute -right-1.5 -top-2 flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-[#f59e0b] px-1 text-[0.625rem] font-bold text-white shadow-sm ring-2 ring-white">
+                <span className="animate-badge-shake pointer-events-none absolute -right-1.5 -top-2 flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-rF bg-[#f59e0b] px-1 text-[0.625rem] font-bold text-white shadow-sm ring-2 ring-white">
                   {list.pendingConfirmCount}
                 </span>
               )}
@@ -114,13 +114,11 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
             transition: 'opacity 0.15s',
           }}
         >
-          <ArrowPathIcon
-            style={{
-              width: 14,
-              height: 14,
-              color: '#3C3C43',
-              animation: isRefreshing ? 'spin 1s linear infinite' : 'none',
-            }}
+          <ArrowClockwise
+            size={14}
+            weight="duotone"
+            color="#3C3C43"
+            style={{ animation: isRefreshing ? 'spin 1s linear infinite' : 'none' }}
           />
         </button>
 
@@ -174,7 +172,7 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
             width: 220,
           }}
         >
-          <MagnifyingGlassIcon style={{ width: 14, height: 14, color: '#8E8E93', flexShrink: 0 }} />
+          <MagnifyingGlass size={14} weight="duotone" color="#8E8E93" style={{ flexShrink: 0 }} />
           <input
             type="text"
             placeholder="Cari pelanggan..."
@@ -200,7 +198,7 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
                 display: 'flex',
               }}
             >
-              <XMarkIcon style={{ width: 12, height: 12, color: '#8E8E93' }} />
+              <X size={12} weight="duotone" color="#8E8E93" />
             </button>
           )}
         </div>

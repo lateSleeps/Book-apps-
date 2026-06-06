@@ -51,7 +51,7 @@ export function BarcodeScanner({ videoRef, canvasRef, onClose }: BarcodeScannerP
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 transition-colors hover:bg-white"
+          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-rF bg-white/90 transition-colors hover:bg-white"
         >
           <svg
             width="20"

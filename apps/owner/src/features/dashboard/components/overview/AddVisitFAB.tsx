@@ -19,7 +19,7 @@ export function AddVisitFAB({
     <div className="fixed bottom-6 right-4 z-40 sm:hidden">
       <button
         onClick={() => setAddDropdownOpen(!addDropdownOpen)}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-[#1a1a1a] text-white shadow-lg transition-all hover:bg-[#333] active:scale-95"
+        className="flex h-14 w-14 items-center justify-center rounded-rF bg-[#1a1a1a] text-white shadow-lg transition-all hover:bg-[#333] active:scale-95"
       >
         <svg
           width="24"
@@ -37,12 +37,12 @@ export function AddVisitFAB({
       {addDropdownOpen && isMobile && (
         <>
           <div className="fixed inset-0 z-30" onClick={() => setAddDropdownOpen(false)} />
-          <div className="absolute bottom-20 right-0 z-40 w-[13rem] overflow-hidden rounded-xl border border-[#efefed] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+          <div className="absolute bottom-20 right-0 z-40 w-[13rem] overflow-hidden rounded-r12 border border-[#efefed] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
             <button
               onClick={onOpenWalkIn}
               className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f8f8f6]"
             >
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f0f0ee]">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-r8 bg-[#f0f0ee]">
                 <svg
                   width="13"
                   height="13"
@@ -67,7 +67,7 @@ export function AddVisitFAB({
               onClick={onOpenBooking}
               className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f8f8f6]"
             >
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f0f0ee]">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-r8 bg-[#f0f0ee]">
                 <svg
                   width="13"
                   height="13"

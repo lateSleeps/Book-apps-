@@ -72,6 +72,7 @@ export function PaymentStatusCard({
 
   return (
     <div
+      className="shadow-card"
       style={{
         borderRadius: 12,
         background: 'white',
@@ -79,7 +80,6 @@ export function PaymentStatusCard({
         display: 'flex',
         flexDirection: 'column',
         gap: 12,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
         height: '100%',
         boxSizing: 'border-box',
       }}

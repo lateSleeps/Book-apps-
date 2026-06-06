@@ -60,6 +60,7 @@ export function WalkInDrawer({
         <div className="fixed inset-0 z-50 flex items-center justify-end p-4">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-[3px]" onClick={closeDrawer} />
           <div
+            className="shadow-drawer"
             style={{
               position: 'relative',
               zIndex: 10,
@@ -70,7 +71,6 @@ export function WalkInDrawer({
               height: '100%',
               background: 'white',
               borderRadius: 20,
-              boxShadow: '-8px 0 48px rgba(0,0,0,0.18)',
               overflow: 'hidden',
             }}
           >
