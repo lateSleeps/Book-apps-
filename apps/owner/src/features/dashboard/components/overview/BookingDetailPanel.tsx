@@ -18,7 +18,14 @@
 
 'use client';
 
-import { Check, Image as ImageIcon, MagnifyingGlass, Plus, X } from '@phosphor-icons/react';
+import {
+  Check,
+  Image as ImageIcon,
+  MagnifyingGlass,
+  PencilSimple,
+  Plus,
+  X,
+} from '@phosphor-icons/react';
 import { MOCK_PRODUCTS, MOCK_SERVICES } from '../../constants/overview/mock-data';
 import type { BookingDetailState } from '../../hooks/overview/use-booking-detail';
 import type { BookingListState } from '../../hooks/overview/use-booking-list';
@@ -113,17 +120,7 @@ function PickerSearchRow({
         onClick={onClose}
         className="flex h-5 w-5 flex-shrink-0 items-center justify-center text-[#ccc] transition-colors hover:text-[#888]"
       >
-        <svg
-          width="10"
-          height="10"
-          viewBox="0 0 10 10"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        >
-          <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
-        </svg>
+        <X size={10} weight="duotone" />
       </button>
     </div>
   );
@@ -314,18 +311,7 @@ export function BookingDetailPanel({
                         transition: 'background 0.15s',
                       }}
                     >
-                      <svg
-                        width="13"
-                        height="13"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M3 3l10 10M13 3L3 13" />
-                      </svg>
+                      <X size={13} weight="duotone" />
                       Tolak
                     </button>
                   </div>
@@ -347,18 +333,7 @@ export function BookingDetailPanel({
                     color: 'white',
                   }}
                 >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M3 8l3 3 7-7" />
-                  </svg>
+                  <Check size={14} weight="duotone" color="white" />
                   Terkonfirmasi
                 </div>
               )}
@@ -418,18 +393,7 @@ export function BookingDetailPanel({
                       borderRadius: 10,
                     }}
                   >
-                    <svg
-                      width="13"
-                      height="13"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      stroke="#8E8E93"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    >
-                      <circle cx="7" cy="7" r="5" />
-                      <path d="M11 11l3 3" />
-                    </svg>
+                    <MagnifyingGlass size={13} weight="duotone" color="#8E8E93" />
                     <input
                       autoFocus
                       type="text"
@@ -463,17 +427,7 @@ export function BookingDetailPanel({
                           padding: 0,
                         }}
                       >
-                        <svg
-                          width="8"
-                          height="8"
-                          viewBox="0 0 10 10"
-                          fill="none"
-                          stroke="white"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                        >
-                          <path d="M2 2l6 6M8 2l-6 6" />
-                        </svg>
+                        <X size={8} weight="duotone" color="white" />
                       </button>
                     )}
                   </div>
@@ -582,18 +536,7 @@ export function BookingDetailPanel({
                   onClick={() => detail.setEditServiceId(b.id)}
                   className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-rF bg-[#f0f0ee] text-gray-500 transition-colors hover:bg-[#e2e2df] hover:text-[#444]"
                 >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M10 1.5l2.5 2.5-8 8H2v-2.5l8-8z" />
-                  </svg>
+                  <PencilSimple size={14} weight="duotone" />
                 </button>
               </div>
             )}
@@ -734,17 +677,7 @@ export function BookingDetailPanel({
                     onClick={() => detail.removeAddOn(b.id, i)}
                     className="flex h-5 w-5 items-center justify-center rounded-rF text-[#ccc] transition-colors hover:bg-st-cancelled-bg hover:text-st-cancelled"
                   >
-                    <svg
-                      width="10"
-                      height="10"
-                      viewBox="0 0 10 10"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    >
-                      <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
-                    </svg>
+                    <X size={10} weight="duotone" />
                   </button>
                 </div>
               </div>

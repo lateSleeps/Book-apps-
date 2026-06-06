@@ -13,6 +13,8 @@
 
 'use client';
 
+import { X } from '@phosphor-icons/react';
+
 interface MobileDetailSheetProps {
   customerName: string;
   serviceName: string;
@@ -44,17 +46,7 @@ export function MobileDetailSheet({
               onClick={onClose}
               className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-r8 transition-colors hover:bg-bg-surface"
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              >
-                <path d="M3 3l10 10M13 3L3 13" />
-              </svg>
+              <X size={14} weight="duotone" />
             </button>
           </div>
 
