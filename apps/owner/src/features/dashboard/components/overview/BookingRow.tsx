@@ -127,7 +127,7 @@ export function BookingRow({
           transition: 'background 0.12s',
           background: isExpanded ? '#fafaf8' : 'transparent',
         }}
-        className="hover:bg-[#fafaf8]"
+        className="hover:bg-bg-surface"
       >
         {/* Col 1: Customer */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
@@ -222,9 +222,9 @@ export function BookingRow({
 
         {/* Col 3: Service */}
         <span
+          className="text-tx-body"
           style={{
             fontSize: '0.875rem',
-            color: '#1a1a1a',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -235,9 +235,9 @@ export function BookingRow({
 
         {/* Col 4: Stylist */}
         <span
+          className="text-tx-subtle"
           style={{
             fontSize: '0.875rem',
-            color: '#555',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -248,7 +248,8 @@ export function BookingRow({
 
         {/* Col 5: Time */}
         <span
-          style={{ fontSize: '0.875rem', color: '#1a1a1a', fontVariantNumeric: 'tabular-nums' }}
+          className="text-tx-body"
+          style={{ fontSize: '0.875rem', fontVariantNumeric: 'tabular-nums' }}
         >
           {b.timeSlot.slice(0, 5)}
         </span>

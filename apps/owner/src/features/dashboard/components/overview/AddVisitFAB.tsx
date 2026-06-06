@@ -19,7 +19,7 @@ export function AddVisitFAB({
     <div className="fixed bottom-6 right-4 z-40 sm:hidden">
       <button
         onClick={() => setAddDropdownOpen(!addDropdownOpen)}
-        className="flex h-14 w-14 items-center justify-center rounded-rF bg-[#1a1a1a] text-white shadow-lg transition-all hover:bg-[#333] active:scale-95"
+        className="flex h-14 w-14 items-center justify-center rounded-rF bg-tx-body text-white shadow-lg transition-all hover:bg-[#333] active:scale-95"
       >
         <svg
           width="24"
@@ -58,7 +58,7 @@ export function AddVisitFAB({
                 </svg>
               </div>
               <div>
-                <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Walk-in</p>
+                <p className="text-[0.875rem] font-medium text-tx-body">Walk-in</p>
                 <p className="text-[0.75rem] text-gray-500">Datang langsung</p>
               </div>
             </button>
@@ -83,7 +83,7 @@ export function AddVisitFAB({
                 </svg>
               </div>
               <div>
-                <p className="text-[0.875rem] font-medium text-[#1a1a1a]">Booking Online</p>
+                <p className="text-[0.875rem] font-medium text-tx-body">Booking Online</p>
                 <p className="text-[0.75rem] text-gray-500">Sudah punya kode booking</p>
               </div>
             </button>

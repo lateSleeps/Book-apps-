@@ -89,7 +89,7 @@ function PickerSearchRow({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="flex-1 bg-transparent text-[0.8125rem] text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
+        className="flex-1 bg-transparent text-[0.8125rem] text-tx-body placeholder:text-[#ccc] focus:outline-none"
       />
       <button
         onClick={onClose}
@@ -141,7 +141,7 @@ export function BookingDetailPanel({
 
   return (
     <div
-      className="relative flex min-h-[23rem] flex-col bg-[#fafaf8] px-3 pb-5 sm:px-6"
+      className="relative flex min-h-[23rem] flex-col bg-bg-surface px-3 pb-5 sm:px-6"
       onClick={(e) => e.stopPropagation()}
     >
       {/* 3-column grid */}
@@ -455,8 +455,8 @@ export function BookingDetailPanel({
                     {detail.serviceSearchQuery && (
                       <button
                         onClick={() => detail.setServiceSearchQuery('')}
+                        className="bg-tx-muted"
                         style={{
-                          background: '#C7C7CC',
                           border: 'none',
                           borderRadius: '50%',
                           width: 16,
@@ -577,10 +577,10 @@ export function BookingDetailPanel({
             ) : (
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-[0.875rem] font-medium text-[#1a1a1a]">
+                  <p className="text-[0.875rem] font-medium text-tx-body">
                     {currentService.serviceName}
                   </p>
-                  <p className="mt-0.5 text-[0.875rem] text-[#555]">
+                  <p className="mt-0.5 text-[0.875rem] text-tx-subtle">
                     oleh {b.stylistName} · {formatRupiah(currentService.price)}
                   </p>
                 </div>
@@ -611,12 +611,12 @@ export function BookingDetailPanel({
                 className="mt-2 flex items-center justify-between border-t border-bd-row pt-2"
               >
                 <div>
-                  <p className="text-[0.8125rem] font-medium text-[#1a1a1a]">{sv.serviceName}</p>
-                  <p className="text-[0.8125rem] text-[#555]">{formatRupiah(sv.price)}</p>
+                  <p className="text-[0.8125rem] font-medium text-tx-body">{sv.serviceName}</p>
+                  <p className="text-[0.8125rem] text-tx-subtle">{formatRupiah(sv.price)}</p>
                 </div>
                 <button
                   onClick={() => detail.removeAdditionalService(b.id, idx)}
-                  className="flex h-6 w-6 items-center justify-center rounded-rF text-tx-muted transition-colors hover:bg-red-50 hover:text-st-cancelled"
+                  className="flex h-6 w-6 items-center justify-center rounded-rF text-tx-muted transition-colors hover:bg-st-cancelled-bg hover:text-st-cancelled"
                 >
                   <svg
                     width="10"
@@ -650,7 +650,7 @@ export function BookingDetailPanel({
                     {availableServices.filter((s) =>
                       s.name.toLowerCase().includes(detail.serviceSearchQuery.toLowerCase())
                     ).length === 0 ? (
-                      <p className="px-3 py-3 text-[0.875rem] text-[#555]">
+                      <p className="px-3 py-3 text-[0.875rem] text-tx-subtle">
                         Layanan tidak ditemukan
                       </p>
                     ) : (
@@ -664,7 +664,7 @@ export function BookingDetailPanel({
                         return (
                           <div key={cat}>
                             {!detail.serviceSearchQuery && (
-                              <p className="px-3 pb-1 pt-2.5 text-[0.6875rem] font-semibold uppercase tracking-wider text-[#555]">
+                              <p className="px-3 pb-1 pt-2.5 text-[0.6875rem] font-semibold uppercase tracking-wider text-tx-subtle">
                                 {cat}
                               </p>
                             )}
@@ -675,10 +675,10 @@ export function BookingDetailPanel({
                                   detail.addService(b.id, svc);
                                   detail.setServiceSearchQuery('');
                                 }}
-                                className="flex w-full items-center justify-between border-b border-[#f9f9f9] px-3 py-2 text-left transition-colors last:border-0 hover:bg-[#fafaf8]"
+                                className="flex w-full items-center justify-between border-b border-[#f9f9f9] px-3 py-2 text-left transition-colors last:border-0 hover:bg-bg-surface"
                               >
                                 <span className="text-[0.8125rem] text-[#333]">{svc.name}</span>
-                                <span className="ml-2 flex-shrink-0 text-[0.8125rem] text-[#555]">
+                                <span className="ml-2 flex-shrink-0 text-[0.8125rem] text-tx-subtle">
                                   {formatRupiah(svc.price)}
                                 </span>
                               </button>
@@ -732,7 +732,7 @@ export function BookingDetailPanel({
                 onChange={(e) => detail.setNote(b.id, e.target.value)}
                 placeholder="Kondisi kulit, alergi, preferensi..."
                 rows={3}
-                className="w-full resize-none border px-3 py-2 text-[0.8125rem] leading-relaxed text-[#1a1a1a] placeholder:text-[#ccc] focus:outline-none"
+                className="w-full resize-none border px-3 py-2 text-[0.8125rem] leading-relaxed text-tx-body placeholder:text-[#ccc] focus:outline-none"
                 style={{
                   borderRadius: 10,
                   borderColor: '#E5E5EA',
@@ -756,14 +756,14 @@ export function BookingDetailPanel({
                 key={ao.id}
                 className="flex items-center justify-between border-b border-[#f5f5f5] py-1.5 last:border-0"
               >
-                <span className="text-[0.8125rem] text-[#555]">{ao.name}</span>
+                <span className="text-[0.8125rem] text-tx-subtle">{ao.name}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-[0.875rem] font-medium text-[#444]">
                     {formatRupiah(ao.price)}
                   </span>
                   <button
                     onClick={() => detail.removeAddOn(b.id, i)}
-                    className="flex h-5 w-5 items-center justify-center rounded-rF text-[#ccc] transition-colors hover:bg-[#fef2f2] hover:text-[#ef4444]"
+                    className="flex h-5 w-5 items-center justify-center rounded-rF text-[#ccc] transition-colors hover:bg-st-cancelled-bg hover:text-st-cancelled"
                   >
                     <svg
                       width="10"
@@ -801,7 +801,7 @@ export function BookingDetailPanel({
                       );
                       if (filtered.length === 0)
                         return (
-                          <p className="px-3 py-3 text-[0.875rem] text-[#555]">
+                          <p className="px-3 py-3 text-[0.875rem] text-tx-subtle">
                             {availableProducts.length === 0
                               ? 'Semua produk sudah ditambahkan'
                               : 'Produk tidak ditemukan'}
@@ -814,10 +814,10 @@ export function BookingDetailPanel({
                             detail.addProduct(b.id, prod);
                             detail.setProductSearchQuery('');
                           }}
-                          className="flex w-full items-center justify-between border-b border-[#f9f9f9] px-3 py-2.5 text-left transition-colors last:border-0 hover:bg-[#fafaf8]"
+                          className="flex w-full items-center justify-between border-b border-[#f9f9f9] px-3 py-2.5 text-left transition-colors last:border-0 hover:bg-bg-surface"
                         >
                           <span className="text-[0.8125rem] text-[#333]">{prod.name}</span>
-                          <span className="text-[0.8125rem] text-[#555]">
+                          <span className="text-[0.8125rem] text-tx-subtle">
                             {formatRupiah(prod.price)}
                           </span>
                         </button>
