@@ -20,12 +20,13 @@ bg-input         #F9F9FB   secondary button, input bg
 ## Warna — Text
 
 ```
-text-primary     #1C1C1E   judul, nilai angka, nama
-text-body        #1a1a1a   body content
-text-secondary   #8E8E93   label uppercase, count, placeholder
-text-subtle      #555555   deskripsi pendukung
-text-muted       #C7C7CC   disabled, placeholder extreme
-text-inverse     #FFFFFF   text di atas background gelap
+tx-primary       #1C1C1E   judul, nilai angka, nama
+tx-body          #1a1a1a   body content
+tx-secondary     #8E8E93   label uppercase, count, placeholder
+tx-subtle        #555555   deskripsi pendukung
+tx-muted         #C7C7CC   disabled, placeholder extreme
+tx-control       #3C3C43   iOS tertiary control label — refresh icons,
+                           sort controls, secondary action buttons
 ```
 
 ## Warna — Border
@@ -63,9 +64,13 @@ no-show-bg       #f9fafb
 ## Warna — Payment Status
 
 ```
-paid-color       #34C759   Lunas
-deposit-color    #FF9500   DP
-unpaid-color     #8E8E93   Belum Bayar
+py-paid          #34C759   Lunas — text color
+py-deposit       #FF9500   DP — text color
+py-unpaid        #8E8E93   Belum Bayar — text color
+
+py-paid-bg       #DCFCE7   Lunas badge background
+py-deposit-bg    #FEF9C3   DP badge background
+py-unpaid-bg     #F5F5F5   Belum Bayar badge background
 ```
 
 ## Warna — Visitor Type Badge

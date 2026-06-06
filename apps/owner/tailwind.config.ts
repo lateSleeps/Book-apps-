@@ -38,6 +38,7 @@ const config: Config = {
         'bg-header': '#F7F7F8', // table header row
         'bg-control': '#F2F2F7', // segmented tab container, icon buttons
         'bg-input': '#F9F9FB', // secondary button, input bg
+        'bg-hover': '#F5F5F7', // list item / row hover state
 
         // Text
         'tx-primary': '#1C1C1E', // judul, angka, nama customer (iOS label)
@@ -45,6 +46,7 @@ const config: Config = {
         'tx-secondary': '#8E8E93', // label uppercase, count (iOS system gray)
         'tx-subtle': '#555555', // deskripsi pendukung
         'tx-muted': '#C7C7CC', // disabled, placeholder extreme
+        'tx-control': '#3C3C43', // iOS tertiary control label (refresh, sort, secondary action)
 
         // Border
         'bd-card': '#E5E5EA', // card, input, modal
@@ -70,6 +72,9 @@ const config: Config = {
         'py-paid': '#34C759', // Lunas
         'py-deposit': '#FF9500', // DP
         'py-unpaid': '#8E8E93', // Belum Bayar
+        'py-paid-bg': '#DCFCE7', // Lunas badge background
+        'py-deposit-bg': '#FEF9C3', // DP badge background
+        'py-unpaid-bg': '#F5F5F5', // Belum Bayar badge background
 
         // Visitor type badge
         'vt-walkin-text': '#856404',
@@ -89,60 +94,62 @@ const config: Config = {
         sans: ['DM Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       fontSize: {
-        // ── Type scale (Apple HIG-aligned, WCAG AA accessible) ──────────────
-        // Caption 2 — absolute minimum, use sparingly (legend dots, badges)
-        'ts-cap2': ['11px', { lineHeight: '1.4', letterSpacing: '0.02em' }],
-        // Caption 1 — labels, tags, eyebrow text, calendar day letters
-        'ts-cap1': ['12px', { lineHeight: '1.4', letterSpacing: '0.015em' }],
-        // Footnote — secondary meta, time slots, step indicators
-        'ts-fn': ['13px', { lineHeight: '1.5', letterSpacing: '0' }],
-        // Subheadline — supporting body, chip text, helper text
-        'ts-sub': ['15px', { lineHeight: '1.5', letterSpacing: '0' }],
-        // Callout / Body — descriptions, secondary content
-        'ts-body': ['16px', { lineHeight: '1.5', letterSpacing: '0' }],
-        // Headline — primary body, button labels, card titles
-        'ts-head': ['17px', { lineHeight: '1.4', letterSpacing: '-0.01em' }],
-        // Title 3 — calendar date numbers, section titles
-        'ts-t3': ['20px', { lineHeight: '1.2', letterSpacing: '-0.015em' }],
-        // Title 2 — page sub-headings
-        'ts-t2': ['22px', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
-        // Title 1 — page headings ("Pilih Stylist")
-        'ts-t1': ['28px', { lineHeight: '1.1', letterSpacing: '-0.025em' }],
-        // Large Title — hero headings ("Selamat pagi.")
-        'ts-hero': ['34px', { lineHeight: '1.0', letterSpacing: '-0.03em' }],
+        // ── Apple HIG Type Scale — rem units ─────────────────────────────────
+        // Caption 2 — 11px — minimum, gunakan untuk legend dots, badges
+        'ts-cap2': ['0.6875rem', { lineHeight: '1.4', letterSpacing: '0.02em' }],
+        // Caption 1 — 12px — labels, tags, eyebrow text
+        'ts-cap1': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.015em' }],
+        // Footnote — 13px — secondary meta, time slots
+        'ts-fn': ['0.8125rem', { lineHeight: '1.5', letterSpacing: '0' }],
+        // Subheadline — 15px — supporting body, chip text
+        'ts-sub': ['0.9375rem', { lineHeight: '1.5', letterSpacing: '0' }],
+        // Callout / Body — 16px — descriptions, secondary content
+        'ts-body': ['1rem', { lineHeight: '1.5', letterSpacing: '0' }],
+        // Headline — 17px — primary body, button labels, card titles
+        'ts-head': ['1.0625rem', { lineHeight: '1.4', letterSpacing: '-0.01em' }],
+        // Title 3 — 20px — section titles
+        'ts-t3': ['1.25rem', { lineHeight: '1.2', letterSpacing: '-0.015em' }],
+        // Title 2 — 22px — page sub-headings
+        'ts-t2': ['1.375rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
+        // Title 1 — 28px — page headings
+        'ts-t1': ['1.75rem', { lineHeight: '1.1', letterSpacing: '-0.025em' }],
+        // Large Title — 34px — hero headings
+        'ts-hero': ['2.125rem', { lineHeight: '1.0', letterSpacing: '-0.03em' }],
 
-        // ── Legacy aliases (kept for backwards compat) ──────────────────────
-        t12: ['12px', { lineHeight: '1.4', letterSpacing: '0.015em' }],
-        t14: ['14px', { lineHeight: '1.5' }],
-        t16: ['16px', { lineHeight: '1.5' }],
-        t18: ['18px', { lineHeight: '1.4' }],
-        t20: ['20px', { lineHeight: '1.2', letterSpacing: '-0.015em' }],
-        t24: ['24px', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
-        t28: ['28px', { lineHeight: '1.1', letterSpacing: '-0.025em' }],
-        t32: ['32px', { lineHeight: '1.0', letterSpacing: '-0.03em' }],
+        // ── Legacy aliases — backwards compat ────────────────────────────────
+        t12: ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.015em' }],
+        t14: ['0.875rem', { lineHeight: '1.5' }],
+        'ts-t14': ['0.875rem', { lineHeight: '1.5' }],
+        t16: ['1rem', { lineHeight: '1.5' }],
+        t18: ['1.125rem', { lineHeight: '1.4' }],
+        t20: ['1.25rem', { lineHeight: '1.2', letterSpacing: '-0.015em' }],
+        t24: ['1.5rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
+        t28: ['1.75rem', { lineHeight: '1.1', letterSpacing: '-0.025em' }],
+        t32: ['2rem', { lineHeight: '1.0', letterSpacing: '-0.03em' }],
       },
       spacing: {
-        s4: '4px',
-        s8: '8px',
-        s12: '12px',
-        s16: '16px',
-        s20: '20px',
-        s24: '24px',
-        s32: '32px',
-        s40: '40px',
-        s48: '48px',
+        // 4pt grid — rem units
+        s4: '0.25rem', // 4px
+        s8: '0.5rem', // 8px
+        s12: '0.75rem', // 12px
+        s16: '1rem', // 16px
+        s20: '1.25rem', // 20px
+        s24: '1.5rem', // 24px
+        s32: '2rem', // 32px
+        s40: '2.5rem', // 40px
+        s48: '3rem', // 48px
       },
       borderRadius: {
-        r6: '6px', // badge status booking
-        r8: '8px',
-        r10: '10px', // input, button action, avatar
-        r12: '12px',
-        r14: '14px',
-        r16: '16px', // table container
-        r20: '20px', // stat card, drawer, dialog
-        r24: '24px',
-        r32: '32px',
-        rF: '9999px', // pill badge
+        r6: '0.375rem', // 6px  — badge status booking
+        r8: '0.5rem', // 8px
+        r10: '0.625rem', // 10px — input, button action, avatar
+        r12: '0.75rem', // 12px
+        r14: '0.875rem', // 14px
+        r16: '1rem', // 16px — table container
+        r20: '1.25rem', // 20px — stat card, drawer, dialog
+        r24: '1.5rem', // 24px
+        r32: '2rem', // 32px
+        rF: '9999px', // pill badge — tetap px supaya tidak overflow
       },
       boxShadow: {
         // Legacy
@@ -153,6 +160,7 @@ const config: Config = {
         drawer: '-8px 0 48px rgba(0,0,0,0.18)', // walk-in drawer
         dialog: '0 24px 64px rgba(0,0,0,0.18)', // modals
         tab: '0 1px 4px rgba(0,0,0,0.1)', // tab button aktif
+        dropdown: '0 8px 32px rgba(0,0,0,0.14)', // floating dropdowns
       },
       keyframes: {
         sIn: {

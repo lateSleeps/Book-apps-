@@ -14,6 +14,7 @@ export function useDashboardData() {
     data: rawBookings = [],
     isLoading: isLoadingBookings,
     error: bookingsError,
+    refetch,
   } = trpc.bookings.getBySalon.useQuery({ salonId: SALON_ID }, { enabled: !!SALON_ID });
 
   console.log('[useDashboardData] rawBookings count:', rawBookings.length);
@@ -77,5 +78,13 @@ export function useDashboardData() {
     return bookingsData;
   }, [bookingsData]);
 
-  return { todayBookings, upcomingBookings, allBookings, stats, stylists };
+  return {
+    todayBookings,
+    upcomingBookings,
+    allBookings,
+    stats,
+    stylists,
+    isLoading: isLoadingBookings,
+    refetch,
+  };
 }

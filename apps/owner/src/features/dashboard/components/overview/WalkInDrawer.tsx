@@ -1,0 +1,218 @@
+'use client';
+
+import { X } from '@phosphor-icons/react';
+import React from 'react';
+import type { WalkInFlowState } from '../../hooks/overview/use-walk-in-flow';
+import type { DashboardBooking } from '../../types/dashboard.types';
+import { AddVisitFAB } from './AddVisitFAB';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyService = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyStylist = any;
+import { BarcodeScanner } from './BarcodeScanner';
+import { BookingCodeSection } from './BookingCodeSection';
+import { ServiceSearchDropdown } from './ServiceSearchDropdown';
+import { StylistTimeSelector } from './StylistTimeSelector';
+import { WalkInNamePhoneFields } from './WalkInNamePhoneFields';
+
+interface WalkInDrawerProps extends WalkInFlowState {
+  isMobile: boolean;
+  realServices: AnyService[];
+  realStylists: AnyStylist[];
+  effectiveBookings: DashboardBooking[];
+  bookingStatusMap: Record<string, string>;
+}
+
+export function WalkInDrawer({
+  addDrawer,
+  addDropdownOpen,
+  walkInForm,
+  setWalkInForm,
+  drawerServiceSearch,
+  setDrawerServiceSearch,
+  drawerServiceOpen,
+  setDrawerServiceOpen,
+  expandedStylistSlots,
+  toggleStylistSlots,
+  bookingCodeInput,
+  setBookingCodeInput,
+  barcodeScannerActive,
+  videoRef,
+  canvasRef,
+  startBarcodeScanner,
+  stopBarcodeScanner,
+  closeDrawer,
+  openDrawer,
+  setAddDropdownOpen,
+  submitWalkIn,
+  isMobile,
+  realServices,
+  realStylists,
+  effectiveBookings,
+  bookingStatusMap,
+}: WalkInDrawerProps) {
+  const isSubmitDisabled = !walkInForm.name || !walkInForm.serviceId || !walkInForm.stylistId;
+
+  return (
+    <>
+      {/* ── Side Drawer Panel ───────────────────────────────────────────── */}
+      {addDrawer !== 'CLOSED' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-end p-4">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-[3px]" onClick={closeDrawer} />
+          <div
+            className="shadow-drawer"
+            style={{
+              position: 'relative',
+              zIndex: 10,
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              maxWidth: '28rem',
+              height: '100%',
+              background: 'white',
+              borderRadius: 20,
+              overflow: 'hidden',
+            }}
+          >
+            {/* Header */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '20px 24px 16px',
+                borderBottom: '1px solid #F2F2F7',
+                flexShrink: 0,
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#8E8E93',
+                    margin: '0 0 2px 0',
+                  }}
+                >
+                  Tambah Kunjungan
+                </p>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1C1C1E', margin: 0 }}>
+                  {addDrawer === 'WALK_IN' ? 'Walk-in' : 'Booking Online'}
+                </h3>
+              </div>
+              <button
+                onClick={closeDrawer}
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: '#F2F2F7',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <X size={10} weight="duotone" color="#8E8E93" />
+              </button>
+            </div>
+
+            {/* Form content */}
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 20,
+                overflowY: 'auto',
+                padding: '20px 24px',
+              }}
+            >
+              {addDrawer === 'WALK_IN' && (
+                <>
+                  <WalkInNamePhoneFields walkInForm={walkInForm} setWalkInForm={setWalkInForm} />
+                  <ServiceSearchDropdown
+                    walkInForm={walkInForm}
+                    setWalkInForm={setWalkInForm}
+                    drawerServiceSearch={drawerServiceSearch}
+                    setDrawerServiceSearch={setDrawerServiceSearch}
+                    drawerServiceOpen={drawerServiceOpen}
+                    setDrawerServiceOpen={setDrawerServiceOpen}
+                    realServices={realServices}
+                  />
+                  <StylistTimeSelector
+                    walkInForm={walkInForm}
+                    setWalkInForm={setWalkInForm}
+                    expandedStylistSlots={expandedStylistSlots}
+                    toggleStylistSlots={toggleStylistSlots}
+                    realServices={realServices}
+                    realStylists={realStylists}
+                    effectiveBookings={effectiveBookings}
+                    bookingStatusMap={bookingStatusMap}
+                  />
+                </>
+              )}
+
+              {addDrawer === 'BOOKING' && (
+                <BookingCodeSection
+                  bookingCodeInput={bookingCodeInput}
+                  setBookingCodeInput={setBookingCodeInput}
+                  onScanBarcode={startBarcodeScanner}
+                />
+              )}
+            </div>
+
+            {/* Footer CTA */}
+            {addDrawer === 'WALK_IN' && (
+              <div style={{ padding: '16px 24px', borderTop: '1px solid #F2F2F7', flexShrink: 0 }}>
+                <button
+                  disabled={isSubmitDisabled}
+                  onClick={() => submitWalkIn(realServices, realStylists)}
+                  style={{
+                    width: '100%',
+                    height: 44,
+                    borderRadius: 10,
+                    border: 'none',
+                    background: isSubmitDisabled ? '#F2F2F7' : '#1C1C1E',
+                    color: isSubmitDisabled ? '#C7C7CC' : 'white',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: isSubmitDisabled ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  Tambahkan ke Daftar
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Barcode Scanner Modal ──────────────────────────────────────── */}
+      {barcodeScannerActive && isMobile && (
+        <BarcodeScanner videoRef={videoRef} canvasRef={canvasRef} onClose={stopBarcodeScanner} />
+      )}
+
+      {/* ── Mobile Floating Action Button ─────────────────────────────── */}
+      <AddVisitFAB
+        addDropdownOpen={addDropdownOpen}
+        setAddDropdownOpen={setAddDropdownOpen}
+        isMobile={isMobile}
+        onOpenWalkIn={() => {
+          openDrawer('WALK_IN');
+          setDrawerServiceOpen(false);
+          setDrawerServiceSearch('');
+        }}
+        onOpenBooking={() => {
+          openDrawer('BOOKING');
+          setDrawerServiceOpen(false);
+          setDrawerServiceSearch('');
+        }}
+      />
+    </>
+  );
+}
