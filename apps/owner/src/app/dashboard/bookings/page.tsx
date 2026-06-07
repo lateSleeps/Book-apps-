@@ -11,7 +11,6 @@
 
 import { HistoryFilterBar } from '@/features/dashboard/components/history/HistoryFilterBar';
 import { HistoryHeader } from '@/features/dashboard/components/history/HistoryHeader';
-import { HistoryStatsRow } from '@/features/dashboard/components/history/HistoryStatsRow';
 import { VisitMobileList } from '@/features/dashboard/components/history/VisitMobileList';
 import { VisitTable } from '@/features/dashboard/components/history/VisitTable';
 import { useHistoryController } from '@/features/dashboard/controller/use-history-controller';
@@ -27,7 +26,6 @@ export default function BookingsPage() {
     handleResetFilters,
     visits,
     stylistOptions,
-    stats,
     selectedVisitId,
     selectVisit,
   } = useHistoryController();
@@ -41,8 +39,6 @@ export default function BookingsPage() {
   return (
     <div className="flex flex-col gap-s24 p-s16 md:p-s24">
       <HistoryHeader />
-
-      <HistoryStatsRow {...stats} />
 
       {/* History Content Card — section title + controls + table on one surface */}
       <div className="overflow-hidden rounded-r16 border border-bd-card bg-bg-card shadow-card">

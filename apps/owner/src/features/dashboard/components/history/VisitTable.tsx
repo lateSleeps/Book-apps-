@@ -60,7 +60,7 @@ const VISIT_TYPE_BADGE_CLASSES: Record<string, string> = {
 
 export function VisitTableHeader() {
   return (
-    <div style={GRID_STYLE} className="bg-bg-header px-s20 py-s8">
+    <div style={GRID_STYLE} className="rounded-t-r12 bg-bg-header px-s20 py-s8">
       {COLUMN_HEADERS.map((h, i) => (
         <span
           key={h}
