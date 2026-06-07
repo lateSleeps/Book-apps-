@@ -153,6 +153,8 @@ export function HistoryFilterBar({
       <div className="ml-auto flex items-center gap-s8">
         <PeriodSelector value={period} onChange={onPeriodChange} />
 
+        <div className="h-4 w-px shrink-0 bg-bd-card" />
+
         <div className="relative w-full md:w-[220px]">
           <MagnifyingGlass
             size={14}
