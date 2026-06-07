@@ -24,7 +24,7 @@ import { formatRupiah } from '@/shared/lib/format';
 
 // ── Grid ──────────────────────────────────────────────────────────────────────
 
-const GRID = '1.2fr 2fr 2fr 1fr 1.5fr 1.2fr 1.2fr';
+const GRID = '2.2fr 1.2fr 2fr 1fr 1.5fr 1.2fr 1.2fr';
 const GRID_STYLE = {
   display: 'grid',
   gridTemplateColumns: GRID,
@@ -32,7 +32,7 @@ const GRID_STYLE = {
   alignItems: 'center',
 } as const;
 
-const COLUMN_HEADERS = ['Tanggal', 'Customer', 'Layanan', 'Tipe', 'Stylist', 'Total', 'Pembayaran'];
+const COLUMN_HEADERS = ['Customer', 'Tanggal', 'Layanan', 'Tipe', 'Stylist', 'Total', 'Pembayaran'];
 
 // ── Date formatter ────────────────────────────────────────────────────────────
 
@@ -97,19 +97,23 @@ export function VisitTableRow({ visit: v, isSelected, onClick }: VisitTableRowPr
         isSelected ? 'bg-bg-surface' : ''
       }`}
     >
-      {/* Tanggal */}
-      <span className="text-ts-fn text-tx-subtle">{formatShortDate(v.date)}</span>
-
       {/* Customer */}
-      <div className="flex min-w-0 items-center gap-s8">
+      <div className="flex min-w-0 items-center gap-s12">
         <div
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-r10 text-ts-cap2 font-semibold"
-          style={{ background: bg, color: avatarText }}
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-r10 font-semibold"
+          style={{
+            background: bg,
+            color: avatarText,
+            fontSize: getInitials(v.customerName).length > 1 ? '0.8125rem' : '1rem',
+          }}
         >
           {getInitials(v.customerName)}
         </div>
         <span className="truncate text-ts-fn font-medium text-tx-primary">{v.customerName}</span>
       </div>
+
+      {/* Tanggal */}
+      <span className="text-ts-fn text-tx-subtle">{formatShortDate(v.date)}</span>
 
       {/* Layanan */}
       <span className="truncate text-ts-fn text-tx-subtle">{v.serviceName}</span>

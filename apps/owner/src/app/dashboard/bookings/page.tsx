@@ -46,8 +46,8 @@ export default function BookingsPage() {
 
       {/* History Content Card — section title + controls + table on one surface */}
       <div className="overflow-hidden rounded-r16 border border-bd-card bg-bg-card shadow-card">
-        {/* Card header: section title left, controls right */}
-        <div className="flex flex-col gap-s12 border-b border-bd-card px-s16 py-s16 md:flex-row md:items-center md:justify-between md:px-s20">
+        {/* Card header: title on top, filters row below */}
+        <div className="flex flex-col gap-s12 border-b border-bd-card px-s16 py-s16 md:px-s20">
           <h2 className="m-0 text-ts-t2 font-bold text-tx-primary">Riwayat Kunjungan Pelanggan</h2>
           <HistoryFilterBar
             searchQuery={searchQuery}

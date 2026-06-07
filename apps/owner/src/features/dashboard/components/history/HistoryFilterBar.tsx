@@ -118,22 +118,6 @@ export function HistoryFilterBar({
 
   return (
     <div className="flex flex-wrap items-center gap-s8">
-      {/* Search */}
-      <div className="relative w-full md:w-[340px]">
-        <MagnifyingGlass
-          size={14}
-          weight="duotone"
-          className="pointer-events-none absolute left-s12 top-1/2 -translate-y-1/2 text-tx-secondary"
-        />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Cari customer atau layanan..."
-          className="h-9 w-full rounded-r10 border border-bd-card bg-bg-input pl-s32 pr-s12 text-ts-fn text-tx-primary transition-colors placeholder:text-tx-muted hover:bg-bg-hover focus:outline-none"
-        />
-      </div>
-
       {/* Period */}
       <PeriodSelector value={period} onChange={onPeriodChange} />
 
@@ -167,6 +151,22 @@ export function HistoryFilterBar({
           Reset
         </button>
       )}
+
+      {/* Search — rightmost */}
+      <div className="relative ml-auto w-full md:w-[340px]">
+        <MagnifyingGlass
+          size={14}
+          weight="duotone"
+          className="pointer-events-none absolute left-s12 top-1/2 -translate-y-1/2 text-tx-secondary"
+        />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Cari customer atau layanan..."
+          className="h-9 w-full rounded-r10 border border-bd-card bg-bg-input pl-s32 pr-s12 text-ts-fn text-tx-primary transition-colors placeholder:text-tx-muted hover:bg-bg-hover focus:outline-none"
+        />
+      </div>
     </div>
   );
 }
