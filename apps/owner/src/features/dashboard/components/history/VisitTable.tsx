@@ -116,7 +116,7 @@ export function VisitTableRow({ visit: v, isSelected, onClick }: VisitTableRowPr
 
       {/* Tipe */}
       <span
-        className={`inline-flex items-center rounded-rF px-s8 py-1 text-ts-cap2 font-semibold ${VISIT_TYPE_BADGE_CLASSES[v.visitType]}`}
+        className={`inline-flex w-fit items-center rounded-rF px-s8 py-1 text-ts-cap2 font-semibold ${VISIT_TYPE_BADGE_CLASSES[v.visitType]}`}
       >
         {vm.label}
       </span>
@@ -131,7 +131,7 @@ export function VisitTableRow({ visit: v, isSelected, onClick }: VisitTableRowPr
 
       {/* Pembayaran */}
       <span
-        className={`inline-flex items-center rounded-rF px-s8 py-1 text-ts-cap2 font-semibold ${PAYMENT_BADGE_CLASSES[v.paymentStatus]}`}
+        className={`inline-flex w-fit items-center rounded-rF px-s8 py-1 text-ts-cap2 font-semibold ${PAYMENT_BADGE_CLASSES[v.paymentStatus]}`}
       >
         {pm.label}
       </span>
@@ -155,7 +155,7 @@ export function VisitTable({
   onRowClick,
 }: VisitTableProps) {
   return (
-    <div className="hidden overflow-hidden rounded-r16 border border-bd-card bg-bg-card shadow-card md:block">
+    <div className="hidden md:block">
       <VisitTableHeader />
       {visits.length === 0 ? (
         <HistoryEmptyState hasActiveFilters={hasActiveFilters} />

@@ -40,37 +40,41 @@ export default function BookingsPage() {
 
   return (
     <div className="flex flex-col gap-s24 p-s16 md:p-s24">
-      <HistoryHeader
-        period={period}
-        onPeriodChange={setPeriod}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
+      <HistoryHeader />
 
       <HistoryStatsRow {...stats} />
 
-      <HistoryFilterBar
-        filters={filters}
-        stylistOptions={stylistOptions}
-        onFilterChange={handleFilterChange}
-        onResetFilters={handleResetFilters}
-      />
+      {/* History Content Card — filters + table in one surface */}
+      <div className="overflow-hidden rounded-r16 border border-bd-card bg-bg-card shadow-card">
+        <div className="border-b border-bd-card px-s16 py-s12 md:px-s20">
+          <HistoryFilterBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            period={period}
+            onPeriodChange={setPeriod}
+            filters={filters}
+            stylistOptions={stylistOptions}
+            onFilterChange={handleFilterChange}
+            onResetFilters={handleResetFilters}
+          />
+        </div>
 
-      {/* Desktop */}
-      <VisitTable
-        visits={visits}
-        selectedVisitId={selectedVisitId}
-        hasActiveFilters={hasActiveFilters}
-        onRowClick={selectVisit}
-      />
+        {/* Desktop */}
+        <VisitTable
+          visits={visits}
+          selectedVisitId={selectedVisitId}
+          hasActiveFilters={hasActiveFilters}
+          onRowClick={selectVisit}
+        />
 
-      {/* Mobile */}
-      <VisitMobileList
-        visits={visits}
-        selectedVisitId={selectedVisitId}
-        hasActiveFilters={hasActiveFilters}
-        onCardClick={selectVisit}
-      />
+        {/* Mobile */}
+        <VisitMobileList
+          visits={visits}
+          selectedVisitId={selectedVisitId}
+          hasActiveFilters={hasActiveFilters}
+          onCardClick={selectVisit}
+        />
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 /**
  * @responsibility
- * Secondary filter bar for Riwayat Kunjungan.
- * Contains: visit type filter, stylist filter, payment status filter.
+ * Unified filter bar for Riwayat Kunjungan.
+ * Contains: search, period, visit type, stylist, payment status.
  *
  * @usedBy
  * app/dashboard/bookings/page.tsx
@@ -9,23 +9,20 @@
  * @notes
  * - Presentation only — no local state.
  * - All filter state owned by parent.
- * - Horizontally scrollable on mobile.
- * - Period filter lives in HistoryHeader (primary control).
+ * - Desktop: single row. Mobile: stacks vertically.
  */
 
 'use client';
 
-import { CaretDown } from '@phosphor-icons/react';
+import { CaretDown, MagnifyingGlass } from '@phosphor-icons/react';
 import type {
   HistoryFilters,
   HistoryPaymentFilter,
+  HistoryPeriodPreset,
   HistoryStylistFilter,
   HistoryVisitTypeFilter,
 } from '../../types/history.types';
-
-// ── Mock stylist list — replace with real data in Phase 3B ───────────────────
-
-const MOCK_STYLISTS = ['Dewi', 'Rina', 'Sari', 'Budi'];
+import { PeriodSelector } from './PeriodSelector';
 
 // ── Filter option types ───────────────────────────────────────────────────────
 
@@ -45,11 +42,6 @@ const PAYMENT_OPTIONS: FilterOption<HistoryPaymentFilter>[] = [
   { value: 'PAID', label: 'Lunas' },
   { value: 'DEPOSIT', label: 'DP' },
   { value: 'UNPAID', label: 'Belum Bayar' },
-];
-
-const STYLIST_OPTIONS: FilterOption<HistoryStylistFilter>[] = [
-  { value: 'ALL', label: 'Semua Stylist' },
-  ...MOCK_STYLISTS.map((s) => ({ value: s, label: s })),
 ];
 
 // ── FilterSelect ──────────────────────────────────────────────────────────────
@@ -94,38 +86,79 @@ function FilterSelect<T extends string>({
 // ── HistoryFilterBar ──────────────────────────────────────────────────────────
 
 interface HistoryFilterBarProps {
+  searchQuery: string;
+  onSearchChange: (q: string) => void;
+  period: HistoryPeriodPreset;
+  onPeriodChange: (p: HistoryPeriodPreset) => void;
   filters: HistoryFilters;
+  stylistOptions: string[];
   onFilterChange: <K extends keyof HistoryFilters>(key: K, value: HistoryFilters[K]) => void;
   onResetFilters: () => void;
 }
 
 export function HistoryFilterBar({
+  searchQuery,
+  onSearchChange,
+  period,
+  onPeriodChange,
   filters,
+  stylistOptions,
   onFilterChange,
   onResetFilters,
 }: HistoryFilterBarProps) {
+  const stylistSelectOptions: FilterOption<HistoryStylistFilter>[] = [
+    { value: 'ALL', label: 'Semua Stylist' },
+    ...stylistOptions.map((s) => ({ value: s, label: s })),
+  ];
   const hasActiveFilters =
-    filters.visitType !== 'ALL' || filters.stylistId !== 'ALL' || filters.paymentStatus !== 'ALL';
+    filters.visitType !== 'ALL' ||
+    filters.stylistId !== 'ALL' ||
+    filters.paymentStatus !== 'ALL' ||
+    searchQuery.trim().length > 0;
 
   return (
-    <div className="flex items-center gap-s8 overflow-x-auto scrollbar-hide">
+    <div className="flex flex-col gap-s8 md:flex-row md:flex-wrap md:items-center">
+      {/* Search */}
+      <div className="relative min-w-[180px] flex-1">
+        <MagnifyingGlass
+          size={14}
+          weight="duotone"
+          className="pointer-events-none absolute left-s12 top-1/2 -translate-y-1/2 text-tx-secondary"
+        />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Cari customer atau layanan..."
+          className="h-9 w-full rounded-r10 border border-bd-card bg-bg-input pl-s32 pr-s12 text-ts-fn text-tx-primary transition-colors placeholder:text-tx-muted hover:bg-bg-hover focus:outline-none"
+        />
+      </div>
+
+      {/* Period */}
+      <PeriodSelector value={period} onChange={onPeriodChange} />
+
+      {/* Visit type */}
       <FilterSelect
         value={filters.visitType}
         options={VISIT_TYPE_OPTIONS}
         onChange={(v) => onFilterChange('visitType', v)}
       />
+
+      {/* Stylist */}
       <FilterSelect
         value={filters.stylistId}
-        options={STYLIST_OPTIONS}
+        options={stylistSelectOptions}
         onChange={(v) => onFilterChange('stylistId', v)}
       />
+
+      {/* Payment */}
       <FilterSelect
         value={filters.paymentStatus}
         options={PAYMENT_OPTIONS}
         onChange={(v) => onFilterChange('paymentStatus', v)}
       />
 
-      {/* Reset button — only visible when a filter is active */}
+      {/* Reset — visible only when a filter is active */}
       {hasActiveFilters && (
         <button
           onClick={onResetFilters}
