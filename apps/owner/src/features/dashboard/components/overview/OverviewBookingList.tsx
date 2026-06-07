@@ -38,19 +38,9 @@ export function OverviewBookingList({
   return (
     <>
       {/* ── Desktop booking table ──────────────────────────────────────── */}
-      <div
-        className="hidden flex-col md:flex"
-        style={{
-          backgroundColor: '#FFFFFF',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-          borderRadius: 16,
-          padding: '0 0 4px',
-        }}
-      >
-        <div style={{ padding: '20px 20px 0' }}>
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1C1C1E', margin: 0 }}>
-            List kunjungan
-          </h2>
+      <div className="hidden flex-col overflow-hidden rounded-r16 bg-bg-card pb-s4 shadow-card md:flex">
+        <div className="px-s20 pt-s20">
+          <h2 className="m-0 text-ts-t2 font-bold text-tx-primary">List kunjungan</h2>
         </div>
         <BookingTableHeader list={list} onRefresh={refreshData} isRefreshing={isRefreshing} />
         <BookingRowColumnHeaders />

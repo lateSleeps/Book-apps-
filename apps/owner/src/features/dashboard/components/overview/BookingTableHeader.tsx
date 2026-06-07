@@ -10,9 +10,7 @@ const CTRL_BTN_BASE = {
   alignItems: 'center',
   height: 32,
   borderRadius: 8,
-  background: '#F2F2F7',
   border: 'none',
-  color: '#3C3C43',
 } as const;
 
 const TABS: { key: VisitorTab; label: string }[] = [
@@ -50,13 +48,13 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
     >
       {/* Segmented tabs — marginLeft:-4 compensates inner padding so text aligns with column headers */}
       <div
+        className="bg-bg-control"
         style={{
           display: 'inline-flex',
           alignItems: 'center',
           gap: 2,
           borderRadius: 12,
           padding: 4,
-          backgroundColor: '#F2F2F7',
           marginLeft: -4,
         }}
       >
@@ -67,23 +65,19 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
             <div key={key} style={{ position: 'relative' }}>
               <button
                 onClick={() => list.setActiveTab(key)}
+                className={`text-ts-fn transition-all duration-150 ${active ? 'bg-bg-card font-semibold text-tx-primary shadow-tab' : 'font-normal text-tx-secondary'}`}
                 style={{
                   whiteSpace: 'nowrap',
                   padding: '6px 14px',
                   borderRadius: 10,
                   border: 'none',
                   cursor: 'pointer',
-                  fontSize: 13,
-                  fontWeight: active ? 600 : 400,
-                  transition: 'all 0.15s',
-                  backgroundColor: active ? '#FFFFFF' : 'transparent',
-                  color: active ? '#1C1C1E' : '#8E8E93',
-                  boxShadow: active ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
                 }}
               >
                 {label}
                 <span
-                  style={{ marginLeft: 5, fontSize: 11, color: active ? '#8E8E93' : '#C7C7CC' }}
+                  className={`text-ts-cap2 ${active ? 'text-tx-secondary' : 'text-tx-muted'}`}
+                  style={{ marginLeft: 5 }}
                 >
                   {list.bookingCounts[key]}
                 </span>
@@ -105,6 +99,7 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
           onClick={onRefresh}
           disabled={isRefreshing}
           title="Refresh data"
+          className="bg-bg-control text-tx-control"
           style={{
             ...CTRL_BTN_BASE,
             justifyContent: 'center',
@@ -117,7 +112,7 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
           <ArrowClockwise
             size={14}
             weight="duotone"
-            color="#3C3C43"
+            className="text-tx-control"
             style={{ animation: isRefreshing ? 'spin 1s linear infinite' : 'none' }}
           />
         </button>
@@ -125,13 +120,12 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
         {/* Sort button */}
         <button
           onClick={() => list.setSortOrder(list.sortOrder === 'ASC' ? 'DESC' : 'ASC')}
+          className="bg-bg-control text-ts-fn font-medium text-tx-control"
           style={{
             ...CTRL_BTN_BASE,
             gap: 6,
             padding: '0 12px',
             cursor: 'pointer',
-            fontSize: 13,
-            fontWeight: 500,
           }}
         >
           <svg
@@ -161,6 +155,7 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
 
         {/* Search */}
         <div
+          className="bg-bg-control"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -168,24 +163,17 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
             height: 36,
             padding: '0 12px',
             borderRadius: 10,
-            background: '#F2F2F7',
             width: 220,
           }}
         >
-          <MagnifyingGlass size={14} weight="duotone" color="#8E8E93" style={{ flexShrink: 0 }} />
+          <MagnifyingGlass size={14} weight="duotone" className="shrink-0 text-tx-secondary" />
           <input
             type="text"
             placeholder="Cari pelanggan..."
             value={list.searchQuery}
             onChange={(e) => list.setSearchQuery(e.target.value)}
-            style={{
-              flex: 1,
-              background: 'none',
-              border: 'none',
-              outline: 'none',
-              fontSize: 13,
-              color: '#1C1C1E',
-            }}
+            className="flex-1 bg-transparent text-ts-fn text-tx-primary outline-none"
+            style={{ border: 'none' }}
           />
           {list.searchQuery && (
             <button
@@ -198,7 +186,7 @@ export function BookingTableHeader({ list, onRefresh, isRefreshing }: BookingTab
                 display: 'flex',
               }}
             >
-              <X size={12} weight="duotone" color="#8E8E93" />
+              <X size={12} weight="duotone" className="text-tx-secondary" />
             </button>
           )}
         </div>

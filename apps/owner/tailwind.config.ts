@@ -39,6 +39,7 @@ const config: Config = {
         'bg-control': '#F2F2F7', // segmented tab container, icon buttons
         'bg-input': '#F9F9FB', // secondary button, input bg
         'bg-hover': '#F5F5F7', // list item / row hover state
+        'bg-row-selected': '#fafaf8', // selected table row background
 
         // Text
         'tx-primary': '#1C1C1E', // judul, angka, nama customer (iOS label)

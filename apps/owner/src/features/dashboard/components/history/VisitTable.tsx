@@ -94,7 +94,7 @@ export function VisitTableRow({ visit: v, isSelected, onClick }: VisitTableRowPr
       onKeyDown={(e) => e.key === 'Enter' && onClick()}
       style={GRID_STYLE}
       className={`cursor-pointer border-b border-bd-row px-s20 py-s12 transition-colors hover:bg-bg-hover focus:outline-none focus-visible:bg-bg-hover ${
-        isSelected ? 'bg-bg-surface' : ''
+        isSelected ? 'bg-bg-row-selected' : ''
       }`}
     >
       {/* Customer */}

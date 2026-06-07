@@ -32,43 +32,14 @@ interface CountCardProps {
 
 function CountCard({ title, value, icon }: CountCardProps) {
   return (
-    <div
-      className="shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
-      style={{
-        backgroundColor: '#FFFFFF',
-        border: '1px solid #E5E5EA',
-        borderRadius: '1.25rem',
-        padding: '1.25rem',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          marginBottom: '0.75rem',
-        }}
-      >
-        <p
-          style={{
-            fontSize: '0.6875rem',
-            fontWeight: 600,
-            letterSpacing: '0.07em',
-            textTransform: 'uppercase',
-            color: '#8E8E93',
-            margin: 0,
-          }}
-        >
+    <div className="flex flex-col justify-between rounded-r20 border border-bd-card bg-bg-card p-s20 shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+      <div className="mb-3 flex items-start justify-between">
+        <p className="m-0 text-ts-cap2 font-semibold uppercase tracking-[0.07em] text-tx-secondary">
           {title}
         </p>
         {icon}
       </div>
-      <p
-        style={{ fontSize: '2.25rem', fontWeight: 700, color: '#1C1C1E', lineHeight: 1, margin: 0 }}
-      >
+      <p className="m-0 font-bold leading-none text-tx-primary" style={{ fontSize: '2.25rem' }}>
         {value}
       </p>
     </div>
@@ -254,49 +225,14 @@ export function StatCardsRow({ stats, allBookings }: StatCardsRowProps) {
       />
 
       {/* Pembatalan */}
-      <div
-        className="shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
-        style={{
-          backgroundColor: '#FFFFFF',
-          border: '1px solid #E5E5EA',
-          borderRadius: '1.25rem',
-          padding: '1.25rem',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            marginBottom: '0.75rem',
-          }}
-        >
-          <p
-            style={{
-              fontSize: '0.6875rem',
-              fontWeight: 600,
-              letterSpacing: '0.07em',
-              textTransform: 'uppercase',
-              color: '#8E8E93',
-              margin: 0,
-            }}
-          >
+      <div className="flex flex-col justify-between rounded-r20 border border-bd-card bg-bg-card p-s20 shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+        <div className="mb-3 flex items-start justify-between">
+          <p className="m-0 text-ts-cap2 font-semibold uppercase tracking-[0.07em] text-tx-secondary">
             Pembatalan
           </p>
           <XCircle size={26} weight="duotone" color="#FF3B30" />
         </div>
-        <p
-          style={{
-            fontSize: '2.25rem',
-            fontWeight: 700,
-            color: '#FF3B30',
-            lineHeight: 1,
-            margin: 0,
-          }}
-        >
+        <p className="m-0 font-bold leading-none" style={{ fontSize: '2.25rem', color: '#FF3B30' }}>
           {cancelledCount}
         </p>
       </div>

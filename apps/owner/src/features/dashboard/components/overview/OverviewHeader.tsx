@@ -29,7 +29,7 @@ export function OverviewHeader({ greeting, userName, isMobile, walkIn }: Overvie
         </div>
 
         {/* Greeting */}
-        <h1 className="m-0 text-t32 font-bold leading-tight text-tx-primary">
+        <h1 className="m-0 text-ts-hero font-bold leading-tight text-tx-primary">
           {greeting || 'Halo'}, {userName} 👋
         </h1>
       </div>
