@@ -62,7 +62,7 @@ function FilterSelect<T extends string>({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as T)}
-        className={`h-9 cursor-pointer appearance-none rounded-r10 border pl-s12 pr-s32 text-ts-fn transition-colors focus:outline-none ${
+        className={`h-8 cursor-pointer appearance-none rounded-r10 border pl-s12 pr-s32 text-ts-fn transition-colors focus:outline-none ${
           isActive
             ? 'border-ac-primary bg-bg-card font-semibold text-ac-primary'
             : 'border-bd-card bg-bg-input font-medium text-tx-subtle hover:bg-bg-hover'
@@ -118,9 +118,6 @@ export function HistoryFilterBar({
 
   return (
     <div className="flex flex-wrap items-center gap-s8">
-      {/* Period */}
-      <PeriodSelector value={period} onChange={onPeriodChange} />
-
       {/* Visit type */}
       <FilterSelect
         value={filters.visitType}
@@ -152,20 +149,24 @@ export function HistoryFilterBar({
         </button>
       )}
 
-      {/* Search — rightmost */}
-      <div className="relative ml-auto w-full md:w-[340px]">
-        <MagnifyingGlass
-          size={14}
-          weight="duotone"
-          className="pointer-events-none absolute left-s12 top-1/2 -translate-y-1/2 text-tx-secondary"
-        />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Cari customer atau layanan..."
-          className="h-9 w-full rounded-r10 border border-bd-card bg-bg-input pl-s32 pr-s12 text-ts-fn text-tx-primary transition-colors placeholder:text-tx-muted hover:bg-bg-hover focus:outline-none"
-        />
+      {/* Period + Search — rightmost pair */}
+      <div className="ml-auto flex items-center gap-s8">
+        <PeriodSelector value={period} onChange={onPeriodChange} />
+
+        <div className="relative w-full md:w-[220px]">
+          <MagnifyingGlass
+            size={14}
+            weight="duotone"
+            className="pointer-events-none absolute left-s12 top-1/2 -translate-y-1/2 text-tx-secondary"
+          />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Cari pelanggan..."
+            className="h-9 w-full rounded-r10 border border-bd-card bg-bg-input pl-s32 pr-s12 text-ts-fn text-tx-primary transition-colors placeholder:text-tx-muted hover:bg-bg-hover focus:outline-none"
+          />
+        </div>
       </div>
     </div>
   );

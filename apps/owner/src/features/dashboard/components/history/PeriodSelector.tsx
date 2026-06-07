@@ -45,7 +45,7 @@ export function PeriodSelector({ value, onChange }: PeriodSelectorProps) {
     <div ref={ref} className="relative shrink-0">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex h-9 items-center gap-s8 rounded-r10 border border-bd-card bg-bg-input px-s12 text-ts-fn font-medium text-tx-primary transition-colors hover:bg-bg-hover"
+        className="flex h-8 items-center gap-s8 rounded-r10 border border-bd-card bg-bg-input px-s12 text-ts-fn font-medium text-tx-primary transition-colors hover:bg-bg-hover"
       >
         <CalendarBlank size={14} weight="duotone" className="text-tx-secondary" />
         <span>{currentLabel}</span>
