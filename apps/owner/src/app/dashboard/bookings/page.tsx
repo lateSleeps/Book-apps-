@@ -48,7 +48,7 @@ export default function BookingsPage() {
         </div>
 
         {/* Filter row — py-s16 (matches Overview BookingTableHeader 'padding: 16px 20px 16px') */}
-        <div className="border-b border-bd-card px-s16 py-s16 md:px-s20">
+        <div className="px-s16 py-s16 md:px-s20">
           <HistoryFilterBar
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
