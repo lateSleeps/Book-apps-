@@ -4,57 +4,39 @@
  * Riwayat Kunjungan - Visit & Transaction Archive
  * Route: /dashboard/bookings
  *
- * This page is the archive and intelligence center for past visits.
- * It does NOT duplicate Overview's operational responsibilities.
- *
- * Architecture: thin page shell - no business logic here.
- * Phase 3A: foundation layout (header, stats, filters).
- * Phase 3B: VisitTable + CustomerDetailPanel.
+ * Thin shell. All state and logic lives in useHistoryController.
+ * Phase 3B complete: VisitTable (desktop) + VisitMobileList (mobile).
+ * Phase 4 will add CustomerDetailPanel for row tap/click.
  */
 
-import { useCallback, useState } from 'react';
 import { HistoryFilterBar } from '@/features/dashboard/components/history/HistoryFilterBar';
 import { HistoryHeader } from '@/features/dashboard/components/history/HistoryHeader';
 import { HistoryStatsRow } from '@/features/dashboard/components/history/HistoryStatsRow';
-import type {
-  HistoryFilters,
-  HistoryPeriodPreset,
-  HistoryStats,
-} from '@/features/dashboard/types/history.types';
-
-// ── Mock stats - replace with use-history-stats hook in Phase 3B ──────────────
-
-const MOCK_STATS: HistoryStats = {
-  totalVisits: 127,
-  totalRevenue: 8_400_000,
-  bookingCount: 84,
-  walkInCount: 43,
-  avgTicket: 66_142,
-};
-
-const DEFAULT_FILTERS: HistoryFilters = {
-  visitType: 'ALL',
-  stylistId: 'ALL',
-  paymentStatus: 'ALL',
-};
-
-// ── Page ──────────────────────────────────────────────────────────────────────
+import { VisitMobileList } from '@/features/dashboard/components/history/VisitMobileList';
+import { VisitTable } from '@/features/dashboard/components/history/VisitTable';
+import { useHistoryController } from '@/features/dashboard/controller/use-history-controller';
 
 export default function BookingsPage() {
-  const [period, setPeriod] = useState<HistoryPeriodPreset>('THIS_MONTH');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<HistoryFilters>(DEFAULT_FILTERS);
+  const {
+    period,
+    setPeriod,
+    searchQuery,
+    setSearchQuery,
+    filters,
+    handleFilterChange,
+    handleResetFilters,
+    visits,
+    stylistOptions,
+    stats,
+    selectedVisitId,
+    selectVisit,
+  } = useHistoryController();
 
-  const handleFilterChange = useCallback(
-    <K extends keyof HistoryFilters>(key: K, value: HistoryFilters[K]) => {
-      setFilters((prev) => ({ ...prev, [key]: value }));
-    },
-    []
-  );
-
-  const handleResetFilters = useCallback(() => {
-    setFilters(DEFAULT_FILTERS);
-  }, []);
+  const hasActiveFilters =
+    filters.visitType !== 'ALL' ||
+    filters.stylistId !== 'ALL' ||
+    filters.paymentStatus !== 'ALL' ||
+    searchQuery.trim().length > 0;
 
   return (
     <div className="flex flex-col gap-s24 p-s16 md:p-s24">
@@ -65,18 +47,30 @@ export default function BookingsPage() {
         onSearchChange={setSearchQuery}
       />
 
-      <HistoryStatsRow {...MOCK_STATS} />
+      <HistoryStatsRow {...stats} />
 
       <HistoryFilterBar
         filters={filters}
+        stylistOptions={stylistOptions}
         onFilterChange={handleFilterChange}
         onResetFilters={handleResetFilters}
       />
 
-      {/* Phase 3B: VisitTable goes here */}
-      <div className="flex min-h-[320px] items-center justify-center rounded-r16 border border-bd-card bg-bg-card shadow-card">
-        <p className="text-ts-fn text-tx-muted">Tabel kunjungan - Phase 3B</p>
-      </div>
+      {/* Desktop */}
+      <VisitTable
+        visits={visits}
+        selectedVisitId={selectedVisitId}
+        hasActiveFilters={hasActiveFilters}
+        onRowClick={selectVisit}
+      />
+
+      {/* Mobile */}
+      <VisitMobileList
+        visits={visits}
+        selectedVisitId={selectedVisitId}
+        hasActiveFilters={hasActiveFilters}
+        onCardClick={selectVisit}
+      />
     </div>
   );
 }
