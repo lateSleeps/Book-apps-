@@ -1,7 +1,7 @@
 'use client';
 
 import { CheckCircle, Image as ImageIcon, Tag } from '@phosphor-icons/react';
-import { PAYMENT_STATUS_META } from '../../constants/overview/booking-status';
+import { PAYMENT_STATUS_META } from '../../constants/domain/payment-status';
 import type { BookingPromoState } from '../../hooks/overview/use-booking-promo';
 import type { DashboardBooking } from '../../types/dashboard.types';
 import { formatRupiah } from '@/shared/lib/format';

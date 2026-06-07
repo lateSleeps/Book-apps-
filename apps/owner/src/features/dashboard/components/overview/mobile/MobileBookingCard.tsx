@@ -15,7 +15,8 @@
 
 'use client';
 
-import { BOOKING_STATUS_META, VISITOR_TYPE_META } from '../../../constants/overview/booking-status';
+import { BOOKING_STATUS_META } from '../../../constants/domain/booking-status';
+import { VISITOR_TYPE_META } from '../../../constants/domain/visitor-type';
 import type { DashboardBooking, BookingStatus } from '../../../types/dashboard.types';
 import { avatarColor, getInitials } from '@/shared/lib/avatar';
 

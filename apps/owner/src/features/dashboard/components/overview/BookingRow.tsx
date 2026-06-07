@@ -16,12 +16,10 @@
 'use client';
 
 import { Trash } from '@phosphor-icons/react';
-import {
-  BOOKING_STATUS_META,
-  PAYMENT_STATUS_META,
-  VISITOR_TYPE_META,
-  UPCOMING_NOTIF_COLOR,
-} from '../../constants/overview/booking-status';
+import { BOOKING_STATUS_META } from '../../constants/domain/booking-status';
+import { PAYMENT_STATUS_META } from '../../constants/domain/payment-status';
+import { VISITOR_TYPE_META } from '../../constants/domain/visitor-type';
+import { UPCOMING_NOTIF_COLOR } from '../../constants/overview/booking-status';
 import type { DashboardBooking, BookingStatus } from '../../types/dashboard.types';
 import { SkeletonRow } from '@/components/SkeletonLoader';
 import { avatarColor, getInitials } from '@/shared/lib/avatar';

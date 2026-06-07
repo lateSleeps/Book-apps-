@@ -1,65 +1,17 @@
 /**
  * Design Tokens — Firalink Owner Dashboard
  *
- * Konstanta JS untuk dipakai di:
- * - Komponen yang butuh value dinamis (e.g. Phosphor icon color)
- * - Logic yang compute warna berdasarkan data
+ * JS constants for use in:
+ * - Components that need dynamic color values (e.g. Phosphor icon color props)
+ * - Logic that computes colors from data
  *
- * Untuk className Tailwind, gunakan token di tailwind.config.ts langsung.
+ * For Tailwind className usage, use tokens in tailwind.config.ts directly.
  * Docs: docs/design-system/tokens.md
+ *
+ * @notes
+ * Business domain metadata (booking status, payment status, visitor type)
+ * lives in features/dashboard/constants/domain/ — not here.
  */
-
-// ── Booking Status ────────────────────────────────────────────────────────────
-
-import type {
-  BookingStatus,
-  PaymentStatus,
-  VisitorType,
-} from '@/features/dashboard/types/dashboard.types';
-
-export interface StatusMeta {
-  label: string;
-  color: string; // text color
-  bg: string; // background color
-}
-
-export const BOOKING_STATUS_META: Record<BookingStatus, StatusMeta> = {
-  UPCOMING: { label: 'Perlu Konfirmasi', color: '#d97706', bg: '#fffbeb' },
-  CONFIRMED: { label: 'Terkonfirmasi', color: '#2563eb', bg: '#eff6ff' },
-  IN_PROGRESS: { label: 'Berlangsung', color: '#16a34a', bg: '#f0fdf4' },
-  COMPLETED: { label: 'Selesai', color: '#9ca3af', bg: '#f9fafb' },
-  CANCELLED: { label: 'Dibatalkan', color: '#ef4444', bg: '#fef2f2' },
-  NO_SHOW: { label: 'Tidak Hadir', color: '#9ca3af', bg: '#f9fafb' },
-};
-
-/** Warna dot notifikasi badge di avatar — hanya UPCOMING */
-export const UPCOMING_DOT_COLOR = '#f59e0b';
-
-// ── Payment Status ────────────────────────────────────────────────────────────
-
-export interface PaymentMeta {
-  label: string;
-  color: string;
-}
-
-export const PAYMENT_STATUS_META: Record<NonNullable<PaymentStatus>, PaymentMeta> = {
-  PAID: { label: 'Lunas', color: '#34C759' },
-  DEPOSIT: { label: 'DP', color: '#FF9500' },
-  UNPAID: { label: 'Belum Bayar', color: '#8E8E93' },
-};
-
-// ── Visitor Type ──────────────────────────────────────────────────────────────
-
-export interface VisitorTypeMeta {
-  label: string;
-  color: string;
-  bg: string;
-}
-
-export const VISITOR_TYPE_META: Record<VisitorType, VisitorTypeMeta> = {
-  WALK_IN: { label: 'Walk-in', color: '#856404', bg: '#FEF3C7' },
-  BOOKING: { label: 'Booking', color: '#1565C0', bg: '#DBEAFE' },
-};
 
 // ── Avatar ────────────────────────────────────────────────────────────────────
 
