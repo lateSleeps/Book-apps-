@@ -117,9 +117,9 @@ export function HistoryFilterBar({
     searchQuery.trim().length > 0;
 
   return (
-    <div className="flex flex-col gap-s8 md:flex-row md:flex-wrap md:items-center">
+    <div className="flex flex-wrap items-center gap-s8">
       {/* Search */}
-      <div className="relative min-w-[180px] flex-1">
+      <div className="relative w-full md:w-[340px]">
         <MagnifyingGlass
           size={14}
           weight="duotone"
