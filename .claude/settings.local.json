@@ -195,7 +195,32 @@
       "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://mezitgxxjbujitpanmnr.supabase.co\" NEXT_PUBLIC_SUPABASE_ANON_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1leml0Z3h4amJ1aml0cGFubW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2ODg1ODAsImV4cCI6MjA5NTI2NDU4MH0.Fh4V3CdpeEDajuaM7iZW_W-4AEmM9aJQcJDr6m_djos\" node seed-bookings.js)",
       "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://mezitgxxjbujitpanmnr.supabase.co\" NEXT_PUBLIC_SUPABASE_ANON_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1leml0Z3h4amJ1aml0cGFubW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2ODg1ODAsImV4cCI6MjA5NTI2NDU4MH0.Fh4V3CdpeEDajuaM7iZW_W-4AEmM9aJQcJDr6m_djos\" node check-data.js)",
       "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://mezitgxxjbujitpanmnr.supabase.co\" NEXT_PUBLIC_SUPABASE_ANON_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1leml0Z3h4amJ1aml0cGFubW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2ODg1ODAsImV4cCI6MjA5NTI2NDU4MH0.Fh4V3CdpeEDajuaM7iZW_W-4AEmM9aJQcJDr6m_djos\" node seed-complete.js)",
-      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://mezitgxxjbujitpanmnr.supabase.co\" SUPABASE_SERVICE_ROLE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1leml0Z3h4amJ1aml0cGFubW5yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTY4ODU4MCwiZXhwIjoyMDk1MjY0NTgwfQ.MK-Y35W2pbmY6t_ZYQ2gGHxrtrsgpYdpVvOA9IhK1Tg\" node seed-with-service-role.js)"
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://mezitgxxjbujitpanmnr.supabase.co\" SUPABASE_SERVICE_ROLE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1leml0Z3h4amJ1aml0cGFubW5yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTY4ODU4MCwiZXhwIjoyMDk1MjY0NTgwfQ.MK-Y35W2pbmY6t_ZYQ2gGHxrtrsgpYdpVvOA9IhK1Tg\" node seed-with-service-role.js)",
+      "Bash(gh pr create --title 'feat\\(owner\\): Step 10–11 overview module refactor — design system, structural cleanup & icon standardization' --body ' *)",
+      "Bash(brew list *)",
+      "Bash(printenv)",
+      "Bash(brew install *)",
+      "Bash(/opt/homebrew/bin/brew install *)",
+      "Bash(find /usr/local /opt /Users/faqihshalihanmuflihun -name 'brew' -maxdepth 5 2>/dev/null | head -3)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://api.github.com/repos/lateSleeps/Book-apps-)",
+      "Bash(curl -s \"https://api.github.com/repos/lateSleeps/Book-apps-/pulls?head=lateSleeps:feat/clean-overview&state=open\")",
+      "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); print\\(data[0]['html_url'] if data else 'none'\\)\")",
+      "Bash(security find-internet-password *)",
+      "Bash(curl -s -w '\\\\n%{http_code}' -H 'Authorization: token __TRACKED_VAR__' -H 'Accept: application/vnd.github+json' -X POST https://api.github.com/repos/lateSleeps/Book-apps-/pulls -d '{ *)",
+      "Bash(security find-generic-password *)",
+      "Bash(gh pr *)",
+      "Bash(which gh *)",
+      "Bash(/opt/homebrew/bin/gh pr create --title 'feat\\(owner\\): Overview module — design system enforcement, icon standardization & architecture cleanup' --base main --head feat/clean-overview --body ' *)",
+      "Read(//Users/faqihshalihanmuflihun/bin/**)",
+      "Bash(command -v gh)",
+      "Read(//Users/faqihshalihanmuflihun/.local/bin/**)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001/)",
+      "Bash(git merge feat/clean-overview --no-ff -m ' *)",
+      "Bash(git merge *)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(kill 25230)",
+      "Bash(grep -v '^$')"
     ]
   }
 }
