@@ -6,11 +6,13 @@
  *
  * Layout (top to bottom):
  *   1. Section header
- *   2. StaffPicker — rich person-card trigger + dropdown (replaces native select)
- *   3. Staff summary card (avatar + name + metrics)
- *   4. Search field
- *   5. Category accordions (collapsed by default, "N/M" count, Pilih/Hapus Semua)
+ *   2. StaffPicker — unified trigger showing identity + metrics + chevron
+ *   3. Search field
+ *   4. Category accordions (collapsed by default, "N/M" count, Pilih/Hapus Semua)
  *      └── Service rows (checkbox + name + duration + Specialist badge)
+ *
+ * Staff identity (avatar, name, role, status) and metrics (layanan, kategori)
+ * appear once — inside the StaffPicker trigger. No separate summary card.
  *
  * Dirty state is owned by useTeamController → SettingsActionBar handles save.
  * No auto-save. No local save button.
@@ -102,15 +104,24 @@ function StatusBadge({ isActive }: { isActive: boolean }) {
 }
 
 // ── StaffPicker ───────────────────────────────────────────────────────────────
-// Rich person-card trigger + dropdown. Replaces native <select>.
+// Unified trigger: identity (avatar + name + role + status) + metrics + chevron.
+// Replaces both the native <select> AND the old separate summary card.
 
 interface StaffPickerProps {
   staff: StaffMember[];
   selectedId: string;
+  assignedCount: number;
+  categoryCount: number;
   onSelect: (id: string) => void;
 }
 
-function StaffPicker({ staff, selectedId, onSelect }: StaffPickerProps) {
+function StaffPicker({
+  staff,
+  selectedId,
+  assignedCount,
+  categoryCount,
+  onSelect,
+}: StaffPickerProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -138,8 +149,8 @@ function StaffPicker({ staff, selectedId, onSelect }: StaffPickerProps) {
         aria-haspopup="listbox"
         aria-expanded={open}
       >
+        {/* Left — identity */}
         <AvatarBubble name={selected.fullName} />
-
         <div className="min-w-0 flex-1 text-left">
           <p className="truncate text-ts-sub font-semibold text-tx-primary">{selected.fullName}</p>
           <div className="mt-s2 flex items-center gap-s8">
@@ -148,11 +159,18 @@ function StaffPicker({ staff, selectedId, onSelect }: StaffPickerProps) {
           </div>
         </div>
 
-        {open ? (
-          <CaretUp size={14} weight="bold" className="shrink-0 text-tx-muted" aria-hidden />
-        ) : (
-          <CaretDown size={14} weight="bold" className="shrink-0 text-tx-muted" aria-hidden />
-        )}
+        {/* Right — metrics + chevron */}
+        <div className="flex shrink-0 items-center gap-s12">
+          <div className="flex flex-col items-end gap-s2">
+            <span className="text-ts-fn font-medium text-tx-primary">{assignedCount} layanan</span>
+            <span className="text-ts-cap1 text-tx-subtle">{categoryCount} kategori</span>
+          </div>
+          {open ? (
+            <CaretUp size={14} weight="duotone" className="text-tx-muted" aria-hidden />
+          ) : (
+            <CaretDown size={14} weight="duotone" className="text-tx-muted" aria-hidden />
+          )}
+        </div>
       </button>
 
       {/* ── Dropdown ────────────────────────────────────────────────────── */}
@@ -179,7 +197,6 @@ function StaffPicker({ staff, selectedId, onSelect }: StaffPickerProps) {
                 )}
               >
                 <AvatarBubble name={member.fullName} />
-
                 <div className="min-w-0 flex-1 text-left">
                   <p className="truncate text-ts-fn font-semibold text-tx-primary">
                     {member.fullName}
@@ -191,56 +208,19 @@ function StaffPicker({ staff, selectedId, onSelect }: StaffPickerProps) {
                     <StatusBadge isActive={member.isActive} />
                   </div>
                 </div>
-
                 {isSelected && (
-                  <Check size={14} weight="bold" className="shrink-0 text-ac-primary" aria-hidden />
+                  <Check
+                    size={14}
+                    weight="duotone"
+                    className="shrink-0 text-ac-primary"
+                    aria-hidden
+                  />
                 )}
               </button>
             );
           })}
         </div>
       )}
-    </div>
-  );
-}
-
-// ── Metric ────────────────────────────────────────────────────────────────────
-
-function Metric({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="flex flex-col items-center gap-s2">
-      <span className="text-ts-t3 font-bold text-tx-primary">{value}</span>
-      <span className="text-ts-cap2 text-tx-subtle">{label}</span>
-    </div>
-  );
-}
-
-// ── Staff summary card ────────────────────────────────────────────────────────
-
-interface SummaryCardProps {
-  member: StaffMember;
-  assignedCount: number;
-  categoryCount: number;
-}
-
-function StaffSummaryCard({ member, assignedCount, categoryCount }: SummaryCardProps) {
-  return (
-    <div className="flex items-center gap-s16 rounded-r12 border border-bd-card bg-bg-card px-s16 py-s12 shadow-card">
-      <AvatarBubble name={member.fullName} />
-
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-ts-fn font-semibold text-tx-primary">{member.fullName}</p>
-        <div className="mt-s2 flex items-center gap-s8">
-          <span className="text-ts-cap1 text-tx-secondary">{ROLE_LABEL[member.role]}</span>
-          <StatusBadge isActive={member.isActive} />
-        </div>
-      </div>
-
-      <div className="flex shrink-0 items-center gap-s24">
-        <Metric label="Layanan" value={assignedCount} />
-        <div className="h-6 w-px bg-bd-card" />
-        <Metric label="Kategori" value={categoryCount} />
-      </div>
     </div>
   );
 }
@@ -309,7 +289,7 @@ function CategoryAccordion({
 
         <CaretDown
           size={14}
-          weight="bold"
+          weight="duotone"
           className={cn(
             'shrink-0 text-tx-muted transition-transform duration-200',
             open && 'rotate-180'
@@ -444,12 +424,14 @@ export function ServiceAssignmentSection({ ctrl, services, categories }: Props) 
         description="Pilih layanan yang dapat dilakukan oleh setiap staff."
       />
 
-      {/* ── [A] Staff Picker ────────────────────────────────────────────── */}
+      {/* ── [A] Staff Picker — identity + metrics unified ───────────────── */}
       <div className="flex flex-col gap-s8">
         <p className="text-ts-fn font-medium text-tx-primary">Pilih Staff</p>
         <StaffPicker
           staff={activeStaff}
           selectedId={resolvedStaffId}
+          assignedCount={assignedCount}
+          categoryCount={categoryCount}
           onSelect={(id) => {
             setSelectedStaffId(id);
             setSearchQuery('');
@@ -457,14 +439,7 @@ export function ServiceAssignmentSection({ ctrl, services, categories }: Props) 
         />
       </div>
 
-      {/* ── [B] Staff Summary Card ──────────────────────────────────────── */}
-      <StaffSummaryCard
-        member={selectedMember}
-        assignedCount={assignedCount}
-        categoryCount={categoryCount}
-      />
-
-      {/* ── [C] Search ──────────────────────────────────────────────────── */}
+      {/* ── [B] Search ──────────────────────────────────────────────────── */}
       <div className="relative">
         <MagnifyingGlass
           size={14}
@@ -481,7 +456,7 @@ export function ServiceAssignmentSection({ ctrl, services, categories }: Props) 
         />
       </div>
 
-      {/* ── [D] Service catalog ─────────────────────────────────────────── */}
+      {/* ── [C] Service catalog ─────────────────────────────────────────── */}
       {activeServices.length === 0 ? (
         <SettingsEmptyState
           icon={<Scissors size={24} weight="duotone" />}
