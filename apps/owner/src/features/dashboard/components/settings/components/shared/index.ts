@@ -2,6 +2,8 @@ export { SettingsFormGrid } from './SettingsFormGrid';
 export { SettingsFieldGroup } from './SettingsFieldGroup';
 export { SettingsInput } from './SettingsInput';
 export type { SettingsInputProps } from './SettingsInput';
+export { SettingsSelect } from './SettingsSelect';
+export type { SettingsSelectProps } from './SettingsSelect';
 export { SettingsTextarea } from './SettingsTextarea';
 export type { SettingsTextareaProps } from './SettingsTextarea';
 export { SettingsUploadField } from './SettingsUploadField';

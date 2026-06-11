@@ -25,6 +25,7 @@ import {
   SettingsFieldGroup,
   SettingsFormGrid,
   SettingsInput,
+  SettingsSelect,
   SettingsUploadField,
 } from '@/features/dashboard/components/settings/components/shared';
 import type { ConfirmPending } from '@/features/dashboard/components/settings/components/shared';
@@ -150,7 +151,7 @@ function StaffTableHeader() {
           key={h}
           className={`relative text-ts-fn font-medium text-tx-secondary ${
             i > 0
-              ? 'before:absolute before:-left-s8 before:top-1/2 before:-translate-y-1/2 before:text-bd-card before:content-["|"]'
+              ? 'pl-s16 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:text-bd-card before:content-["|"]'
               : ''
           }`}
         >
@@ -205,28 +206,32 @@ function StaffTableRow({ member, schedule, onEdit, onDeactivate, onDelete }: Sta
       </div>
 
       {/* Role badge */}
-      <span
-        className={`inline-flex w-fit items-center rounded-rF px-s8 py-0.5 text-ts-cap2 font-medium ${roleMeta.badgeClass}`}
-      >
-        {roleMeta.label}
-      </span>
+      <div className="pl-s16">
+        <span
+          className={`inline-flex w-fit items-center rounded-rF px-s8 py-0.5 text-ts-cap2 font-medium ${roleMeta.badgeClass}`}
+        >
+          {roleMeta.label}
+        </span>
+      </div>
 
       {/* Telepon */}
-      <span className="text-ts-fn text-tx-subtle">{member.phone || '—'}</span>
+      <span className="pl-s16 text-ts-fn text-tx-subtle">{member.phone || '—'}</span>
 
       {/* Status badge */}
-      <span
-        className={`inline-flex w-fit items-center rounded-rF px-s8 py-0.5 text-ts-cap2 font-medium ${
-          member.isActive
-            ? 'bg-st-in-progress-bg text-st-in-progress'
-            : 'bg-bg-control text-tx-subtle'
-        }`}
-      >
-        {member.isActive ? 'Aktif' : 'Nonaktif'}
-      </span>
+      <div className="pl-s16">
+        <span
+          className={`inline-flex w-fit items-center rounded-rF px-s8 py-0.5 text-ts-cap2 font-medium ${
+            member.isActive
+              ? 'bg-st-in-progress-bg text-st-in-progress'
+              : 'bg-bg-control text-tx-subtle'
+          }`}
+        >
+          {member.isActive ? 'Aktif' : 'Nonaktif'}
+        </span>
+      </div>
 
       {/* Jadwal summary */}
-      <span className="text-ts-fn text-tx-subtle">{scheduleLabel(schedule)}</span>
+      <span className="pl-s16 text-ts-fn text-tx-subtle">{scheduleLabel(schedule)}</span>
 
       {/* Aksi — EntityActionMenu (matches Services / Produk pattern) */}
       <EntityActionMenu
@@ -281,28 +286,26 @@ function StaffFormContent({ draft, onChange }: StaffFormContentProps) {
       </SettingsFieldGroup>
 
       <SettingsFieldGroup label="Role" htmlFor="staff-role">
-        <select
+        <SettingsSelect
           id="staff-role"
           value={draft.role}
           onChange={(e) => onChange({ role: e.target.value as StaffRole })}
-          className="w-full rounded-r10 border border-bd-card bg-bg-input px-s12 py-s8 text-ts-fn text-tx-primary focus:outline-none focus:ring-2 focus:ring-tx-primary/20"
         >
           {ROLE_OPTIONS.map((r) => (
             <option key={r} value={r}>
               {ROLE_META[r].label}
             </option>
           ))}
-        </select>
+        </SettingsSelect>
       </SettingsFieldGroup>
 
       <SettingsFieldGroup label="Spesialisasi" htmlFor="staff-specialty">
-        <select
+        <SettingsSelect
           id="staff-specialty"
           value={draft.specialty ?? ''}
           onChange={(e) =>
             onChange({ specialty: (e.target.value || null) as StaffSpecialty | null })
           }
-          className="w-full rounded-r10 border border-bd-card bg-bg-input px-s12 py-s8 text-ts-fn text-tx-primary focus:outline-none focus:ring-2 focus:ring-tx-primary/20"
         >
           <option value="">Tidak ada</option>
           {SPECIALTY_OPTIONS.map((s) => (
@@ -310,7 +313,7 @@ function StaffFormContent({ draft, onChange }: StaffFormContentProps) {
               {SPECIALTY_LABELS[s]}
             </option>
           ))}
-        </select>
+        </SettingsSelect>
       </SettingsFieldGroup>
     </SettingsFormGrid>
   );
