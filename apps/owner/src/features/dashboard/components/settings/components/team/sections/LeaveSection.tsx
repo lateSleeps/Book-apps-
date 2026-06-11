@@ -273,7 +273,7 @@ function StaffPicker({ staff, selectedId, metrics, onSelect }: StaffPickerProps)
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        {/* Left — identity */}
+        {/* Content block — all information grouped together */}
         <AvatarBubble name={selected.fullName} />
         <div className="min-w-0 flex-1 text-left">
           <p className="truncate text-ts-sub font-semibold text-tx-primary">{selected.fullName}</p>
@@ -281,29 +281,27 @@ function StaffPicker({ staff, selectedId, metrics, onSelect }: StaffPickerProps)
             <span className="text-ts-fn text-tx-secondary">{ROLE_LABEL[selected.role]}</span>
             <StatusBadge isActive={selected.isActive} />
           </div>
-        </div>
-
-        {/* Right — absence metrics, right-aligned */}
-        <div className="flex shrink-0 items-center gap-s12">
-          <div className="flex flex-col items-end gap-s2">
-            <span className="text-ts-fn font-medium text-tx-primary">
-              {metrics.totalCatatan} Catatan
-            </span>
-            <span className="text-ts-cap1 text-tx-subtle">
-              {metrics.totalHari} Hari Tidak Hadir
-            </span>
-            {metrics.nextLeave && (
-              <span className="text-ts-cap1 font-medium text-st-confirmed">
+          <p className="mt-s4 text-ts-cap1 text-tx-subtle">
+            {metrics.totalCatatan === 0
+              ? 'Belum ada catatan'
+              : `${metrics.totalCatatan} catatan · ${metrics.totalHari} hari tidak hadir`}
+          </p>
+          {metrics.nextLeave && (
+            <p className="mt-s2 text-ts-cap1 text-tx-secondary">
+              Cuti berikutnya:{' '}
+              <span className="font-medium text-st-confirmed">
                 {formatDateShort(metrics.nextLeave)}
               </span>
-            )}
-          </div>
-          {open ? (
-            <CaretUp size={14} weight="duotone" className="text-tx-muted" aria-hidden />
-          ) : (
-            <CaretDown size={14} weight="duotone" className="text-tx-muted" aria-hidden />
+            </p>
           )}
         </div>
+
+        {/* Chevron — affordance only, no dead zone */}
+        {open ? (
+          <CaretUp size={14} weight="duotone" className="shrink-0 text-tx-muted" aria-hidden />
+        ) : (
+          <CaretDown size={14} weight="duotone" className="shrink-0 text-tx-muted" aria-hidden />
+        )}
       </button>
 
       {/* Dropdown */}
