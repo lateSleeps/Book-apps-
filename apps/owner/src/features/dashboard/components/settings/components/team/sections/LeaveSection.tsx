@@ -263,11 +263,6 @@ function StaffPicker({ staff, selectedId, metrics, onSelect }: StaffPickerProps)
     return () => document.removeEventListener('mousedown', handleMouseDown);
   }, [open]);
 
-  const summaryLine =
-    metrics.totalCatatan === 0
-      ? 'Belum ada catatan'
-      : `${metrics.totalCatatan} catatan · ${metrics.totalHari} hari tidak hadir`;
-
   return (
     <div ref={containerRef} className="relative">
       {/* Trigger */}
@@ -286,19 +281,23 @@ function StaffPicker({ staff, selectedId, metrics, onSelect }: StaffPickerProps)
             <span className="text-ts-fn text-tx-secondary">{ROLE_LABEL[selected.role]}</span>
             <StatusBadge isActive={selected.isActive} />
           </div>
-          <p className="mt-s4 text-ts-cap1 text-tx-subtle">{summaryLine}</p>
-          {metrics.nextLeave && (
-            <p className="mt-s2 text-ts-cap1 text-tx-secondary">
-              Cuti berikutnya:{' '}
-              <span className="font-medium text-st-confirmed">
-                {formatDateShort(metrics.nextLeave)}
-              </span>
-            </p>
-          )}
         </div>
 
-        {/* Chevron */}
-        <div className="shrink-0">
+        {/* Right — absence metrics, right-aligned */}
+        <div className="flex shrink-0 items-center gap-s12">
+          <div className="flex flex-col items-end gap-s2">
+            <span className="text-ts-fn font-medium text-tx-primary">
+              {metrics.totalCatatan} Catatan
+            </span>
+            <span className="text-ts-cap1 text-tx-subtle">
+              {metrics.totalHari} Hari Tidak Hadir
+            </span>
+            {metrics.nextLeave && (
+              <span className="text-ts-cap1 font-medium text-st-confirmed">
+                {formatDateShort(metrics.nextLeave)}
+              </span>
+            )}
+          </div>
           {open ? (
             <CaretUp size={14} weight="duotone" className="text-tx-muted" aria-hidden />
           ) : (
@@ -371,18 +370,22 @@ interface TimelineEntryProps {
 function TimelineEntry({ leave, onDelete }: TimelineEntryProps) {
   return (
     <div className="flex items-start gap-s12 px-s4 py-s12">
-      {/* Left — badge + date + note */}
+      {/* Left — badge inline with date, note below */}
       <div className="flex flex-1 flex-col gap-s4">
-        <LeaveBadge type={leave.type} />
-        <p className="text-ts-fn font-medium text-tx-primary">{formatDateLong(leave.date)}</p>
+        <div className="flex items-center gap-s8">
+          <LeaveBadge type={leave.type} />
+          <span className="text-ts-fn font-medium text-tx-primary">
+            {formatDateLong(leave.date)}
+          </span>
+        </div>
         {leave.note && <p className="text-ts-fn text-tx-secondary">{leave.note}</p>}
       </div>
 
-      {/* Right — delete */}
+      {/* Right — delete, top-aligned with badge row */}
       <button
         type="button"
         onClick={() => onDelete(leave.id)}
-        className="shrink-0 text-ts-cap1 font-medium text-ac-danger transition-opacity hover:opacity-70"
+        className="mt-0.5 shrink-0 text-ts-cap1 font-medium text-ac-danger transition-opacity hover:opacity-70"
       >
         Hapus
       </button>
@@ -448,9 +451,15 @@ export function LeaveSection({ ctrl }: Props) {
 
   return (
     <div className="flex flex-col gap-s16">
+      {/* Add button lives in the header action slot — no standalone row */}
       <SettingsSectionHeader
         title="Cuti & Hari Tidak Tersedia"
         description="Catat hari cuti, sakit, dan ketidakhadiran staff."
+        action={
+          !showForm ? (
+            <SettingsAddButton onClick={openAdd}>Tambah Ketidakhadiran</SettingsAddButton>
+          ) : undefined
+        }
       />
 
       {/* ── Staff picker ─────────────────────────────────────────────────── */}
@@ -463,9 +472,6 @@ export function LeaveSection({ ctrl }: Props) {
           onSelect={handleStaffChange}
         />
       </div>
-
-      {/* ── Primary CTA — above timeline ─────────────────────────────────── */}
-      {!showForm && <SettingsAddButton onClick={openAdd}>Tambah Ketidakhadiran</SettingsAddButton>}
 
       {/* ── Inline add form ───────────────────────────────────────────────── */}
       {showForm && (
