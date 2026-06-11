@@ -2,6 +2,19 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
 /**
+ * Format a number as IDR currency.
+ * e.g. 150000 → "Rp 150.000"
+ * Used by settings sections (AddOnsSection, BundlesSection, ServicesAccordion).
+ */
+export function formatPrice(n: number): string {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    maximumFractionDigits: 0,
+  }).format(n);
+}
+
+/**
  * Format a number as Indonesian Rupiah.
  * e.g. 65000 → "Rp 65.000"
  */

@@ -1,12 +1,12 @@
-// Standard primary action button for a settings section header.
-// Pass to SettingsSectionHeader's `action` slot so every list domain
-// (Categories, Services, Bundles, Add-ons) gets the same add affordance.
+// Standard add-action button for settings section headers.
+// Card-style outline with embedded Plus icon to match the approved UI.
+// Pass to SettingsSectionHeader's `action` slot or the ServicesAccordion header area.
 
-import type { ReactNode } from 'react';
+import { Plus } from '@phosphor-icons/react';
 
 interface SettingsAddButtonProps {
   onClick: () => void;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export function SettingsAddButton({ onClick, children }: SettingsAddButtonProps) {
@@ -14,8 +14,9 @@ export function SettingsAddButton({ onClick, children }: SettingsAddButtonProps)
     <button
       type="button"
       onClick={onClick}
-      className="shrink-0 rounded-r10 bg-ac-primary px-s12 py-s8 text-ts-cap1 font-medium text-white transition-opacity hover:opacity-90"
+      className="flex shrink-0 items-center gap-s8 rounded-r10 border border-bd-card bg-bg-card px-s12 py-s8 text-ts-fn font-medium text-tx-primary shadow-card transition-colors hover:bg-bg-hover"
     >
+      <Plus size={13} weight="bold" />
       {children}
     </button>
   );

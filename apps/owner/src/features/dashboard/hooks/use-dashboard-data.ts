@@ -45,10 +45,6 @@ export function useDashboardData() {
     return bookingsData.filter((b) => b.date >= today);
   }, [bookingsData, today]);
 
-  const pastBookings: DashboardBooking[] = useMemo(() => {
-    return bookingsData.filter((b) => b.date < today);
-  }, [bookingsData, today]);
-
   const stats: DashboardStats = useMemo(
     () => ({
       revenueToday: bookingsData.reduce((sum, b) => sum + (b.price || 0), 0),

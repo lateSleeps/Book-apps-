@@ -1,5 +1,5 @@
+import { render, type RenderOptions, type RenderResult } from '@testing-library/react';
 import React from 'react';
-import { render, type RenderOptions } from '@testing-library/react';
 
 /** Wrapper with all providers for testing */
 function AllProviders({ children }: { children: React.ReactNode }) {
@@ -7,7 +7,10 @@ function AllProviders({ children }: { children: React.ReactNode }) {
 }
 
 /** Custom render with providers */
-function customRender(ui: React.ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
+function customRender(
+  ui: React.ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'>
+): RenderResult {
   return render(ui, { wrapper: AllProviders, ...options });
 }
 

@@ -17,7 +17,7 @@ export function SettingsSectionHeader({ title, description, action }: SettingsSe
   return (
     <div className="flex items-start justify-between gap-s16">
       <div className="flex min-w-0 flex-col gap-s4">
-        <h2 className="m-0 text-ts-head font-semibold text-tx-primary">{title}</h2>
+        <h2 className="m-0 text-ts-t3 font-bold text-tx-primary">{title}</h2>
         {description && <p className="m-0 text-ts-fn text-tx-secondary">{description}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}

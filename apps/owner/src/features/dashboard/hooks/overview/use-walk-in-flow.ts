@@ -228,6 +228,7 @@ export function useWalkInFlow(callbacks: WalkInCallbacks): WalkInFlowState {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const submitWalkIn = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async (realServices: any[], realStylists: any[]) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const svc = realServices.find((s: any) => s.id === walkInForm.serviceId);
@@ -293,7 +294,7 @@ export function useWalkInFlow(callbacks: WalkInCallbacks): WalkInFlowState {
           notes: 'Walk-in',
           paymentStatus: 'lunas',
         })
-        .catch((e) => console.error('Failed to save walk-in to DB:', e));
+        .catch((e: unknown) => console.error('Failed to save walk-in to DB:', e));
 
       closeDrawer();
     },

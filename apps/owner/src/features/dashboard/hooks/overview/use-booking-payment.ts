@@ -81,7 +81,7 @@ export interface BookingPaymentState {
 export function useBookingPayment(callbacks: BookingPaymentCallbacks): BookingPaymentState {
   const utils = trpc.useUtils();
   const processPaymentMutation = trpc.bookings.processPayment.useMutation({
-    onSuccess: (_data, variables) => {
+    onSuccess: (_data: unknown, variables: { bookingId: string }) => {
       callbacks.onPaymentOverride(variables.bookingId, 'PAID');
       callbacks.onStatusOverride(variables.bookingId, 'COMPLETED');
       utils.bookings.getBySalon.invalidate();

@@ -3,3 +3,8 @@ export { SettingsSection } from './SettingsSection';
 export { SettingsSectionHeader } from './SettingsSectionHeader';
 export { SettingsContentCard } from './SettingsContentCard';
 export { SettingsActionBar } from './SettingsActionBar';
+export { SettingsSubNav } from './SettingsSubNav';
+export { SettingsTabbedCard } from './SettingsTabbedCard';
+export { SettingsPanel } from './SettingsPanel';
+export { SettingsPanelSection } from './SettingsPanelSection';
+export { SettingsSideSheet } from './SettingsSideSheet';

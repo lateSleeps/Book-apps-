@@ -26,8 +26,8 @@ export interface ServiceCategory {
   color: string;
   /** Hex color for blob/glow effect in customer app. e.g. '#f5c4ab' */
   blobColor: string;
-  /** Emoji icon displayed on category card. e.g. '✂️' */
-  icon: string;
+  /** Phosphor icon name for category card. e.g. 'Scissors' */
+  iconName: string;
   isActive: boolean;
   sortOrder: number;
 }
@@ -43,6 +43,7 @@ export interface ServiceQuestion {
   /** Options for chips type. Empty array for photo/text. */
   options: string[];
   sortOrder: number;
+  isActive: boolean;
 }
 
 // ── Service ───────────────────────────────────────────────────────────────────
@@ -73,9 +74,7 @@ export interface AddOnProduct {
   description: string;
   /** Price in IDR */
   price: number;
-  /** Emoji used as image fallback in customer app */
-  imageEmoji: string;
-  /** Actual uploaded image URL (WebP). Null until uploaded. */
+  /** Product image URL (WebP). Null until uploaded. */
   imageUrl: string | null;
   isActive: boolean;
   sortOrder: number;
@@ -91,14 +90,16 @@ export interface ServiceBundle {
   serviceIds: string[];
   /** Bundle price (usually lower than sum of individual services) */
   bundlePrice: number;
+  /** Cover image URL (WebP). Null until uploaded. */
+  imageUrl: string | null;
   isActive: boolean;
+  sortOrder: number;
 }
 
 // ── Aggregate ─────────────────────────────────────────────────────────────────
 
+/** Services domain — owned exclusively by useServicesController */
 export interface ServicesDomain {
   categories: ServiceCategory[];
   services: ServiceItem[];
-  addons: AddOnProduct[];
-  bundles: ServiceBundle[];
 }

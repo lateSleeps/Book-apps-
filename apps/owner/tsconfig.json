@@ -22,6 +22,8 @@
       "@rara/mock-data/*": ["../../packages/mock-data/src/*"],
       "@rara/hooks": ["../../packages/hooks/src"],
       "@rara/hooks/*": ["../../packages/hooks/src/*"],
+      "@rara/database": ["../../packages/database/src"],
+      "@rara/database/*": ["../../packages/database/src/*"],
       "@/*": ["./src/*"],
       "@/features/*": ["./src/features/*"],
       "@/shared/*": ["./src/shared/*"],

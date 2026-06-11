@@ -96,6 +96,8 @@ const config: Config = {
       },
       fontSize: {
         // ── Apple HIG Type Scale — rem units ─────────────────────────────────
+        // Micro — 10px — sub-caption, category card description, legend chips
+        'ts-micro': ['0.625rem', { lineHeight: '1.4', letterSpacing: '0.02em' }],
         // Caption 2 — 11px — minimum, gunakan untuk legend dots, badges
         'ts-cap2': ['0.6875rem', { lineHeight: '1.4', letterSpacing: '0.02em' }],
         // Caption 1 — 12px — labels, tags, eyebrow text
@@ -130,9 +132,13 @@ const config: Config = {
       },
       spacing: {
         // 4pt grid — rem units
+        // Half-step values (s2, s6, s14) used by SegmentedControl primitive
+        s2: '0.125rem', // 2px  — segmented control inner gap
         s4: '0.25rem', // 4px
+        s6: '0.375rem', // 6px  — segmented control button vertical padding
         s8: '0.5rem', // 8px
         s12: '0.75rem', // 12px
+        s14: '0.875rem', // 14px — segmented control button horizontal padding
         s16: '1rem', // 16px
         s20: '1.25rem', // 20px
         s24: '1.5rem', // 24px

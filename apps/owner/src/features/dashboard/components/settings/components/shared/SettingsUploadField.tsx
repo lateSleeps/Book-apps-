@@ -39,8 +39,8 @@ const VARIANT_CONFIG: Record<UploadVariant, UploadConfig> = {
   addon: {
     label: 'Gambar Produk',
     aspectClass: 'aspect-square',
-    maxBytes: 2_097_152,
-    hint: 'PNG atau JPG, maks 2MB',
+    maxBytes: 5_242_880,
+    hint: 'PNG, JPG, atau WebP — otomatis dikonversi ke WebP',
   },
 };
 
@@ -56,6 +56,12 @@ interface SettingsUploadFieldProps {
   onRemove: () => void;
   error?: string;
   disabled?: boolean;
+  /** Constrain the preview to a small square (e.g. for logos). */
+  compact?: boolean;
+  /** Replace aspect ratio with flex-1 so the zone fills its parent height. */
+  fillHeight?: boolean;
+  /** Extra classes applied directly to the upload zone div (overrides aspect/size). */
+  zoneClassName?: string;
   className?: string;
 }
 
@@ -66,6 +72,9 @@ export function SettingsUploadField({
   onRemove,
   error,
   disabled = false,
+  compact = false,
+  fillHeight = false,
+  zoneClassName,
   className,
 }: SettingsUploadFieldProps) {
   const config = VARIANT_CONFIG[variant];
@@ -100,7 +109,7 @@ export function SettingsUploadField({
   const displayError = error ?? sizeError;
 
   return (
-    <div className={cn('flex flex-col gap-s8', className)}>
+    <div className={cn('flex flex-col gap-s8', fillHeight && 'h-full', className)}>
       <p className="text-ts-fn font-medium text-tx-primary">{config.label}</p>
 
       <div
@@ -112,8 +121,10 @@ export function SettingsUploadField({
           if (!disabled && (e.key === 'Enter' || e.key === ' ')) inputRef.current?.click();
         }}
         className={cn(
-          'relative w-full overflow-hidden rounded-r16 border-2 border-dashed border-bd-card bg-bg-input transition-colors',
-          config.aspectClass,
+          'relative overflow-hidden rounded-r16 border-2 border-dashed border-bd-card bg-bg-input transition-colors',
+          !zoneClassName && (fillHeight ? 'w-full flex-1' : `w-full ${config.aspectClass}`),
+          compact && !zoneClassName && 'max-w-[140px]',
+          zoneClassName,
           !disabled && 'cursor-pointer hover:border-tx-secondary hover:bg-bg-hover',
           disabled && 'cursor-not-allowed opacity-60',
           displayError && 'border-ac-danger'
@@ -148,6 +159,16 @@ export function SettingsUploadField({
         )}
       </div>
 
+      <button
+        type="button"
+        onClick={() => !disabled && inputRef.current?.click()}
+        disabled={disabled}
+        className="inline-flex w-fit items-center gap-s8 rounded-r10 border border-bd-card bg-bg-input px-s12 py-s8 text-ts-fn font-medium text-tx-primary transition-colors hover:bg-bg-hover disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <Image size={15} weight="duotone" className="text-tx-secondary" />
+        Ambil dari Galeri
+      </button>
+
       <input
         ref={inputRef}
         type="file"
@@ -164,10 +185,7 @@ export function SettingsUploadField({
         </p>
       )}
 
-      <p className="text-ts-cap2 text-tx-muted">
-        {/* Future: auto-converted to WebP before upload */}
-        Format diterima: PNG, JPG, WebP
-      </p>
+      <p className="text-ts-cap2 text-tx-muted">Format diterima: PNG, JPG, WebP</p>
     </div>
   );
 }

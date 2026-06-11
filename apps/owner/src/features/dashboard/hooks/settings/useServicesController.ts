@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import type { BaseSettingsController } from './types/BaseSettingsController';
 import type {
   ServiceCategory,
   ServiceItem,
-  AddOnProduct,
-  ServiceBundle,
+  ServiceQuestion,
   ServicesDomain,
 } from '@/features/dashboard/components/settings/types/services.types';
 
@@ -20,7 +20,7 @@ const MOCK_DOMAIN: ServicesDomain = {
       description: 'Haircut, wash, styling & braiding',
       color: 'bg-c-peach',
       blobColor: '#f5c4ab',
-      icon: '✂️',
+      iconName: 'Scissors',
       isActive: true,
       sortOrder: 0,
     },
@@ -30,7 +30,7 @@ const MOCK_DOMAIN: ServicesDomain = {
       description: 'Colouring, keratin & hair spa',
       color: 'bg-c-blue',
       blobColor: '#b8d6f0',
-      icon: '🎨',
+      iconName: 'Drop',
       isActive: true,
       sortOrder: 1,
     },
@@ -40,7 +40,7 @@ const MOCK_DOMAIN: ServicesDomain = {
       description: 'Facial, make up & lash extensions',
       color: 'bg-c-mint',
       blobColor: '#a8e6d4',
-      icon: '💆',
+      iconName: 'Eye',
       isActive: true,
       sortOrder: 2,
     },
@@ -50,7 +50,7 @@ const MOCK_DOMAIN: ServicesDomain = {
       description: 'Full body, reflexology & scrub',
       color: 'bg-c-yellow',
       blobColor: '#f5d98a',
-      icon: '🪷',
+      iconName: 'FlowerLotus',
       isActive: true,
       sortOrder: 3,
     },
@@ -60,7 +60,7 @@ const MOCK_DOMAIN: ServicesDomain = {
       description: 'Manicure, pedicure & nail art',
       color: 'bg-c-lilac',
       blobColor: '#c8bef0',
-      icon: '💅',
+      iconName: 'PaintBrush',
       isActive: true,
       sortOrder: 4,
     },
@@ -123,78 +123,65 @@ const MOCK_DOMAIN: ServicesDomain = {
       questions: [],
     },
   ],
-  addons: [
-    {
-      id: 'prod-1',
-      name: 'Makarizo Shampoo',
-      description: 'Shampoo rambut sehat 200ml',
-      price: 45_000,
-      imageEmoji: '🧴',
-      imageUrl: null,
-      isActive: true,
-      sortOrder: 0,
-    },
-    {
-      id: 'prod-2',
-      name: "L'Oreal Conditioner",
-      description: 'Kondisioner nutrisi intensif 175ml',
-      price: 55_000,
-      imageEmoji: '💧',
-      imageUrl: null,
-      isActive: true,
-      sortOrder: 1,
-    },
-    {
-      id: 'prod-4',
-      name: 'TRESemmé Serum',
-      description: 'Serum rambut anti-frizz 50ml',
-      price: 65_000,
-      imageEmoji: '✨',
-      imageUrl: null,
-      isActive: true,
-      sortOrder: 2,
-    },
-  ],
-  bundles: [],
 };
 
 // ── Controller interface ──────────────────────────────────────────────────────
 
-export interface ServicesController {
+export interface ServicesController extends BaseSettingsController {
   domain: ServicesDomain;
 
   // Categories
   addCategory: (draft: Omit<ServiceCategory, 'id' | 'sortOrder'>) => void;
   updateCategory: (id: string, patch: Partial<ServiceCategory>) => void;
-  removeCategory: (id: string) => void;
+  deleteCategory: (id: string) => void;
 
   // Services
   addService: (draft: Omit<ServiceItem, 'id' | 'sortOrder' | 'questions'>) => void;
   updateService: (id: string, patch: Partial<ServiceItem>) => void;
-  archiveService: (id: string) => void;
+  deleteService: (id: string) => void;
 
-  // Add-ons
-  addAddon: (draft: Omit<AddOnProduct, 'id' | 'sortOrder'>) => void;
-  updateAddon: (id: string, patch: Partial<AddOnProduct>) => void;
-  removeAddon: (id: string) => void;
-
-  // Bundles
-  addBundle: (draft: Omit<ServiceBundle, 'id'>) => void;
-  updateBundle: (id: string, patch: Partial<ServiceBundle>) => void;
-  removeBundle: (id: string) => void;
+  // Consultation Questions
+  addQuestion: (draft: Omit<ServiceQuestion, 'id' | 'sortOrder'>) => void;
+  updateQuestion: (questionId: string, patch: Partial<ServiceQuestion>) => void;
+  deleteQuestion: (questionId: string) => void;
 }
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
 export function useServicesController(): ServicesController {
   const [domain, setDomain] = useState<ServicesDomain>(MOCK_DOMAIN);
+  const [savedDomain, setSavedDomain] = useState<ServicesDomain>(MOCK_DOMAIN);
+  const [isDirty, setIsDirty] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   function nextId(prefix: string) {
     return `${prefix}-${Date.now()}`;
   }
 
+  function setDirtyDomain(updater: (d: ServicesDomain) => ServicesDomain) {
+    setDomain(updater);
+    setIsDirty(true);
+  }
+
+  const handleSave = useCallback(() => {
+    setIsSaving(true);
+    // TODO: replace with tRPC mutation
+    setTimeout(() => {
+      setSavedDomain(domain);
+      setIsDirty(false);
+      setIsSaving(false);
+    }, 600);
+  }, [domain]);
+
+  const handleReset = useCallback(() => {
+    setDomain(savedDomain);
+    setIsDirty(false);
+  }, [savedDomain]);
+
+  // ── Categories ────────────────────────────────────────────────────────────
+
   const addCategory = useCallback((draft: Omit<ServiceCategory, 'id' | 'sortOrder'>) => {
-    setDomain((d) => ({
+    setDirtyDomain((d) => ({
       ...d,
       categories: [
         ...d.categories,
@@ -204,18 +191,24 @@ export function useServicesController(): ServicesController {
   }, []);
 
   const updateCategory = useCallback((id: string, patch: Partial<ServiceCategory>) => {
-    setDomain((d) => ({
+    setDirtyDomain((d) => ({
       ...d,
       categories: d.categories.map((c) => (c.id === id ? { ...c, ...patch } : c)),
     }));
   }, []);
 
-  const removeCategory = useCallback((id: string) => {
-    setDomain((d) => ({ ...d, categories: d.categories.filter((c) => c.id !== id) }));
+  const deleteCategory = useCallback((id: string) => {
+    setDirtyDomain((d) => ({
+      ...d,
+      categories: d.categories.filter((c) => c.id !== id),
+      services: d.services.filter((s) => s.categoryId !== id),
+    }));
   }, []);
 
+  // ── Services ──────────────────────────────────────────────────────────────
+
   const addService = useCallback((draft: Omit<ServiceItem, 'id' | 'sortOrder' | 'questions'>) => {
-    setDomain((d) => ({
+    setDirtyDomain((d) => ({
       ...d,
       services: [
         ...d.services,
@@ -225,68 +218,65 @@ export function useServicesController(): ServicesController {
   }, []);
 
   const updateService = useCallback((id: string, patch: Partial<ServiceItem>) => {
-    setDomain((d) => ({
+    setDirtyDomain((d) => ({
       ...d,
       services: d.services.map((s) => (s.id === id ? { ...s, ...patch } : s)),
     }));
   }, []);
 
-  const archiveService = useCallback((id: string) => {
-    setDomain((d) => ({
+  const deleteService = useCallback((id: string) => {
+    setDirtyDomain((d) => ({ ...d, services: d.services.filter((s) => s.id !== id) }));
+  }, []);
+
+  // ── Consultation Questions ────────────────────────────────────────────────
+
+  const addQuestion = useCallback((draft: Omit<ServiceQuestion, 'id' | 'sortOrder'>) => {
+    setDirtyDomain((d) => ({
       ...d,
-      services: d.services.map((s) => (s.id === id ? { ...s, isActive: false } : s)),
+      services: d.services.map((s) => {
+        if (s.id !== draft.serviceId) return s;
+        return {
+          ...s,
+          questions: [...s.questions, { ...draft, id: nextId('q'), sortOrder: s.questions.length }],
+        };
+      }),
     }));
   }, []);
 
-  const addAddon = useCallback((draft: Omit<AddOnProduct, 'id' | 'sortOrder'>) => {
-    setDomain((d) => ({
+  const updateQuestion = useCallback((questionId: string, patch: Partial<ServiceQuestion>) => {
+    setDirtyDomain((d) => ({
       ...d,
-      addons: [...d.addons, { ...draft, id: nextId('prod'), sortOrder: d.addons.length }],
+      services: d.services.map((s) => ({
+        ...s,
+        questions: s.questions.map((q) => (q.id === questionId ? { ...q, ...patch } : q)),
+      })),
     }));
   }, []);
 
-  const updateAddon = useCallback((id: string, patch: Partial<AddOnProduct>) => {
-    setDomain((d) => ({
+  const deleteQuestion = useCallback((questionId: string) => {
+    setDirtyDomain((d) => ({
       ...d,
-      addons: d.addons.map((a) => (a.id === id ? { ...a, ...patch } : a)),
+      services: d.services.map((s) => ({
+        ...s,
+        questions: s.questions.filter((q) => q.id !== questionId),
+      })),
     }));
-  }, []);
-
-  const removeAddon = useCallback((id: string) => {
-    setDomain((d) => ({ ...d, addons: d.addons.filter((a) => a.id !== id) }));
-  }, []);
-
-  const addBundle = useCallback((draft: Omit<ServiceBundle, 'id'>) => {
-    setDomain((d) => ({
-      ...d,
-      bundles: [...d.bundles, { ...draft, id: nextId('bundle') }],
-    }));
-  }, []);
-
-  const updateBundle = useCallback((id: string, patch: Partial<ServiceBundle>) => {
-    setDomain((d) => ({
-      ...d,
-      bundles: d.bundles.map((b) => (b.id === id ? { ...b, ...patch } : b)),
-    }));
-  }, []);
-
-  const removeBundle = useCallback((id: string) => {
-    setDomain((d) => ({ ...d, bundles: d.bundles.filter((b) => b.id !== id) }));
   }, []);
 
   return {
+    isDirty,
+    isSaving,
+    handleSave,
+    handleReset,
     domain,
     addCategory,
     updateCategory,
-    removeCategory,
+    deleteCategory,
     addService,
     updateService,
-    archiveService,
-    addAddon,
-    updateAddon,
-    removeAddon,
-    addBundle,
-    updateBundle,
-    removeBundle,
+    deleteService,
+    addQuestion,
+    updateQuestion,
+    deleteQuestion,
   };
 }

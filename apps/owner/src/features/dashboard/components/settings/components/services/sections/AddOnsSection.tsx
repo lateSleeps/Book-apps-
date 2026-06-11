@@ -2,81 +2,93 @@
 
 import { ShoppingBag } from '@phosphor-icons/react';
 import {
-  SettingsListCard,
   SettingsEmptyState,
+  EntityActionMenu,
   SettingsAddButton,
 } from '@/features/dashboard/components/settings/components/shared';
 import {
   SettingsSection,
   SettingsSectionHeader,
-  SettingsContentCard,
 } from '@/features/dashboard/components/settings/layout';
 import type { AddOnProduct } from '@/features/dashboard/components/settings/types/services.types';
-import type { ServicesController } from '@/features/dashboard/hooks/settings/useServicesController';
+import { formatPrice } from '@/shared/lib/format';
 
 interface AddOnsSectionProps {
   addons: AddOnProduct[];
-  onToggleActive: ServicesController['updateAddon'];
   onAdd: () => void;
+  onEdit: (addon: AddOnProduct) => void;
+  onDelete: (addon: AddOnProduct) => void;
 }
 
-export function AddOnsSection({ addons, onToggleActive, onAdd }: AddOnsSectionProps) {
+export function AddOnsSection({ addons, onAdd, onEdit, onDelete }: AddOnsSectionProps) {
   return (
     <SettingsSection>
       <SettingsSectionHeader
         title="Produk Add-on"
-        description="Produk tambahan yang ditawarkan kepada pelanggan saat booking. Upload foto produk untuk tampil di customer app."
-        action={<SettingsAddButton onClick={onAdd}>+ Tambah Produk</SettingsAddButton>}
+        description="Produk tambahan yang ditawarkan kepada pelanggan saat booking."
+        action={<SettingsAddButton onClick={onAdd}>Tambah Produk</SettingsAddButton>}
       />
 
-      <SettingsContentCard padding="none">
-        {addons.length === 0 ? (
+      {addons.length === 0 ? (
+        <div className="rounded-r16 border border-bd-card bg-bg-card shadow-card">
           <SettingsEmptyState
             icon={<ShoppingBag size={24} weight="duotone" />}
             title="Belum ada produk add-on"
             description="Tambah produk pelengkap yang bisa dipesan bersamaan dengan layanan."
           />
-        ) : (
-          <div className="divide-y divide-bd-row">
-            {addons.map((addon) => (
-              <SettingsListCard
-                key={addon.id}
-                className="rounded-none border-0 shadow-none"
-                imageUrl={addon.imageUrl ?? undefined}
-                imageFallback={addon.imageEmoji}
-                title={addon.name}
-                description={addon.description}
-                badges={[
-                  {
-                    label: new Intl.NumberFormat('id-ID', {
-                      style: 'currency',
-                      currency: 'IDR',
-                      maximumFractionDigits: 0,
-                    }).format(addon.price),
-                    variant: 'default',
-                  },
-                  {
-                    label: addon.isActive ? 'Aktif' : 'Nonaktif',
-                    variant: addon.isActive ? 'success' : 'default',
-                  },
-                  ...(addon.imageUrl
-                    ? []
-                    : [{ label: 'Belum ada foto', variant: 'warning' as const }]),
-                ]}
-                actions={
-                  <button
-                    type="button"
-                    onClick={() => onToggleActive(addon.id, { isActive: !addon.isActive })}
-                    className="rounded-r8 border border-bd-card px-s8 py-s4 text-ts-cap2 text-tx-control transition-colors hover:bg-bg-hover"
-                  >
-                    {addon.isActive ? 'Nonaktifkan' : 'Aktifkan'}
-                  </button>
-                }
-              />
-            ))}
-          </div>
-        )}
-      </SettingsContentCard>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-s12 md:grid-cols-3 lg:grid-cols-4">
+          {addons.map((addon) => (
+            <div
+              key={addon.id}
+              className="flex flex-col gap-s12 rounded-r16 border border-bd-card bg-bg-card p-s16 shadow-card transition-shadow hover:shadow-dropdown"
+            >
+              <div className="flex items-center justify-end">
+                <EntityActionMenu
+                  actions={[
+                    { label: 'Edit Produk', onClick: () => onEdit(addon) },
+                    { label: 'Hapus Permanen', variant: 'danger', onClick: () => onDelete(addon) },
+                  ]}
+                />
+              </div>
+
+              <div className="flex justify-center">
+                {addon.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={addon.imageUrl}
+                    alt={addon.name}
+                    className="h-16 w-16 rounded-r12 object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="flex h-16 w-16 items-center justify-center rounded-r12 bg-bg-control">
+                    <ShoppingBag size={24} weight="duotone" className="text-tx-muted" />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-1 flex-col gap-s4">
+                <p className="m-0 text-ts-body font-semibold text-tx-primary">{addon.name}</p>
+                {addon.description && (
+                  <p className="m-0 line-clamp-2 text-ts-fn text-tx-secondary">
+                    {addon.description}
+                  </p>
+                )}
+              </div>
+
+              <div className="border-t border-bd-row pt-s12">
+                <p className="m-0 text-ts-fn font-bold text-tx-primary">
+                  {formatPrice(addon.price)}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </SettingsSection>
   );
 }

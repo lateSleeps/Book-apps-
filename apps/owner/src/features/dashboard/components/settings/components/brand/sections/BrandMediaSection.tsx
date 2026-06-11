@@ -2,11 +2,7 @@ import {
   SettingsFormGrid,
   SettingsUploadField,
 } from '@/features/dashboard/components/settings/components/shared';
-import {
-  SettingsSection,
-  SettingsSectionHeader,
-  SettingsContentCard,
-} from '@/features/dashboard/components/settings/layout';
+import { SettingsPanelSection } from '@/features/dashboard/components/settings/layout';
 import type { BrandMedia } from '@/features/dashboard/components/settings/types/brand.types';
 
 interface BrandMediaSectionProps {
@@ -25,27 +21,29 @@ export function BrandMediaSection({
   removeCoverImage,
 }: BrandMediaSectionProps) {
   return (
-    <SettingsSection>
-      <SettingsSectionHeader
-        title="Logo & Foto Cover"
-        description="Aset visual utama yang ditampilkan di halaman booking."
-      />
-      <SettingsContentCard>
-        <SettingsFormGrid cols={2}>
-          <SettingsUploadField
-            variant="logo"
-            value={media.logoUrl}
-            onChange={setLogo}
-            onRemove={removeLogo}
-          />
-          <SettingsUploadField
-            variant="cover"
-            value={media.coverImageUrl}
-            onChange={setCoverImage}
-            onRemove={removeCoverImage}
-          />
-        </SettingsFormGrid>
-      </SettingsContentCard>
-    </SettingsSection>
+    <SettingsPanelSection
+      title="Logo & Foto Cover"
+      description="Aset visual utama yang ditampilkan di halaman booking."
+    >
+      {/* grid-cols-2 items-stretch: cover (right) sets row height via aspect-[16/6];
+          logo (left) mirrors that height as a square via h-full aspect-square */}
+      <SettingsFormGrid cols={2} className="items-stretch">
+        <SettingsUploadField
+          variant="logo"
+          fillHeight
+          zoneClassName="w-full h-full"
+          value={media.logoUrl}
+          onChange={setLogo}
+          onRemove={removeLogo}
+          className="w-full"
+        />
+        <SettingsUploadField
+          variant="cover"
+          value={media.coverImageUrl}
+          onChange={setCoverImage}
+          onRemove={removeCoverImage}
+        />
+      </SettingsFormGrid>
+    </SettingsPanelSection>
   );
 }

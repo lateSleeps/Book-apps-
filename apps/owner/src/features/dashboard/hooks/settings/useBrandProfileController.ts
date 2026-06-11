@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
+import type { BaseSettingsController } from './types/BaseSettingsController';
 import type {
   BrandProfile,
   BrandIdentity,
@@ -42,7 +43,7 @@ const MOCK_PROFILE: BrandProfile = {
 
 // ── Controller ────────────────────────────────────────────────────────────────
 
-export interface BrandProfileController {
+export interface BrandProfileController extends BaseSettingsController {
   profile: BrandProfile;
   isDirty: boolean;
   isSaving: boolean;

@@ -34,7 +34,7 @@ export function SettingsDangerZone({
     setPendingIndex(null);
   }
 
-  async function handleConfirm(action: DangerAction, idx: number) {
+  async function handleConfirm(action: DangerAction, _idx: number) {
     await action.onConfirm();
     setPendingIndex(null);
   }

@@ -10,7 +10,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { VisitRecord } from '../../types/history.types';
 
-interface ProofZoom {
+export interface ProofZoom {
   url: string;
   label: string;
 }

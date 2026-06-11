@@ -34,6 +34,8 @@ interface SettingsListCardProps {
   className?: string;
   /** Full row is clickable */
   onClick?: () => void;
+  /** Thumbnail size — default 'md' (40px), 'lg' = 56px */
+  thumbnailSize?: 'md' | 'lg';
 }
 
 export function SettingsListCard({
@@ -45,7 +47,12 @@ export function SettingsListCard({
   actions,
   className,
   onClick,
+  thumbnailSize = 'md',
 }: SettingsListCardProps) {
+  const thumbClass =
+    thumbnailSize === 'lg'
+      ? 'h-14 w-14 rounded-r12 text-ts-t3'
+      : 'h-10 w-10 rounded-r10 text-ts-body';
   const isClickable = typeof onClick === 'function';
 
   return (
@@ -71,9 +78,9 @@ export function SettingsListCard({
         <div className="shrink-0">
           {imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={imageUrl} alt={title} className="h-10 w-10 rounded-r10 object-cover" />
+            <img src={imageUrl} alt={title} className={`${thumbClass} object-cover`} />
           ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-r10 bg-bg-control text-ts-body">
+            <div className={`flex items-center justify-center bg-bg-control ${thumbClass}`}>
               {imageFallback}
             </div>
           )}

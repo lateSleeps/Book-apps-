@@ -2,8 +2,8 @@
 
 import { ChatCircleText } from '@phosphor-icons/react';
 import {
-  SettingsListCard,
-  SettingsEmptyState,
+  EntityActionMenu,
+  SettingsAddButton,
 } from '@/features/dashboard/components/settings/components/shared';
 import {
   SettingsSection,
@@ -23,74 +23,107 @@ const QUESTION_TYPE_LABEL: Record<ServiceQuestion['type'], string> = {
 
 interface ConsultationQuestionsSectionProps {
   services: ServiceItem[];
-  onAddQuestion: (serviceId: string) => void;
+  onAddQuestion: (serviceId: string, serviceName: string) => void;
+  onEditQuestion: (question: ServiceQuestion, serviceName: string) => void;
+  onDeleteQuestion: (question: ServiceQuestion) => void;
 }
 
 export function ConsultationQuestionsSection({
   services,
   onAddQuestion,
+  onEditQuestion,
+  onDeleteQuestion,
 }: ConsultationQuestionsSectionProps) {
-  const servicesWithQuestions = services.filter((s) => s.questions.length > 0);
-  const allQuestions: Array<ServiceQuestion & { serviceName: string }> =
-    servicesWithQuestions.flatMap((s) => s.questions.map((q) => ({ ...q, serviceName: s.name })));
+  const activeServices = services.filter((s) => s.isActive);
 
   return (
     <SettingsSection>
       <SettingsSectionHeader
         title="Pertanyaan Konsultasi"
-        description="Pertanyaan yang ditampilkan saat pelanggan memilih layanan tertentu. Sumber kebenaran untuk customer app."
+        description="Pertanyaan yang ditampilkan saat pelanggan memilih layanan tertentu."
       />
 
-      {services.length === 0 ? (
+      {activeServices.length === 0 ? (
         <SettingsContentCard>
           <p className="text-ts-fn text-tx-secondary">
             Tambah layanan terlebih dahulu sebelum mengatur pertanyaan konsultasi.
           </p>
         </SettingsContentCard>
       ) : (
-        <>
-          <SettingsContentCard padding="none">
-            {allQuestions.length === 0 ? (
-              <SettingsEmptyState
-                icon={<ChatCircleText size={24} weight="duotone" />}
-                title="Belum ada pertanyaan konsultasi"
-                description="Pertanyaan ditampilkan kepada pelanggan saat memilih layanan yang membutuhkan detail tambahan."
-              />
-            ) : (
-              <div className="divide-y divide-bd-row">
-                {allQuestions.map((q) => (
-                  <SettingsListCard
-                    key={q.id}
-                    className="rounded-none border-0 shadow-none"
-                    imageFallback={q.type === 'photo' ? '📷' : q.type === 'chips' ? '🔘' : '✏️'}
-                    title={q.label}
-                    description={q.serviceName}
-                    badges={[
-                      { label: QUESTION_TYPE_LABEL[q.type], variant: 'info' },
-                      {
-                        label: q.required ? 'Wajib' : 'Opsional',
-                        variant: q.required ? 'warning' : 'default',
-                      },
-                    ]}
-                  />
-                ))}
-              </div>
-            )}
-          </SettingsContentCard>
-
-          <div className="flex flex-wrap gap-s8">
-            {services.map((svc) => (
-              <button
+        <div className="flex flex-col gap-s16">
+          {activeServices.map((svc) => {
+            const questions = svc.questions;
+            return (
+              <div
                 key={svc.id}
-                type="button"
-                onClick={() => onAddQuestion(svc.id)}
-                className="rounded-r10 border border-bd-card bg-bg-card px-s12 py-s8 text-ts-cap1 text-tx-control transition-colors hover:bg-bg-hover"
+                className="flex flex-col overflow-hidden rounded-r16 border border-bd-card bg-bg-card shadow-card"
               >
-                + Pertanyaan untuk {svc.name}
-              </button>
-            ))}
-          </div>
-        </>
+                {/* Service header */}
+                <div className="flex items-center justify-between border-b border-bd-row px-s16 py-s12">
+                  <div className="flex flex-col gap-s2">
+                    <p className="m-0 text-ts-fn font-semibold text-tx-primary">{svc.name}</p>
+                    <p className="m-0 text-ts-cap1 text-tx-muted">{questions.length} pertanyaan</p>
+                  </div>
+                  <SettingsAddButton onClick={() => onAddQuestion(svc.id, svc.name)}>
+                    Tambah
+                  </SettingsAddButton>
+                </div>
+
+                {/* Questions list */}
+                {questions.length === 0 ? (
+                  <div className="flex items-center gap-s12 px-s16 py-s16">
+                    <ChatCircleText size={18} weight="duotone" className="shrink-0 text-tx-muted" />
+                    <p className="m-0 text-ts-cap1 text-tx-secondary">
+                      Belum ada pertanyaan untuk layanan ini.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-bd-row">
+                    {questions.map((q) => (
+                      <div key={q.id} className="flex items-center gap-s12 px-s16 py-s12">
+                        {/* Type badge */}
+                        <span className="shrink-0 rounded-r6 bg-bg-control px-s8 py-s4 text-ts-cap2 font-medium text-tx-secondary">
+                          {QUESTION_TYPE_LABEL[q.type]}
+                        </span>
+
+                        {/* Label */}
+                        <div className="flex flex-1 flex-col gap-s2 overflow-hidden">
+                          <p className="m-0 truncate text-ts-fn font-medium text-tx-primary">
+                            {q.label}
+                          </p>
+                          {q.type === 'chips' && q.options.length > 0 && (
+                            <p className="m-0 truncate text-ts-cap1 text-tx-muted">
+                              {q.options.join(' · ')}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Required badge */}
+                        {q.required && (
+                          <span className="shrink-0 rounded-r6 bg-ac-danger/10 px-s8 py-s4 text-ts-cap2 font-medium text-ac-danger">
+                            Wajib
+                          </span>
+                        )}
+
+                        {/* Kebab action menu */}
+                        <EntityActionMenu
+                          actions={[
+                            { label: 'Edit', onClick: () => onEditQuestion(q, svc.name) },
+                            {
+                              label: 'Hapus',
+                              variant: 'danger',
+                              onClick: () => onDeleteQuestion(q),
+                            },
+                          ]}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       )}
     </SettingsSection>
   );

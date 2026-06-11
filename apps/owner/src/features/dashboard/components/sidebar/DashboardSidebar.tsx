@@ -16,7 +16,7 @@ import {
   CaretRight,
 } from '@phosphor-icons/react';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCurrentUser, useHasPermission } from '@/features/auth/hooks/useAuth';
 import { Permission } from '@/features/auth/types/permissions.types';
 import { getRoleColor, getRoleDisplayName } from '@/features/auth/utils/role-permissions';
@@ -111,6 +111,22 @@ export function DashboardSidebar() {
   const currentUser = useCurrentUser();
   const canViewSettings = useHasPermission(SETTINGS_PERMISSION);
   const [collapsed, setCollapsed] = useState(false);
+
+  // usePathname can be null during certain render passes — guard it so the
+  // whole sidebar (incl. the collapse toggle) never crashes.
+  const isActive = (path: string) => pathname?.startsWith(path) ?? false;
+
+  useEffect(() => {
+    setCollapsed(localStorage.getItem('rb-sidebar-collapsed') === '1');
+  }, []);
+
+  function toggleCollapsed() {
+    setCollapsed((c) => {
+      const next = !c;
+      localStorage.setItem('rb-sidebar-collapsed', next ? '1' : '0');
+      return next;
+    });
+  }
 
   const w = collapsed ? 80 : 300;
 
@@ -250,7 +266,7 @@ export function DashboardSidebar() {
                 label={label}
                 path={path}
                 Icon={Icon}
-                active={pathname.startsWith(path)}
+                active={isActive(path)}
                 collapsed={collapsed}
               />
             ))}
@@ -281,7 +297,7 @@ export function DashboardSidebar() {
                 label={label}
                 path={path}
                 Icon={Icon}
-                active={pathname.startsWith(path)}
+                active={isActive(path)}
                 collapsed={collapsed}
               />
             ))}
@@ -311,7 +327,7 @@ export function DashboardSidebar() {
               label="Bantuan"
               path="/dashboard/help"
               Icon={Question}
-              active={pathname.startsWith('/dashboard/help')}
+              active={isActive('/dashboard/help')}
               collapsed={collapsed}
             />
             {canViewSettings && (
@@ -319,7 +335,7 @@ export function DashboardSidebar() {
                 label="Pengaturan"
                 path="/dashboard/settings"
                 Icon={Gear}
-                active={pathname.startsWith('/dashboard/settings')}
+                active={isActive('/dashboard/settings')}
                 collapsed={collapsed}
               />
             )}
@@ -358,7 +374,7 @@ export function DashboardSidebar() {
                   flexShrink: 0,
                 }}
               >
-                {currentUser.avatar || currentUser.name?.charAt(0) || '?'}
+                {currentUser.name?.charAt(0) || '?'}
               </div>
               {!collapsed && (
                 <>
@@ -402,12 +418,13 @@ export function DashboardSidebar() {
 
       {/* Floating chevron — pinned to right edge of sidebar */}
       <button
-        onClick={() => setCollapsed((c) => !c)}
+        onClick={toggleCollapsed}
+        aria-label={collapsed ? 'Buka sidebar' : 'Tutup sidebar'}
         style={{
           position: 'fixed',
           top: 48,
           left: w - 14,
-          zIndex: 40,
+          zIndex: 50,
           width: 28,
           height: 28,
           borderRadius: '50%',
