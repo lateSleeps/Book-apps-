@@ -27,6 +27,12 @@ interface SettingsListCardProps {
   imageUrl?: string;
   /** Fallback shown when no imageUrl — emoji or initials */
   imageFallback?: string;
+  /**
+   * Custom leading slot — replaces the thumbnail entirely when provided.
+   * Use when the thumbnail requires a React component (e.g. AvatarBubble).
+   * Takes precedence over imageUrl / imageFallback.
+   */
+  leadingSlot?: ReactNode;
   badges?: BadgeConfig[];
   /** Action buttons / icon buttons rendered on the right */
   actions?: ReactNode;
@@ -43,6 +49,7 @@ export function SettingsListCard({
   description,
   imageUrl,
   imageFallback,
+  leadingSlot,
   badges,
   actions,
   className,
@@ -73,8 +80,10 @@ export function SettingsListCard({
         className
       )}
     >
-      {/* Thumbnail */}
-      {(imageUrl || imageFallback) && (
+      {/* Thumbnail / leading slot */}
+      {leadingSlot ? (
+        <div className="shrink-0">{leadingSlot}</div>
+      ) : imageUrl || imageFallback ? (
         <div className="shrink-0">
           {imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -85,7 +94,7 @@ export function SettingsListCard({
             </div>
           )}
         </div>
-      )}
+      ) : null}
 
       {/* Text */}
       <div className="min-w-0 flex-1">
