@@ -2,15 +2,15 @@
 
 /**
  * @responsibility
- * Staff availability timeline — staff-first layout.
+ * Staff availability timeline — Apple-style information hierarchy.
  *
- * Layout order:
- *   1. Section header
- *   2. StaffPicker — identity + absence metrics + upcoming leave in trigger
- *   3. SettingsAddButton — primary CTA above timeline (intent: add before browse)
- *   4. Inline add form (appears between button and timeline when open)
- *   5. Timeline — activity-feed grouped by month, descending
- *   6. SettingsEmptyState — when no records exist
+ * Section order:
+ *   A. Staff selector   — identity only, full-width card
+ *   B. Summary card     — 3-column equal grid (catatan / hari / berikutnya)
+ *   C. Timeline         — primary content, grouped by month
+ *
+ * Staff is context. Leave records are the primary content.
+ * No metric duplication between selector and summary card.
  */
 
 import { CalendarX, CaretDown, CaretUp, Check, Users } from '@phosphor-icons/react';
@@ -47,7 +47,6 @@ const LEAVE_LABELS: Record<LeaveType, string> = {
   UNAVAILABLE: 'Tidak Tersedia',
 };
 
-// Badge token classes per type — no hardcoded colors
 const LEAVE_BADGE_CLASS: Record<LeaveType, string> = {
   LEAVE: 'bg-st-confirmed-bg text-st-confirmed',
   SICK: 'bg-st-cancelled-bg text-st-cancelled',
@@ -100,7 +99,6 @@ const ID_DAY: string[] = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat',
 
 // ── Date helpers ──────────────────────────────────────────────────────────────
 
-/** "YYYY-MM-DD" → "Jumat, 20 Juni 2026" */
 function formatDateLong(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number);
   if (!y || !m || !d) return iso;
@@ -108,27 +106,23 @@ function formatDateLong(iso: string): string {
   return `${ID_DAY[dt.getDay()]}, ${d} ${ID_MONTH[m - 1]} ${y}`;
 }
 
-/** "YYYY-MM-DD" → "20 Jun 2026" */
 function formatDateShort(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number);
   if (!y || !m || !d) return iso;
   return `${d} ${ID_MONTH_SHORT[m - 1]} ${y}`;
 }
 
-/** "YYYY-MM-DD" → "Juni 2026" — used as timeline group label */
 function monthYearLabel(iso: string): string {
   const [y, m] = iso.split('-').map(Number);
   if (!y || !m) return iso;
   return `${ID_MONTH[m - 1]} ${y}`;
 }
 
-/** "YYYY-MM-DD" → sortable number YYYYMM */
 function monthSortKey(iso: string): number {
   const [y, m] = iso.split('-').map(Number);
   return (y ?? 0) * 100 + (m ?? 0);
 }
 
-/** Today as "YYYY-MM-DD" */
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
@@ -138,21 +132,18 @@ function todayIso(): string {
 interface AbsenceMetrics {
   totalCatatan: number;
   totalHari: number;
-  lastDate: string | null;
   nextLeave: string | null;
 }
 
 function computeMetrics(leaves: StaffLeave[]): AbsenceMetrics {
   const today = todayIso();
-  const sorted = [...leaves].sort((a, b) => b.date.localeCompare(a.date));
-  const upcoming = sorted
+  const upcoming = [...leaves]
     .filter((l) => l.date >= today && l.type === 'LEAVE')
     .sort((a, b) => a.date.localeCompare(b.date));
 
   return {
     totalCatatan: leaves.length,
     totalHari: leaves.length,
-    lastDate: sorted[0]?.date ?? null,
     nextLeave: upcoming[0]?.date ?? null,
   };
 }
@@ -167,14 +158,12 @@ interface TimelineGroup {
 
 function groupByMonth(leaves: StaffLeave[]): TimelineGroup[] {
   const map = new Map<string, StaffLeave[]>();
-
   for (const leave of leaves) {
     const label = monthYearLabel(leave.date);
     const existing = map.get(label) ?? [];
     existing.push(leave);
     map.set(label, existing);
   }
-
   return Array.from(map.entries())
     .map(([label, entries]) => ({
       label,
@@ -185,25 +174,18 @@ function groupByMonth(leaves: StaffLeave[]): TimelineGroup[] {
 }
 
 // ── Avatar bubble ─────────────────────────────────────────────────────────────
-// size "sm" = 32px — used in compact selector trigger and dropdown rows.
-// Inline style only for runtime-computed bg — cannot be Tailwind.
+// Inline style only for runtime-computed bg.
 
-type AvatarSize = 'sm' | 'md';
-
-function AvatarBubble({ name, size = 'sm' }: { name: string; size?: AvatarSize }) {
+function AvatarBubble({ name }: { name: string }) {
   const { bg } = avatarColor(name);
   const initials = getInitials(name);
   const isTwoChar = initials.length > 1;
 
-  const sizeClass = size === 'sm' ? 'h-8 w-8 rounded-r8' : 'h-10 w-10 rounded-r10';
-  const textClass = isTwoChar ? 'text-ts-cap2' : 'text-ts-fn';
-
   return (
     <div
       className={cn(
-        'flex shrink-0 items-center justify-center font-semibold text-tx-primary',
-        sizeClass,
-        textClass
+        'flex h-10 w-10 shrink-0 items-center justify-center rounded-r10 font-semibold text-tx-primary',
+        isTwoChar ? 'text-ts-fn' : 'text-ts-body'
       )}
       style={{ background: bg }}
     >
@@ -242,19 +224,17 @@ function LeaveBadge({ type }: { type: LeaveType }) {
   );
 }
 
-// ── StaffPicker ───────────────────────────────────────────────────────────────
-// Compact inline selector — not a large card.
-// Trigger: small avatar + name + role/status + chevron.
-// Absence metrics are rendered as plain supporting text OUTSIDE this component
-// by the parent — they are not part of the selector affordance itself.
+// ── Section A: Staff selector card ────────────────────────────────────────────
+// Identity only — no metrics, no record counts, no leave dates.
+// Metrics live in the separate Summary card (Section B).
 
-interface StaffPickerProps {
+interface StaffSelectorProps {
   staff: StaffMember[];
   selectedId: string;
   onSelect: (id: string) => void;
 }
 
-function StaffPicker({ staff, selectedId, onSelect }: StaffPickerProps) {
+function StaffSelector({ staff, selectedId, onSelect }: StaffSelectorProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const selected = staff.find((s) => s.id === selectedId) ?? staff[0]!;
@@ -271,38 +251,27 @@ function StaffPicker({ staff, selectedId, onSelect }: StaffPickerProps) {
   }, [open]);
 
   return (
-    <div ref={containerRef} className="relative inline-block">
-      {/* Compact trigger — no card, no shadow, input-like weight */}
+    <div ref={containerRef} className="relative">
+      {/* Trigger — full-width card, identity only */}
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-s8 rounded-r10 border border-bd-card bg-bg-input px-s12 py-s8 transition-colors hover:bg-bg-hover"
+        className="flex w-full items-center gap-s12 rounded-r12 border border-bd-card bg-bg-card px-s16 py-s12 shadow-card transition-colors hover:bg-bg-hover"
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <AvatarBubble name={selected.fullName} size="sm" />
-        <div className="text-left">
-          <p className="text-ts-fn font-semibold text-tx-primary">{selected.fullName}</p>
-          <div className="flex items-center gap-s6">
-            <span className="text-ts-cap1 text-tx-secondary">{ROLE_LABEL[selected.role]}</span>
-            <span className="text-ts-cap2 text-tx-muted">·</span>
+        <AvatarBubble name={selected.fullName} />
+        <div className="min-w-0 flex-1 text-left">
+          <p className="truncate text-ts-sub font-semibold text-tx-primary">{selected.fullName}</p>
+          <div className="mt-s2 flex items-center gap-s8">
+            <span className="text-ts-fn text-tx-secondary">{ROLE_LABEL[selected.role]}</span>
             <StatusBadge isActive={selected.isActive} />
           </div>
         </div>
         {open ? (
-          <CaretUp
-            size={13}
-            weight="duotone"
-            className="ml-s4 shrink-0 text-tx-muted"
-            aria-hidden
-          />
+          <CaretUp size={14} weight="duotone" className="shrink-0 text-tx-muted" aria-hidden />
         ) : (
-          <CaretDown
-            size={13}
-            weight="duotone"
-            className="ml-s4 shrink-0 text-tx-muted"
-            aria-hidden
-          />
+          <CaretDown size={14} weight="duotone" className="shrink-0 text-tx-muted" aria-hidden />
         )}
       </button>
 
@@ -310,7 +279,7 @@ function StaffPicker({ staff, selectedId, onSelect }: StaffPickerProps) {
       {open && (
         <div
           role="listbox"
-          className="absolute left-0 top-full z-20 mt-s4 min-w-full overflow-hidden rounded-r12 border border-bd-card bg-bg-card shadow-card"
+          className="absolute left-0 right-0 top-full z-20 mt-s4 overflow-hidden rounded-r12 border border-bd-card bg-bg-card shadow-card"
         >
           {staff.map((member) => {
             const isSelected = member.id === selectedId;
@@ -325,26 +294,25 @@ function StaffPicker({ staff, selectedId, onSelect }: StaffPickerProps) {
                   setOpen(false);
                 }}
                 className={cn(
-                  'flex w-full items-center gap-s8 border-b border-bd-row px-s12 py-s8 transition-colors last:border-b-0 hover:bg-bg-hover',
+                  'flex w-full items-center gap-s12 border-b border-bd-row px-s16 py-s8 transition-colors last:border-b-0 hover:bg-bg-hover',
                   isSelected && 'bg-bg-hover'
                 )}
               >
-                <AvatarBubble name={member.fullName} size="sm" />
+                <AvatarBubble name={member.fullName} />
                 <div className="min-w-0 flex-1 text-left">
                   <p className="truncate text-ts-fn font-semibold text-tx-primary">
                     {member.fullName}
                   </p>
-                  <div className="flex items-center gap-s6">
+                  <div className="mt-s2 flex items-center gap-s8">
                     <span className="text-ts-cap1 text-tx-secondary">
                       {ROLE_LABEL[member.role]}
                     </span>
-                    <span className="text-ts-cap2 text-tx-muted">·</span>
                     <StatusBadge isActive={member.isActive} />
                   </div>
                 </div>
                 {isSelected && (
                   <Check
-                    size={13}
+                    size={14}
                     weight="duotone"
                     className="shrink-0 text-ac-primary"
                     aria-hidden
@@ -359,9 +327,50 @@ function StaffPicker({ staff, selectedId, onSelect }: StaffPickerProps) {
   );
 }
 
-// ── Timeline entry ────────────────────────────────────────────────────────────
-// Lightweight activity-feed row — badge + date + note + delete.
-// No outer card wrapper; separated only by a thin divider.
+// ── Section B: Summary card ───────────────────────────────────────────────────
+// 3-column equal-width grid. No left-heavy alignment.
+// Values are large; labels are small and subtle below.
+
+interface SummaryCardProps {
+  metrics: AbsenceMetrics;
+}
+
+function SummaryCard({ metrics }: SummaryCardProps) {
+  const nextLeaveLabel = metrics.nextLeave ? formatDateShort(metrics.nextLeave) : '—';
+  const nextLeaveIsUpcoming = metrics.nextLeave !== null;
+
+  return (
+    <div className="grid grid-cols-3 divide-x divide-bd-card overflow-hidden rounded-r12 border border-bd-card bg-bg-card shadow-card">
+      {/* Catatan */}
+      <div className="flex flex-col items-center gap-s4 px-s16 py-s14">
+        <span className="text-ts-t3 font-bold text-tx-primary">{metrics.totalCatatan}</span>
+        <span className="text-ts-cap1 text-tx-subtle">Catatan</span>
+      </div>
+
+      {/* Hari Tidak Hadir */}
+      <div className="flex flex-col items-center gap-s4 px-s16 py-s14">
+        <span className="text-ts-t3 font-bold text-tx-primary">{metrics.totalHari}</span>
+        <span className="text-center text-ts-cap1 text-tx-subtle">Hari Tidak Hadir</span>
+      </div>
+
+      {/* Cuti Berikutnya */}
+      <div className="flex flex-col items-center gap-s4 px-s16 py-s14">
+        <span
+          className={cn(
+            'text-ts-t3 font-bold',
+            nextLeaveIsUpcoming ? 'text-st-confirmed' : 'text-tx-subtle'
+          )}
+        >
+          {nextLeaveLabel}
+        </span>
+        <span className="text-ts-cap1 text-tx-subtle">Berikutnya</span>
+      </div>
+    </div>
+  );
+}
+
+// ── Section C: Timeline entry card ───────────────────────────────────────────
+// Full-width card per record. Vertical hierarchy: badge → date → note → delete.
 
 interface TimelineEntryProps {
   leave: StaffLeave;
@@ -370,26 +379,19 @@ interface TimelineEntryProps {
 
 function TimelineEntry({ leave, onDelete }: TimelineEntryProps) {
   return (
-    <div className="flex items-start gap-s12 px-s4 py-s12">
-      {/* Left — badge inline with date, note below */}
-      <div className="flex flex-1 flex-col gap-s4">
-        <div className="flex items-center gap-s8">
-          <LeaveBadge type={leave.type} />
-          <span className="text-ts-fn font-medium text-tx-primary">
-            {formatDateLong(leave.date)}
-          </span>
-        </div>
-        {leave.note && <p className="text-ts-fn text-tx-secondary">{leave.note}</p>}
+    <div className="flex flex-col gap-s8 rounded-r12 border border-bd-card bg-bg-card px-s16 py-s12 shadow-card">
+      <LeaveBadge type={leave.type} />
+      <p className="text-ts-fn font-medium text-tx-primary">{formatDateLong(leave.date)}</p>
+      {leave.note && <p className="text-ts-fn text-tx-secondary">{leave.note}</p>}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => onDelete(leave.id)}
+          className="text-ts-cap1 font-medium text-ac-danger transition-opacity hover:opacity-70"
+        >
+          Hapus
+        </button>
       </div>
-
-      {/* Right — delete, top-aligned with badge row */}
-      <button
-        type="button"
-        onClick={() => onDelete(leave.id)}
-        className="mt-0.5 shrink-0 text-ts-cap1 font-medium text-ac-danger transition-opacity hover:opacity-70"
-      >
-        Hapus
-      </button>
     </div>
   );
 }
@@ -452,7 +454,7 @@ export function LeaveSection({ ctrl }: Props) {
 
   return (
     <div className="flex flex-col gap-s16">
-      {/* Add button lives in the header action slot — no standalone row */}
+      {/* Header — add button in action slot */}
       <SettingsSectionHeader
         title="Cuti & Hari Tidak Tersedia"
         description="Catat hari cuti, sakit, dan ketidakhadiran staff."
@@ -463,25 +465,13 @@ export function LeaveSection({ ctrl }: Props) {
         }
       />
 
-      {/* ── Staff picker + supporting metadata ──────────────────────────── */}
-      <div className="flex flex-col gap-s6">
-        <StaffPicker staff={activeStaff} selectedId={resolvedId} onSelect={handleStaffChange} />
-        <p className="text-ts-cap1 text-tx-subtle">
-          {metrics.totalCatatan === 0
-            ? 'Belum ada catatan'
-            : `${metrics.totalCatatan} catatan · ${metrics.totalHari} hari tidak hadir`}
-          {metrics.nextLeave && (
-            <>
-              {' · '}
-              <span className="font-medium text-st-confirmed">
-                Cuti berikutnya: {formatDateShort(metrics.nextLeave)}
-              </span>
-            </>
-          )}
-        </p>
-      </div>
+      {/* ── A: Staff selector — identity only ─────────────────────────── */}
+      <StaffSelector staff={activeStaff} selectedId={resolvedId} onSelect={handleStaffChange} />
 
-      {/* ── Inline add form ───────────────────────────────────────────────── */}
+      {/* ── B: Summary — 3-column equal grid ──────────────────────────── */}
+      <SummaryCard metrics={metrics} />
+
+      {/* ── Inline add form ───────────────────────────────────────────── */}
       {showForm && (
         <SettingsContentCard padding="default">
           <SettingsFormGrid cols={2}>
@@ -539,7 +529,7 @@ export function LeaveSection({ ctrl }: Props) {
         </SettingsContentCard>
       )}
 
-      {/* ── Timeline ─────────────────────────────────────────────────────── */}
+      {/* ── C: Timeline — primary content ─────────────────────────────── */}
       {staffLeaves.length === 0 ? (
         <SettingsEmptyState
           icon={<CalendarX size={24} weight="duotone" />}
@@ -547,24 +537,18 @@ export function LeaveSection({ ctrl }: Props) {
           description="Tambahkan cuti, sakit, atau jadwal tidak tersedia untuk staff ini."
         />
       ) : (
-        <div className="flex flex-col gap-s8">
+        <div className="flex flex-col gap-s16">
           {groups.map((group) => (
-            <div key={group.label}>
-              {/* Month label */}
-              <div className="mb-s8 flex items-center gap-s8">
+            <div key={group.label} className="flex flex-col gap-s8">
+              {/* Month divider */}
+              <div className="flex items-center gap-s8">
                 <p className="shrink-0 text-ts-cap1 font-semibold text-tx-subtle">{group.label}</p>
                 <div className="h-px flex-1 bg-bd-row" />
               </div>
-
-              {/* Entries */}
-              <div className="flex flex-col">
-                {group.entries.map((leave, idx) => (
-                  <div key={leave.id}>
-                    <TimelineEntry leave={leave} onDelete={ctrl.removeLeave} />
-                    {idx < group.entries.length - 1 && <div className="h-px bg-bd-row" />}
-                  </div>
-                ))}
-              </div>
+              {/* Leave cards */}
+              {group.entries.map((leave) => (
+                <TimelineEntry key={leave.id} leave={leave} onDelete={ctrl.removeLeave} />
+              ))}
             </div>
           ))}
         </div>
