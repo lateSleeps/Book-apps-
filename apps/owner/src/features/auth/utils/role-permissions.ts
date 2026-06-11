@@ -8,9 +8,10 @@ import { Permission as PermissionEnum } from '../types/permissions.types';
 
 /**
  * Master access-role-to-permissions mapping.
- * OWNER  — full access including user/role management
- * ADMIN  — manage-level access (ex-MANAGER); cannot manage users/roles
- * STAFF  — employee access: own bookings, schedule, client history
+ * OWNER   — full access including user/role management
+ * ADMIN   — full operational + settings; cannot manage users/roles
+ * MANAGER — bookings, schedule, clients, services, staff; no settings/users
+ * STAFF   — own bookings, schedule, client history only
  */
 export const ROLE_PERMISSIONS_MAP: RolePermissionMap = {
   OWNER: [
@@ -92,6 +93,38 @@ export const ROLE_PERMISSIONS_MAP: RolePermissionMap = {
     PermissionEnum.EXPORT_DATA,
   ],
 
+  MANAGER: [
+    // Dashboard
+    PermissionEnum.VIEW_DASHBOARD,
+    PermissionEnum.VIEW_STATS,
+
+    // Bookings (full)
+    PermissionEnum.VIEW_BOOKINGS,
+    PermissionEnum.CREATE_BOOKING,
+    PermissionEnum.EDIT_BOOKING,
+    PermissionEnum.CANCEL_BOOKING,
+    PermissionEnum.MANAGE_PAYMENT,
+
+    // Schedule (full — all staff)
+    PermissionEnum.VIEW_SCHEDULE,
+    PermissionEnum.EDIT_SCHEDULE,
+    PermissionEnum.MANAGE_STAFF_SCHEDULE,
+    PermissionEnum.APPROVE_SCHEDULE,
+
+    // Clients (full)
+    PermissionEnum.VIEW_CLIENTS,
+    PermissionEnum.CREATE_CLIENT,
+    PermissionEnum.EDIT_CLIENT,
+    PermissionEnum.DELETE_CLIENT,
+    PermissionEnum.VIEW_CLIENT_HISTORY,
+
+    // Services & staff (no salon-level settings)
+    PermissionEnum.VIEW_SETTINGS,
+    PermissionEnum.MANAGE_SERVICES,
+    PermissionEnum.MANAGE_ADDONS,
+    PermissionEnum.MANAGE_STAFF,
+  ],
+
   STAFF: [
     // Dashboard
     PermissionEnum.VIEW_DASHBOARD,
@@ -125,6 +158,7 @@ export function getRoleDisplayName(role: string): string {
   const roleDisplayNames: Record<string, string> = {
     OWNER: 'Pemilik',
     ADMIN: 'Admin',
+    MANAGER: 'Manager',
     STAFF: 'Staf',
   };
   return roleDisplayNames[role] || role;
@@ -140,6 +174,7 @@ export function getRoleTokenClasses(role: string): string {
   const roleClasses: Record<string, string> = {
     OWNER: 'bg-st-confirmed-bg text-st-confirmed',
     ADMIN: 'bg-st-upcoming-bg text-st-upcoming',
+    MANAGER: 'bg-st-in-progress-bg text-st-in-progress',
     STAFF: 'bg-bg-control text-tx-subtle',
   };
   return roleClasses[role] ?? 'bg-bg-control text-tx-subtle';

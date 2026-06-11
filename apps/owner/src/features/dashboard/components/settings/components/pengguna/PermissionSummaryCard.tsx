@@ -16,6 +16,7 @@ const CAPABILITY_GROUPS: CapabilityGroup[] = [
     detail: {
       OWNER: 'Buat, edit, batalkan & kelola pembayaran',
       ADMIN: 'Buat, edit, batalkan & kelola pembayaran',
+      MANAGER: 'Buat, edit, batalkan & kelola pembayaran',
       STAFF: 'Lihat & kelola pemesanan sendiri',
     },
   },
@@ -24,6 +25,7 @@ const CAPABILITY_GROUPS: CapabilityGroup[] = [
     detail: {
       OWNER: 'Kelola jadwal semua staf',
       ADMIN: 'Kelola jadwal semua staf',
+      MANAGER: 'Kelola jadwal semua staf',
       STAFF: 'Edit jadwal sendiri',
     },
   },
@@ -32,6 +34,7 @@ const CAPABILITY_GROUPS: CapabilityGroup[] = [
     detail: {
       OWNER: 'Lihat, buat, edit & hapus data klien',
       ADMIN: 'Lihat, buat, edit & hapus data klien',
+      MANAGER: 'Lihat, buat, edit & hapus data klien',
       STAFF: 'Lihat riwayat klien',
     },
   },
@@ -40,6 +43,7 @@ const CAPABILITY_GROUPS: CapabilityGroup[] = [
     detail: {
       OWNER: 'Ubah info bisnis, layanan & tim',
       ADMIN: 'Ubah info bisnis, layanan & tim',
+      MANAGER: 'Kelola layanan & tim (tidak termasuk info bisnis)',
       STAFF: null,
     },
   },
@@ -48,6 +52,7 @@ const CAPABILITY_GROUPS: CapabilityGroup[] = [
     detail: {
       OWNER: 'Kelola akun & peran',
       ADMIN: null,
+      MANAGER: null,
       STAFF: null,
     },
   },

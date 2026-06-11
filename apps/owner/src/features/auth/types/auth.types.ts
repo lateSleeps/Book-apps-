@@ -8,12 +8,13 @@ import type { Permission } from './permissions.types';
 export type UserRole = 'OWNER' | 'MANAGER' | 'STYLIST' | 'STAFF';
 
 /**
- * Access tier — replaces the old 4-value UserRole.
- * OWNER   = full access (salon owner)
- * ADMIN   = manage-level access (ex-MANAGER)
- * STAFF   = employee access (ex-STYLIST)
+ * Access tier hierarchy (highest → lowest):
+ * OWNER   = full access (salon owner, cannot be invited)
+ * ADMIN   = full operational + settings access, cannot manage users
+ * MANAGER = operational access: bookings, schedule, staff, services
+ * STAFF   = own bookings and schedule only
  */
-export type AccessRole = 'OWNER' | 'ADMIN' | 'STAFF';
+export type AccessRole = 'OWNER' | 'ADMIN' | 'MANAGER' | 'STAFF';
 
 export type UserAccountStatus = 'ACTIVE' | 'INVITED' | 'INACTIVE' | 'REVOKED';
 

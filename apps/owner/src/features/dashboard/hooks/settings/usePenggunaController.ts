@@ -42,6 +42,22 @@ const SEED_USERS: User[] = [
     phone: '+62812345679',
   },
   {
+    id: 'manager-001',
+    name: 'Siti Aminah',
+    email: 'siti@rarabeauty.com',
+    role: 'MANAGER',
+    permissions: ROLE_PERMISSIONS_MAP.MANAGER,
+    salonId: 'salon-001',
+    isActive: true,
+    status: 'ACTIVE',
+    joinDate: '2024-02-01',
+    invitedAt: '2024-01-30T10:00:00.000Z',
+    lastLoginAt: '2026-06-10T11:00:00.000Z',
+    avatarUrl: null,
+    staffId: 'sty-4',
+    phone: '+62812345681',
+  },
+  {
     id: 'staff-002',
     name: 'Luna Sari',
     email: 'luna@rarabeauty.com',
@@ -91,10 +107,12 @@ const SEED_USERS: User[] = [
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+export type InvitableRole = 'ADMIN' | 'MANAGER' | 'STAFF';
+
 export interface InviteUserDraft {
   name: string;
   email: string;
-  role: 'ADMIN' | 'STAFF';
+  role: InvitableRole;
 }
 
 export interface PenggunaController {

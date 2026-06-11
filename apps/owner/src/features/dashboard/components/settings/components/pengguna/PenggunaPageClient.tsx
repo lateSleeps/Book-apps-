@@ -13,6 +13,7 @@ import {
   SettingsEmptyState,
   SettingsFieldGroup,
   SettingsInput,
+  SettingsSelect,
 } from '@/features/dashboard/components/settings/components/shared';
 import type {
   ActionItem,
@@ -23,7 +24,10 @@ import {
   SettingsSectionHeader,
   SettingsSideSheet,
 } from '@/features/dashboard/components/settings/layout';
-import type { PenggunaController } from '@/features/dashboard/hooks/settings/usePenggunaController';
+import type {
+  InvitableRole,
+  PenggunaController,
+} from '@/features/dashboard/hooks/settings/usePenggunaController';
 import { usePenggunaController } from '@/features/dashboard/hooks/settings/usePenggunaController';
 import { AvatarBubble } from '@/shared/components/ui/AvatarBubble';
 import { SegmentedControl } from '@/shared/components/ui/segmented-control';
@@ -34,7 +38,16 @@ import { avatarColor, getInitials } from '@/shared/lib/avatar';
 const ROLE_BADGE_CLASS: Record<AccessRole, string> = {
   OWNER: 'bg-st-confirmed-bg text-st-confirmed',
   ADMIN: 'bg-st-upcoming-bg text-st-upcoming',
+  MANAGER: 'bg-st-in-progress-bg text-st-in-progress',
   STAFF: 'bg-bg-control text-tx-subtle',
+};
+
+// ── Role select helpers ───────────────────────────────────────────────────────
+
+const ROLE_DESCRIPTION: Record<InvitableRole, string> = {
+  ADMIN: 'Akses penuh ke pengaturan dan operasional salon.',
+  MANAGER: 'Mengelola staff, jadwal, layanan, dan aktivitas operasional.',
+  STAFF: 'Mengelola pemesanan dan jadwal miliknya sendiri.',
 };
 
 const STATUS_LABEL: Record<User['status'], string> = {
@@ -183,56 +196,16 @@ type StatusFilter = 'all' | 'active' | 'invited' | 'inactive';
 
 type SheetMode = { kind: 'invite' } | { kind: 'edit'; user: User };
 
-// ── Role toggle (full-width, matches ServiceForm price toggle) ───────────────
-
-const ROLE_TOGGLE_OPTIONS: { value: 'ADMIN' | 'STAFF'; label: string; hint: string }[] = [
-  { value: 'ADMIN', label: 'Admin', hint: 'Kelola salon penuh (kecuali pengguna)' },
-  { value: 'STAFF', label: 'Staf', hint: 'Kelola pemesanan & jadwal sendiri' },
-];
-
-interface RoleToggleProps {
-  value: 'ADMIN' | 'STAFF';
-  onChange: (v: 'ADMIN' | 'STAFF') => void;
-}
-
-function RoleToggle({ value, onChange }: RoleToggleProps) {
-  return (
-    <div className="flex overflow-hidden rounded-r10 border border-bd-card text-ts-fn font-medium">
-      {ROLE_TOGGLE_OPTIONS.map((opt) => (
-        <button
-          key={opt.value}
-          type="button"
-          onClick={() => onChange(opt.value)}
-          className={`flex flex-1 flex-col items-center px-s16 py-s12 transition-colors ${
-            value === opt.value
-              ? 'bg-tx-primary text-bg-card'
-              : 'bg-bg-input text-tx-secondary hover:bg-bg-hover'
-          }`}
-        >
-          <span className="font-semibold">{opt.label}</span>
-          <span
-            className={`mt-s2 text-ts-cap2 font-normal ${
-              value === opt.value ? 'text-bg-card/80' : 'text-tx-muted'
-            }`}
-          >
-            {opt.hint}
-          </span>
-        </button>
-      ))}
-    </div>
-  );
-}
-
 // ── Invite sheet body ─────────────────────────────────────────────────────────
 
 interface InviteSheetBodyProps {
   name: string;
   email: string;
-  role: 'ADMIN' | 'STAFF';
+  role: InvitableRole;
   emailError: string;
   onName: (v: string) => void;
   onEmail: (v: string) => void;
-  onRole: (v: 'ADMIN' | 'STAFF') => void;
+  onRole: (v: InvitableRole) => void;
 }
 
 function InviteSheetBody({
@@ -273,8 +246,17 @@ function InviteSheetBody({
         />
       </SettingsFieldGroup>
 
-      <SettingsFieldGroup label="Peran Akses" required>
-        <RoleToggle value={role} onChange={onRole} />
+      <SettingsFieldGroup label="Peran Akses" required htmlFor="invite-role">
+        <SettingsSelect
+          id="invite-role"
+          value={role}
+          onChange={(e) => onRole(e.target.value as InvitableRole)}
+        >
+          <option value="ADMIN">Admin</option>
+          <option value="MANAGER">Manager</option>
+          <option value="STAFF">Staf</option>
+        </SettingsSelect>
+        <p className="mt-s6 text-ts-fn text-tx-secondary">{ROLE_DESCRIPTION[role]}</p>
       </SettingsFieldGroup>
 
       <div className="flex flex-col gap-s8">
@@ -289,9 +271,9 @@ function InviteSheetBody({
 
 interface EditSheetBodyProps {
   user: User;
-  editRole: 'ADMIN' | 'STAFF';
+  editRole: InvitableRole;
   isSelf: boolean;
-  onRoleChange: (v: 'ADMIN' | 'STAFF') => void;
+  onRoleChange: (v: InvitableRole) => void;
   ctrl: PenggunaController;
   onClose: () => void;
 }
@@ -372,7 +354,15 @@ function EditSheetBody({
       {isEditable && (
         <div className="flex flex-col gap-s8">
           <p className="text-ts-fn font-semibold text-tx-primary">Peran Akses</p>
-          <RoleToggle value={editRole} onChange={onRoleChange} />
+          <SettingsSelect
+            value={editRole}
+            onChange={(e) => onRoleChange(e.target.value as InvitableRole)}
+          >
+            <option value="ADMIN">Admin</option>
+            <option value="MANAGER">Manager</option>
+            <option value="STAFF">Staf</option>
+          </SettingsSelect>
+          <p className="text-ts-fn text-tx-secondary">{ROLE_DESCRIPTION[editRole]}</p>
         </div>
       )}
 
@@ -444,11 +434,11 @@ export function PenggunaPageClient() {
   // Invite form state
   const [inviteName, setInviteName] = useState('');
   const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState<'ADMIN' | 'STAFF'>('STAFF');
+  const [inviteRole, setInviteRole] = useState<InvitableRole>('STAFF');
   const [inviteEmailError, setInviteEmailError] = useState('');
 
   // Edit form state
-  const [editRole, setEditRole] = useState<'ADMIN' | 'STAFF'>('STAFF');
+  const [editRole, setEditRole] = useState<InvitableRole>('STAFF');
 
   // ── Derived counts ──────────────────────────────────────────────────────────
 
@@ -478,8 +468,8 @@ export function PenggunaPageClient() {
     );
   }, [ctrl.users, filter, search]);
 
-  // Sort: OWNER first, then ADMIN, then STAFF; within each tier, alphabetical
-  const ROLE_ORDER: Record<AccessRole, number> = { OWNER: 0, ADMIN: 1, STAFF: 2 };
+  // Sort: OWNER first, then ADMIN, MANAGER, STAFF; within each tier, alphabetical
+  const ROLE_ORDER: Record<AccessRole, number> = { OWNER: 0, ADMIN: 1, MANAGER: 2, STAFF: 3 };
   const sorted = useMemo(
     () =>
       [...filtered].sort((a, b) => {
@@ -501,7 +491,7 @@ export function PenggunaPageClient() {
   }
 
   function openEditSheet(user: User) {
-    const safeRole: 'ADMIN' | 'STAFF' = user.role === 'OWNER' ? 'ADMIN' : user.role;
+    const safeRole: InvitableRole = user.role === 'OWNER' ? 'ADMIN' : (user.role as InvitableRole);
     setEditRole(safeRole);
     setSheet({ kind: 'edit', user });
   }
@@ -525,11 +515,13 @@ export function PenggunaPageClient() {
   function handleEditSave() {
     if (sheet?.kind !== 'edit') return;
     const user = sheet.user;
-    const isDowngrade = user.role === 'ADMIN' && editRole === 'STAFF';
+    const ROLE_RANK: Record<InvitableRole, number> = { ADMIN: 0, MANAGER: 1, STAFF: 2 };
+    const currentRank = ROLE_RANK[user.role as InvitableRole] ?? 0;
+    const isDowngrade = ROLE_RANK[editRole] > currentRank;
     if (isDowngrade) {
       setConfirmPending({
         title: `Turunkan peran ${user.name}?`,
-        message: `${user.name} tidak akan lagi bisa mengubah pengaturan salon, mengelola staf, atau melihat laporan.`,
+        message: `${user.name} akan kehilangan beberapa akses sesuai dengan peran baru yang dipilih.`,
         confirmLabel: 'Ya, Turunkan',
         variant: 'danger',
         onConfirm: () => {
