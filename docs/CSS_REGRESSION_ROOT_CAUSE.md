@@ -240,3 +240,67 @@ After clearing `.next` and restarting dev:
 | `ls apps/owner/.next/static/css/app/`                           | `layout.css` present  |
 | `curl -I http://localhost:3001/_next/static/css/app/layout.css` | `HTTP/1.1 200 OK`     |
 | Settings page in browser                                        | Tailwind styles apply |
+
+---
+
+# CSS Regression #3
+
+**Date:** 2026-06-11
+**Trigger:** `pnpm --filter owner build` ran at 12:16 to verify the SettingsSelect commit compiled cleanly
+**Status:** Fixed — same fix as Regressions #1 and #2
+
+## Root Cause
+
+Identical mechanism to Regression #2.
+
+During the `SettingsSelect` investigation, `pnpm --filter owner build` was run at **12:16:57** to
+confirm the build compiled without errors. The dev server was running since **12:07** (restarted
+after Regression #2 fix). The production build replaced `.next` with production artifacts:
+
+- `BUILD_ID` = `hnI4t1xKkuPMSRghLxphy` (production hash, not `"development"`)
+- `.next/static/css/a7f03bfd95c22d89.css` — production bundle (50K)
+- `.next/static/css/app/` — directory exists but empty
+
+The dev server continued running but its CSS chunk (`app/layout.css`) no longer existed.
+
+## Evidence Chain
+
+1. Dev server restarted at 12:07 after Regression #2 fix
+2. SettingsSelect built and committed at 12:17 (`ae160c5`)
+3. `pnpm --filter owner build` ran at **12:16:57** (35 seconds before commit, to verify it compiled)
+4. `BUILD_ID` timestamp = 12:16:57 = production build timestamp
+5. `app/` directory timestamp = 12:17:42 — empty, no `layout.css`
+6. Dev server PID 57872 still alive — running since 12:07, `.next` now production-owned
+7. Source files (`SettingsSelect.tsx`, `index.ts`, `StaffDirectorySection.tsx`) — zero layout/CSS/config changes confirmed via `git diff`
+
+The SettingsSelect source code change was NOT the cause. No layout, globals.css,
+tailwind.config, postcss.config, or next.config files were modified.
+
+## Fix
+
+```bash
+pkill -f "next dev"
+rm -rf apps/owner/.next
+pnpm --filter owner dev
+```
+
+## MANDATORY RULE — Effective Immediately
+
+`pnpm build` is **PROHIBITED** while the dev server is running.
+
+This is the third occurrence of the same root cause. From this point:
+
+1. **To verify a build compiles:** stop the dev server first, run build, then restart dev
+2. **TypeScript checking without full build:** use `pnpm --filter owner tsc --noEmit` instead
+3. The `.next` directory is exclusively owned by whichever process is currently running
+
+## Verification
+
+After clearing `.next` and restarting dev, hit one route to trigger CSS emission:
+
+| Check                                                           | Expected              |
+| --------------------------------------------------------------- | --------------------- |
+| `cat apps/owner/.next/BUILD_ID`                                 | `development`         |
+| `curl -I http://localhost:3001/_next/static/css/app/layout.css` | `HTTP/1.1 200 OK`     |
+| `ls apps/owner/.next/static/css/app/`                           | `layout.css` present  |
+| Settings page in browser                                        | Tailwind styles apply |
