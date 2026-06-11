@@ -41,8 +41,8 @@ export const SettingsSelect = forwardRef<HTMLSelectElement, SettingsSelectProps>
         </select>
 
         <CaretDown
-          size={14}
-          weight="bold"
+          size={16}
+          weight="duotone"
           className="pointer-events-none absolute right-s12 top-1/2 -translate-y-1/2 text-tx-muted"
           aria-hidden
         />

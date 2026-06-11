@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   SettingsInput,
+  SettingsSelect,
   SettingsTextarea,
 } from '@/features/dashboard/components/settings/components/shared';
 import type {
@@ -160,20 +161,19 @@ export function ServiceForm({ initial, categories, onChange }: ServiceFormProps)
         <label className="text-ts-cap1 font-semibold uppercase tracking-widest text-tx-secondary">
           Kategori <span className="text-ac-danger">*</span>
         </label>
-        <select
+        <SettingsSelect
           value={categoryId}
           onChange={(e) => {
             setCategoryId(e.target.value);
             emit(name, description, e.target.value);
           }}
-          className="w-full rounded-r10 border border-bd-card bg-bg-input px-s16 py-s12 text-ts-fn text-tx-primary focus:border-tx-secondary focus:outline-none"
         >
           {activeCategories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
             </option>
           ))}
-        </select>
+        </SettingsSelect>
       </div>
 
       {/* Price type */}
@@ -237,21 +237,20 @@ export function ServiceForm({ initial, categories, onChange }: ServiceFormProps)
         <label className="text-ts-cap1 font-semibold uppercase tracking-widest text-tx-secondary">
           Service Flow
         </label>
-        <select
+        <SettingsSelect
           value={serviceFlow}
           onChange={(e) => {
             const v = e.target.value as ServiceFlow;
             setServiceFlow(v);
             emit(name, description, categoryId, priceType, price, duration, v);
           }}
-          className="w-full rounded-r10 border border-bd-card bg-bg-input px-s16 py-s12 text-ts-fn text-tx-primary focus:border-tx-secondary focus:outline-none"
         >
           {FLOW_OPTIONS.map((f) => (
             <option key={f.value} value={f.value}>
               {f.label}
             </option>
           ))}
-        </select>
+        </SettingsSelect>
       </div>
 
       {/* Requires Specialist */}
