@@ -20,7 +20,6 @@ import type {
 } from '@/features/dashboard/components/settings/components/shared';
 import {
   SettingsPageShell,
-  SettingsSection,
   SettingsSectionHeader,
   SettingsSideSheet,
 } from '@/features/dashboard/components/settings/layout';
@@ -91,7 +90,7 @@ const COLUMN_HEADERS = ['Pengguna', 'Peran', 'Status', 'Login Terakhir', ''];
 
 function PenggunaTableHeader() {
   return (
-    <div style={GRID_STYLE} className="rounded-t-r12 bg-bg-header px-s20 py-s8">
+    <div style={GRID_STYLE} className="bg-bg-header px-s20 py-s8">
       {COLUMN_HEADERS.map((h, i) => (
         <span
           key={i}
@@ -642,40 +641,42 @@ export function PenggunaPageClient() {
 
   return (
     <SettingsPageShell>
-      <SettingsSection>
-        {/* Header */}
-        <SettingsSectionHeader
-          title="Pengguna & Akses"
-          description="Kelola akun login dan hak akses anggota tim."
-          action={<SettingsAddButton onClick={openInviteSheet}>Undang Pengguna</SettingsAddButton>}
-        />
-
-        {/* Status filter */}
-        <SegmentedControl
-          items={segmentItems}
-          activeId={filter}
-          onChange={(id) => setFilter(id as StatusFilter)}
-        />
-
-        {/* Search */}
-        <div className="relative">
-          <MagnifyingGlass
-            size={14}
-            weight="duotone"
-            className="pointer-events-none absolute left-s12 top-1/2 -translate-y-1/2 text-tx-secondary"
-            aria-hidden
+      <div className="overflow-hidden rounded-r16 bg-bg-card shadow-card">
+        {/* Controls */}
+        <div className="flex flex-col gap-s16 p-s20">
+          <SettingsSectionHeader
+            title="Pengguna & Akses"
+            description="Kelola akun login dan hak akses anggota tim."
+            action={
+              <SettingsAddButton onClick={openInviteSheet}>Undang Pengguna</SettingsAddButton>
+            }
           />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari nama atau email..."
-            className="w-full rounded-r10 border border-bd-card bg-bg-input py-s12 pl-s32 pr-s16 text-ts-fn text-tx-primary transition-colors placeholder:text-tx-muted focus:border-tx-secondary focus:outline-none focus:ring-1 focus:ring-tx-secondary"
+
+          <SegmentedControl
+            items={segmentItems}
+            activeId={filter}
+            onChange={(id) => setFilter(id as StatusFilter)}
           />
+
+          <div className="relative">
+            <MagnifyingGlass
+              size={14}
+              weight="duotone"
+              className="pointer-events-none absolute left-s12 top-1/2 -translate-y-1/2 text-tx-secondary"
+              aria-hidden
+            />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari nama atau email..."
+              className="w-full rounded-r10 border border-bd-card bg-bg-input py-s12 pl-s32 pr-s16 text-ts-fn text-tx-primary transition-colors placeholder:text-tx-muted focus:border-tx-secondary focus:outline-none focus:ring-1 focus:ring-tx-secondary"
+            />
+          </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-hidden rounded-r16 bg-bg-card shadow-card">
+        {/* Table — full bleed, separated from controls */}
+        <div className="border-t border-bd-row">
           <PenggunaTableHeader />
           {sorted.length === 0 ? (
             (() => {
@@ -709,7 +710,7 @@ export function PenggunaPageClient() {
             </div>
           )}
         </div>
-      </SettingsSection>
+      </div>
 
       {/* ── Invite side sheet ──────────────────────────── */}
       {sheet?.kind === 'invite' && (
