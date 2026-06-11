@@ -143,7 +143,7 @@ function PenggunaTableRow({ user, isSelf, actions, onClick }: PenggunaTableRowPr
         </div>
         <div className="flex min-w-0 flex-col gap-0.5">
           <div className="flex items-center gap-s8">
-            <span className="truncate text-ts-fn font-semibold text-tx-primary">{user.name}</span>
+            <span className="truncate text-ts-sub font-semibold text-tx-primary">{user.name}</span>
             {isSelf && (
               <span className="shrink-0 text-ts-cap2 font-medium text-tx-muted">(Kamu)</span>
             )}
@@ -652,26 +652,28 @@ export function PenggunaPageClient() {
             }
           />
 
-          <SegmentedControl
-            items={segmentItems}
-            activeId={filter}
-            onChange={(id) => setFilter(id as StatusFilter)}
-          />
+          <div className="flex items-center gap-s12">
+            <SegmentedControl
+              items={segmentItems}
+              activeId={filter}
+              onChange={(id) => setFilter(id as StatusFilter)}
+            />
 
-          <div className="relative">
-            <MagnifyingGlass
-              size={14}
-              weight="duotone"
-              className="pointer-events-none absolute left-s12 top-1/2 -translate-y-1/2 text-tx-secondary"
-              aria-hidden
-            />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari nama atau email..."
-              className="w-full rounded-r10 border border-bd-card bg-bg-input py-s12 pl-s32 pr-s16 text-ts-fn text-tx-primary transition-colors placeholder:text-tx-muted focus:border-tx-secondary focus:outline-none focus:ring-1 focus:ring-tx-secondary"
-            />
+            <div className="relative w-64 shrink-0">
+              <MagnifyingGlass
+                size={14}
+                weight="duotone"
+                className="pointer-events-none absolute left-s12 top-1/2 -translate-y-1/2 text-tx-secondary"
+                aria-hidden
+              />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Cari nama atau email..."
+                className="w-full rounded-r10 border border-bd-card bg-bg-input py-s8 pl-s32 pr-s16 text-ts-fn text-tx-primary transition-colors placeholder:text-tx-muted focus:border-tx-secondary focus:outline-none focus:ring-1 focus:ring-tx-secondary"
+              />
+            </div>
           </div>
         </div>
 
