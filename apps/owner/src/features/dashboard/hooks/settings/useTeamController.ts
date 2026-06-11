@@ -98,6 +98,7 @@ export interface TeamController extends BaseSettingsController {
   addStaff: (draft: Omit<StaffMember, 'id'>) => void;
   updateStaff: (id: string, patch: Partial<StaffMember>) => void;
   deactivateStaff: (id: string) => void;
+  deleteStaff: (id: string) => void;
 
   // Assignments
   setAssignment: (staffId: string, serviceIds: string[]) => void;
@@ -170,6 +171,16 @@ export function useTeamController(): TeamController {
     }));
   }, []);
 
+  const deleteStaff = useCallback((id: string) => {
+    setDirtyDomain((d) => ({
+      ...d,
+      staff: d.staff.filter((s) => s.id !== id),
+      assignments: d.assignments.filter((a) => a.staffId !== id),
+      schedules: d.schedules.filter((sch) => sch.staffId !== id),
+      leaves: d.leaves.filter((l) => l.staffId !== id),
+    }));
+  }, []);
+
   const setAssignment = useCallback((staffId: string, serviceIds: string[]) => {
     setDirtyDomain((d) => ({
       ...d,
@@ -218,6 +229,7 @@ export function useTeamController(): TeamController {
     addStaff,
     updateStaff,
     deactivateStaff,
+    deleteStaff,
     setAssignment,
     updateDaySchedule,
     addLeave,
