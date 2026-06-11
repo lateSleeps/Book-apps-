@@ -132,7 +132,7 @@ function PenggunaTableRow({ user, isSelf, actions, onClick }: PenggunaTableRowPr
       {/* Col 1 — Pengguna */}
       <div className="flex min-w-0 items-center gap-s12">
         <div
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-r10 font-semibold"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-r10 font-semibold"
           style={{
             background: bg,
             color: avatarText,
@@ -659,7 +659,7 @@ export function PenggunaPageClient() {
               onChange={(id) => setFilter(id as StatusFilter)}
             />
 
-            <div className="relative w-64 shrink-0">
+            <div className="relative ml-auto w-64 shrink-0">
               <MagnifyingGlass
                 size={14}
                 weight="duotone"
