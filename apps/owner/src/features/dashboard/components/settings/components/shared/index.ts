@@ -1,4 +1,6 @@
 export { SettingsFormGrid } from './SettingsFormGrid';
+export { TimeInputInline } from './TimeInputInline';
+export type { TimeInputInlineProps } from './TimeInputInline';
 export { SettingsFieldGroup } from './SettingsFieldGroup';
 export { SettingsInput } from './SettingsInput';
 export type { SettingsInputProps } from './SettingsInput';

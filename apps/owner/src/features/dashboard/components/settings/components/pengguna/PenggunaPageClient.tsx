@@ -103,7 +103,7 @@ const COLUMN_HEADERS = ['Pengguna', 'Peran', 'Status', 'Login Terakhir', ''];
 
 function PenggunaTableHeader() {
   return (
-    <div style={GRID_STYLE} className="bg-bg-header px-s20 py-s8">
+    <div style={GRID_STYLE} className="rounded-t-r12 bg-bg-header px-s20 py-s8">
       {COLUMN_HEADERS.map((h, i) => (
         <span
           key={i}
@@ -670,7 +670,7 @@ export function PenggunaPageClient() {
         </div>
 
         {/* Table — full bleed, separated from controls */}
-        <div className="border-t border-bd-row">
+        <div>
           <PenggunaTableHeader />
           {sorted.length === 0 ? (
             (() => {

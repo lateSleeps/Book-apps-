@@ -15,7 +15,10 @@
 
 import { CaretDown, CaretUp, Check, Users } from '@phosphor-icons/react';
 import { useEffect, useRef, useState } from 'react';
-import { SettingsEmptyState } from '@/features/dashboard/components/settings/components/shared';
+import {
+  SettingsEmptyState,
+  TimeInputInline,
+} from '@/features/dashboard/components/settings/components/shared';
 import { SettingsSectionHeader } from '@/features/dashboard/components/settings/layout';
 import type {
   StaffMember,
@@ -204,12 +207,6 @@ function StaffPicker({ staff, selectedId, hariKerja, totalMinutes, onSelect }: S
   );
 }
 
-// ── Time input ────────────────────────────────────────────────────────────────
-
-const TIME_INPUT_CLASS =
-  'rounded-r8 border border-bd-card bg-bg-input px-s8 py-s4 text-ts-fn text-tx-primary ' +
-  'focus:border-tx-secondary focus:outline-none focus:ring-1 focus:ring-tx-secondary transition-colors';
-
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 interface Props {
@@ -295,26 +292,22 @@ export function WeeklyScheduleSection({ ctrl }: Props) {
                 <div className="flex flex-1 items-center gap-s8">
                   {dd.enabled ? (
                     <>
-                      <input
-                        type="time"
+                      <TimeInputInline
                         value={dd.startTime}
                         onChange={(e) =>
                           ctrl.updateDaySchedule(resolvedId, dd.day, {
                             startTime: e.target.value,
                           })
                         }
-                        className={TIME_INPUT_CLASS}
                       />
                       <span className="text-ts-cap1 text-tx-muted">→</span>
-                      <input
-                        type="time"
+                      <TimeInputInline
                         value={dd.endTime}
                         onChange={(e) =>
                           ctrl.updateDaySchedule(resolvedId, dd.day, {
                             endTime: e.target.value,
                           })
                         }
-                        className={TIME_INPUT_CLASS}
                       />
                     </>
                   ) : (
