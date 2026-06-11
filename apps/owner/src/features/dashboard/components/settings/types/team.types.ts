@@ -3,8 +3,12 @@
 
 // ── Enums ─────────────────────────────────────────────────────────────────────
 
+/**
+ * Job function within the salon.
+ * Separate from AccessRole (permission tier) — do not conflate.
+ */
 export type StaffRole =
-  | 'OWNER'
+  | 'MANAGER'
   | 'STYLIST'
   | 'COLORIST'
   | 'NAIL_ARTIST'

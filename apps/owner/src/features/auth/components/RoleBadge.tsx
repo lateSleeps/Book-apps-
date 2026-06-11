@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { getRoleDisplayName, getRoleColor, getRoleBackgroundColor } from '../utils/role-permissions';
+import { getRoleDisplayName, getRoleTokenClasses } from '../utils/role-permissions';
 
 interface RoleBadgeProps {
   role: string;
@@ -22,8 +22,7 @@ export function RoleBadge({
   className = '',
 }: RoleBadgeProps) {
   const displayName = getRoleDisplayName(role);
-  const color = getRoleColor(role);
-  const bgColor = getRoleBackgroundColor(role);
+  const tokenClasses = getRoleTokenClasses(role);
 
   const sizeClasses = {
     sm: 'px-2 py-1 text-[11px]',
@@ -33,7 +32,7 @@ export function RoleBadge({
 
   if (variant === 'text') {
     return (
-      <span style={{ color }} className={`font-medium ${className}`}>
+      <span className={`font-medium ${tokenClasses.split(' ')[1] ?? ''} ${className}`}>
         {displayName}
       </span>
     );
@@ -42,8 +41,7 @@ export function RoleBadge({
   if (variant === 'pill') {
     return (
       <span
-        style={{ backgroundColor: bgColor, color, borderColor: color }}
-        className={`inline-flex items-center rounded-full font-medium border ${sizeClasses[size]} ${className}`}
+        className={`inline-flex items-center rounded-full border font-medium ${tokenClasses} ${sizeClasses[size]} ${className}`}
       >
         {displayName}
       </span>
@@ -53,8 +51,7 @@ export function RoleBadge({
   // Default badge variant
   return (
     <span
-      style={{ backgroundColor: bgColor, color }}
-      className={`inline-flex items-center rounded font-medium ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center rounded font-medium ${tokenClasses} ${sizeClasses[size]} ${className}`}
     >
       {displayName}
     </span>
@@ -76,13 +73,11 @@ export function RoleBadgeWithIcon({
   className = '',
 }: RoleBadgeWithIconProps) {
   const displayName = getRoleDisplayName(role);
-  const color = getRoleColor(role);
-  const bgColor = getRoleBackgroundColor(role);
+  const tokenClasses = getRoleTokenClasses(role);
 
   const roleIcons: Record<string, string> = {
     OWNER: '👑',
-    MANAGER: '💼',
-    STYLIST: '✨',
+    ADMIN: '💼',
     STAFF: '🎨',
   };
 
@@ -96,8 +91,7 @@ export function RoleBadgeWithIcon({
 
   return (
     <span
-      style={{ backgroundColor: bgColor, color }}
-      className={`inline-flex items-center rounded px-3 py-1.5 text-[12px] font-medium ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center rounded px-3 py-1.5 text-[12px] font-medium ${tokenClasses} ${sizeClasses[size]} ${className}`}
     >
       <span className="text-sm">{roleIcon}</span>
       {displayName}

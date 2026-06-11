@@ -58,21 +58,21 @@ const GRID_STYLE = {
 // ── Role metadata ─────────────────────────────────────────────────────────────
 
 const ROLE_META: Record<StaffRole, { label: string; badgeClass: string }> = {
-  OWNER: { label: 'Owner', badgeClass: 'bg-st-confirmed-bg text-st-confirmed' },
+  MANAGER: { label: 'Manager', badgeClass: 'bg-st-upcoming-bg text-st-upcoming' },
   STYLIST: { label: 'Stylist', badgeClass: 'bg-bg-control text-tx-subtle' },
-  COLORIST: { label: 'Colorist', badgeClass: 'bg-st-upcoming-bg text-st-upcoming' },
+  COLORIST: { label: 'Colorist', badgeClass: 'bg-st-confirmed-bg text-st-confirmed' },
   NAIL_ARTIST: { label: 'Nail Artist', badgeClass: 'bg-bg-control text-tx-subtle' },
   THERAPIST: { label: 'Therapist', badgeClass: 'bg-st-in-progress-bg text-st-in-progress' },
   RECEPTIONIST: { label: 'Receptionist', badgeClass: 'bg-bg-control text-tx-subtle' },
 };
 
 const ROLE_OPTIONS: StaffRole[] = [
+  'MANAGER',
   'STYLIST',
   'COLORIST',
   'NAIL_ARTIST',
   'THERAPIST',
   'RECEPTIONIST',
-  'OWNER',
 ];
 
 const SPECIALTY_OPTIONS: StaffSpecialty[] = [

@@ -35,7 +35,8 @@ import type {
   StaffRole,
 } from '@/features/dashboard/components/settings/types/team.types';
 import type { TeamController } from '@/features/dashboard/hooks/settings/useTeamController';
-import { avatarColor, getInitials } from '@/shared/lib/avatar';
+import { AvatarBubble } from '@/shared/components/ui/AvatarBubble';
+import { StatusBadge } from '@/shared/components/ui/StatusBadge';
 import { cn } from '@/shared/lib/cn';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -57,7 +58,7 @@ const LEAVE_BADGE_CLASS: Record<LeaveType, string> = {
 const LEAVE_TYPES: LeaveType[] = ['LEAVE', 'SICK', 'HOLIDAY', 'UNAVAILABLE'];
 
 const ROLE_LABEL: Record<StaffRole, string> = {
-  OWNER: 'Owner',
+  MANAGER: 'Manager',
   STYLIST: 'Stylist',
   COLORIST: 'Colorist',
   NAIL_ARTIST: 'Nail Artist',
@@ -171,42 +172,6 @@ function groupByMonth(leaves: StaffLeave[]): TimelineGroup[] {
       entries: [...entries].sort((a, b) => b.date.localeCompare(a.date)),
     }))
     .sort((a, b) => b.sortKey - a.sortKey);
-}
-
-// ── Avatar bubble ─────────────────────────────────────────────────────────────
-// Inline style only for runtime-computed bg.
-
-function AvatarBubble({ name }: { name: string }) {
-  const { bg } = avatarColor(name);
-  const initials = getInitials(name);
-  const isTwoChar = initials.length > 1;
-
-  return (
-    <div
-      className={cn(
-        'flex h-10 w-10 shrink-0 items-center justify-center rounded-r10 font-semibold text-tx-primary',
-        isTwoChar ? 'text-ts-fn' : 'text-ts-body'
-      )}
-      style={{ background: bg }}
-    >
-      {initials}
-    </div>
-  );
-}
-
-// ── Status badge ──────────────────────────────────────────────────────────────
-
-function StatusBadge({ isActive }: { isActive: boolean }) {
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center rounded-rF px-s8 py-0.5 text-ts-cap2 font-medium',
-        isActive ? 'bg-st-in-progress-bg text-st-in-progress' : 'bg-bg-control text-tx-subtle'
-      )}
-    >
-      {isActive ? 'Aktif' : 'Nonaktif'}
-    </span>
-  );
 }
 
 // ── Leave type badge ──────────────────────────────────────────────────────────

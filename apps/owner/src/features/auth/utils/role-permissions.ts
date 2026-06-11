@@ -7,11 +7,10 @@ import type { Permission, RolePermissionMap } from '../types';
 import { Permission as PermissionEnum } from '../types/permissions.types';
 
 /**
- * Master role-to-permissions mapping
- * OWNER has all permissions
- * MANAGER has all except user/role management
- * STYLIST has limited permissions (own schedule, bookings, clients)
- * STAFF has view-only permissions
+ * Master access-role-to-permissions mapping.
+ * OWNER  — full access including user/role management
+ * ADMIN  — manage-level access (ex-MANAGER); cannot manage users/roles
+ * STAFF  — employee access: own bookings, schedule, client history
  */
 export const ROLE_PERMISSIONS_MAP: RolePermissionMap = {
   OWNER: [
@@ -55,7 +54,7 @@ export const ROLE_PERMISSIONS_MAP: RolePermissionMap = {
     PermissionEnum.EXPORT_DATA,
   ],
 
-  MANAGER: [
+  ADMIN: [
     // Dashboard
     PermissionEnum.VIEW_DASHBOARD,
     PermissionEnum.VIEW_STATS,
@@ -80,7 +79,7 @@ export const ROLE_PERMISSIONS_MAP: RolePermissionMap = {
     PermissionEnum.DELETE_CLIENT,
     PermissionEnum.VIEW_CLIENT_HISTORY,
 
-    // Settings
+    // Settings (cannot manage users/roles)
     PermissionEnum.VIEW_SETTINGS,
     PermissionEnum.EDIT_BUSINESS_INFO,
     PermissionEnum.MANAGE_SERVICES,
@@ -89,41 +88,26 @@ export const ROLE_PERMISSIONS_MAP: RolePermissionMap = {
     PermissionEnum.MANAGE_WORKING_HOURS,
     PermissionEnum.MANAGE_POLICIES,
 
-    // Admin (MANAGER cannot manage users/roles)
     PermissionEnum.VIEW_ANALYTICS,
     PermissionEnum.EXPORT_DATA,
   ],
 
-  STYLIST: [
-    // Dashboard (view only)
+  STAFF: [
+    // Dashboard
     PermissionEnum.VIEW_DASHBOARD,
 
-    // Bookings (own only)
+    // Bookings (own)
     PermissionEnum.VIEW_BOOKINGS,
     PermissionEnum.CREATE_BOOKING,
     PermissionEnum.EDIT_BOOKING,
 
-    // Schedule (own only)
+    // Schedule (own)
     PermissionEnum.VIEW_SCHEDULE,
     PermissionEnum.EDIT_SCHEDULE,
 
-    // Clients (view and limited edit)
+    // Clients (view)
     PermissionEnum.VIEW_CLIENTS,
     PermissionEnum.VIEW_CLIENT_HISTORY,
-  ],
-
-  STAFF: [
-    // Dashboard (view only)
-    PermissionEnum.VIEW_DASHBOARD,
-
-    // Bookings (view only)
-    PermissionEnum.VIEW_BOOKINGS,
-
-    // Schedule (view only, own)
-    PermissionEnum.VIEW_SCHEDULE,
-
-    // Clients (view only)
-    PermissionEnum.VIEW_CLIENTS,
   ],
 };
 
@@ -140,35 +124,48 @@ export function getPermissionsForRole(role: string): Permission[] {
 export function getRoleDisplayName(role: string): string {
   const roleDisplayNames: Record<string, string> = {
     OWNER: 'Pemilik',
-    MANAGER: 'Manajer',
-    STYLIST: 'Stylist',
+    ADMIN: 'Admin',
     STAFF: 'Staf',
   };
   return roleDisplayNames[role] || role;
 }
 
 /**
- * Get role color for UI display
+ * Get Tailwind badge classes for a given AccessRole.
+ * Returns a combined `bg-* text-*` class string using design system tokens.
+ *
+ * Usage: <span className={`inline-flex ... ${getRoleTokenClasses(role)}`}>
  */
-export function getRoleColor(role: string): string {
-  const roleColors: Record<string, string> = {
-    OWNER: '#2563eb', // blue
-    MANAGER: '#9333ea', // purple
-    STYLIST: '#16a34a', // green
-    STAFF: '#6b7280', // gray
+export function getRoleTokenClasses(role: string): string {
+  const roleClasses: Record<string, string> = {
+    OWNER: 'bg-st-confirmed-bg text-st-confirmed',
+    ADMIN: 'bg-st-upcoming-bg text-st-upcoming',
+    STAFF: 'bg-bg-control text-tx-subtle',
   };
-  return roleColors[role] || '#6b7280';
+  return roleClasses[role] ?? 'bg-bg-control text-tx-subtle';
 }
 
 /**
- * Get role background color for badges
+ * @deprecated Use getRoleTokenClasses() for badge styling.
+ * Kept for DashboardSidebar avatar circle until that component is refactored.
+ */
+export function getRoleColor(role: string): string {
+  const roleColors: Record<string, string> = {
+    OWNER: '#2563eb',
+    ADMIN: '#9333ea',
+    STAFF: '#6b7280',
+  };
+  return roleColors[role] ?? '#6b7280';
+}
+
+/**
+ * @deprecated Use getRoleTokenClasses() for badge styling.
  */
 export function getRoleBackgroundColor(role: string): string {
   const roleBgColors: Record<string, string> = {
     OWNER: '#eff6ff',
-    MANAGER: '#faf5ff',
-    STYLIST: '#f0fdf4',
+    ADMIN: '#faf5ff',
     STAFF: '#f9fafb',
   };
-  return roleBgColors[role] || '#f9fafb';
+  return roleBgColors[role] ?? '#f9fafb';
 }
