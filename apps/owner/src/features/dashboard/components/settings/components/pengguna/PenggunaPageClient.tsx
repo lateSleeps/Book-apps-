@@ -1,26 +1,5 @@
 'use client';
 
-/**
- * @responsibility
- * Pengguna & Akses — account management page.
- *
- * Layout (top to bottom):
- *   1. Section header + Undang Pengguna button
- *   2. SegmentedControl — status filter (Semua / Aktif / Diundang / Nonaktif)
- *   3. Search input
- *   4. SettingsListCard rows — one per User
- *   5. SettingsEmptyState when filtered list is empty
- *
- * Side sheet (Invite):
- *   Name · Email · Role toggle · PermissionSummaryCard
- *
- * Side sheet (Edit / Detail):
- *   Identity block · Role toggle · PermissionSummaryCard · SettingsDangerZone
- *
- * Self-protection:
- *   OWNER role is immutable. Current user cannot edit/deactivate/revoke self.
- */
-
 import { MagnifyingGlass, UserGear } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
 import { PermissionSummaryCard } from './PermissionSummaryCard';
@@ -34,7 +13,6 @@ import {
   SettingsEmptyState,
   SettingsFieldGroup,
   SettingsInput,
-  SettingsListCard,
 } from '@/features/dashboard/components/settings/components/shared';
 import type {
   ActionItem,
@@ -50,6 +28,7 @@ import type { PenggunaController } from '@/features/dashboard/hooks/settings/use
 import { usePenggunaController } from '@/features/dashboard/hooks/settings/usePenggunaController';
 import { AvatarBubble } from '@/shared/components/ui/AvatarBubble';
 import { SegmentedControl } from '@/shared/components/ui/segmented-control';
+import { avatarColor, getInitials } from '@/shared/lib/avatar';
 
 // ── Badge helpers ─────────────────────────────────────────────────────────────
 
@@ -94,6 +73,107 @@ function formatDateLong(iso: string | null | undefined): string {
     month: 'long',
     year: 'numeric',
   }).format(new Date(iso));
+}
+
+// ── Table grid ────────────────────────────────────────────────────────────────
+
+const GRID = '2.5fr 1fr 1fr 1.4fr 44px';
+const GRID_STYLE = {
+  display: 'grid',
+  gridTemplateColumns: GRID,
+  columnGap: 16,
+  alignItems: 'center',
+} as const;
+
+const COLUMN_HEADERS = ['Pengguna', 'Peran', 'Status', 'Login Terakhir', ''];
+
+// ── PenggunaTableHeader ───────────────────────────────────────────────────────
+
+function PenggunaTableHeader() {
+  return (
+    <div style={GRID_STYLE} className="rounded-t-r12 bg-bg-header px-s20 py-s8">
+      {COLUMN_HEADERS.map((h, i) => (
+        <span
+          key={i}
+          className={`text-ts-fn font-medium text-tx-secondary ${
+            i > 0
+              ? 'relative before:absolute before:-left-3 before:top-1/2 before:-translate-y-1/2 before:text-bd-card before:content-["|"]'
+              : ''
+          }`}
+        >
+          {h}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+// ── PenggunaTableRow ──────────────────────────────────────────────────────────
+
+interface PenggunaTableRowProps {
+  user: User;
+  isSelf: boolean;
+  actions: ActionItem[];
+  onClick: () => void;
+}
+
+function PenggunaTableRow({ user, isSelf, actions, onClick }: PenggunaTableRowProps) {
+  const { bg, text: avatarText } = avatarColor(user.name);
+  const initials = getInitials(user.name);
+
+  return (
+    <div
+      role="row"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
+      style={GRID_STYLE}
+      className="cursor-pointer border-b border-bd-row px-s20 py-s12 transition-colors last:border-0 hover:bg-bg-hover focus:outline-none focus-visible:bg-bg-hover"
+    >
+      {/* Col 1 — Pengguna */}
+      <div className="flex min-w-0 items-center gap-s12">
+        <div
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-r10 font-semibold"
+          style={{
+            background: bg,
+            color: avatarText,
+            fontSize: initials.length > 1 ? '0.8125rem' : '1rem',
+          }}
+        >
+          {initials}
+        </div>
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <div className="flex items-center gap-s8">
+            <span className="truncate text-ts-fn font-semibold text-tx-primary">{user.name}</span>
+            {isSelf && (
+              <span className="shrink-0 text-ts-cap2 font-medium text-tx-muted">(Kamu)</span>
+            )}
+          </div>
+          <span className="truncate text-ts-cap1 text-tx-subtle">{user.email}</span>
+        </div>
+      </div>
+
+      {/* Col 2 — Peran */}
+      <span
+        className={`inline-flex w-fit items-center rounded-rF px-s8 py-1 text-ts-cap2 font-semibold ${ROLE_BADGE_CLASS[user.role]}`}
+      >
+        {getRoleDisplayName(user.role)}
+      </span>
+
+      {/* Col 3 — Status */}
+      <span
+        className={`inline-flex w-fit items-center rounded-rF px-s8 py-1 text-ts-cap2 font-semibold ${STATUS_BADGE_CLASS[user.status]}`}
+      >
+        {STATUS_LABEL[user.status]}
+      </span>
+
+      {/* Col 4 — Login Terakhir */}
+      <span className="text-ts-fn text-tx-subtle">{formatRelativeDate(user.lastLoginAt)}</span>
+
+      {/* Col 5 — Aksi */}
+      <EntityActionMenu actions={actions} />
+    </div>
+  );
 }
 
 // ── Filter type ───────────────────────────────────────────────────────────────
@@ -594,48 +674,11 @@ export function PenggunaPageClient() {
           />
         </div>
 
-        {/* User list */}
-        {sorted.length > 0 ? (
-          <div className="flex flex-col gap-s8">
-            {sorted.map((user) => {
-              const isSelf = user.id === ctrl.currentUserId;
-              return (
-                <SettingsListCard
-                  key={user.id}
-                  leadingSlot={<AvatarBubble name={user.name} />}
-                  title={user.name}
-                  description={`${user.email}${isSelf ? ' · Kamu' : ''}`}
-                  onClick={() => openEditSheet(user)}
-                  actions={
-                    <div className="flex items-center gap-s8">
-                      {/* Role badge */}
-                      <span
-                        className={`hidden shrink-0 items-center rounded-rF px-s8 py-0.5 text-ts-cap2 font-medium sm:inline-flex ${ROLE_BADGE_CLASS[user.role]}`}
-                      >
-                        {getRoleDisplayName(user.role)}
-                      </span>
-                      {/* Status badge */}
-                      <span
-                        className={`hidden shrink-0 items-center rounded-rF px-s8 py-0.5 text-ts-cap2 font-medium sm:inline-flex ${STATUS_BADGE_CLASS[user.status]}`}
-                      >
-                        {STATUS_LABEL[user.status]}
-                      </span>
-                      {/* Last login — subtle, desktop only */}
-                      {user.lastLoginAt && (
-                        <span className="hidden shrink-0 text-ts-cap1 text-tx-muted lg:block">
-                          {formatRelativeDate(user.lastLoginAt)}
-                        </span>
-                      )}
-                      <EntityActionMenu actions={buildActions(user)} />
-                    </div>
-                  }
-                />
-              );
-            })}
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-r16 border border-bd-card bg-bg-card shadow-card">
-            {(() => {
+        {/* Table */}
+        <div className="overflow-hidden rounded-r16 bg-bg-card shadow-card">
+          <PenggunaTableHeader />
+          {sorted.length === 0 ? (
+            (() => {
               const { icon, title, description } = getEmptyState();
               return (
                 <SettingsEmptyState
@@ -651,9 +694,21 @@ export function PenggunaPageClient() {
                   }
                 />
               );
-            })()}
-          </div>
-        )}
+            })()
+          ) : (
+            <div role="rowgroup">
+              {sorted.map((user) => (
+                <PenggunaTableRow
+                  key={user.id}
+                  user={user}
+                  isSelf={user.id === ctrl.currentUserId}
+                  actions={buildActions(user)}
+                  onClick={() => openEditSheet(user)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </SettingsSection>
 
       {/* ── Invite side sheet ──────────────────────────── */}
