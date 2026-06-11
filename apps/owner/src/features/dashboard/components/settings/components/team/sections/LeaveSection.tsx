@@ -185,18 +185,25 @@ function groupByMonth(leaves: StaffLeave[]): TimelineGroup[] {
 }
 
 // ── Avatar bubble ─────────────────────────────────────────────────────────────
-// Inline style only for runtime-computed avatar bg — cannot be Tailwind.
+// size "sm" = 32px — used in compact selector trigger and dropdown rows.
+// Inline style only for runtime-computed bg — cannot be Tailwind.
 
-function AvatarBubble({ name }: { name: string }) {
+type AvatarSize = 'sm' | 'md';
+
+function AvatarBubble({ name, size = 'sm' }: { name: string; size?: AvatarSize }) {
   const { bg } = avatarColor(name);
   const initials = getInitials(name);
   const isTwoChar = initials.length > 1;
 
+  const sizeClass = size === 'sm' ? 'h-8 w-8 rounded-r8' : 'h-10 w-10 rounded-r10';
+  const textClass = isTwoChar ? 'text-ts-cap2' : 'text-ts-fn';
+
   return (
     <div
       className={cn(
-        'flex h-10 w-10 shrink-0 items-center justify-center rounded-r10 font-semibold text-tx-primary',
-        isTwoChar ? 'text-ts-fn' : 'text-ts-body'
+        'flex shrink-0 items-center justify-center font-semibold text-tx-primary',
+        sizeClass,
+        textClass
       )}
       style={{ background: bg }}
     >
@@ -236,18 +243,18 @@ function LeaveBadge({ type }: { type: LeaveType }) {
 }
 
 // ── StaffPicker ───────────────────────────────────────────────────────────────
-// Trigger: identity (avatar + name + role + status) + absence metrics + chevron.
-// Metrics row shows catatan count + hari count.
-// Third line: upcoming leave date (only if exists).
+// Compact inline selector — not a large card.
+// Trigger: small avatar + name + role/status + chevron.
+// Absence metrics are rendered as plain supporting text OUTSIDE this component
+// by the parent — they are not part of the selector affordance itself.
 
 interface StaffPickerProps {
   staff: StaffMember[];
   selectedId: string;
-  metrics: AbsenceMetrics;
   onSelect: (id: string) => void;
 }
 
-function StaffPicker({ staff, selectedId, metrics, onSelect }: StaffPickerProps) {
+function StaffPicker({ staff, selectedId, onSelect }: StaffPickerProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const selected = staff.find((s) => s.id === selectedId) ?? staff[0]!;
@@ -264,43 +271,38 @@ function StaffPicker({ staff, selectedId, metrics, onSelect }: StaffPickerProps)
   }, [open]);
 
   return (
-    <div ref={containerRef} className="relative">
-      {/* Trigger */}
+    <div ref={containerRef} className="relative inline-block">
+      {/* Compact trigger — no card, no shadow, input-like weight */}
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center gap-s12 rounded-r12 border border-bd-card bg-bg-card px-s16 py-s12 shadow-card transition-colors hover:bg-bg-hover"
+        className="inline-flex items-center gap-s8 rounded-r10 border border-bd-card bg-bg-input px-s12 py-s8 transition-colors hover:bg-bg-hover"
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        {/* Content block — all information grouped together */}
-        <AvatarBubble name={selected.fullName} />
-        <div className="min-w-0 flex-1 text-left">
-          <p className="truncate text-ts-sub font-semibold text-tx-primary">{selected.fullName}</p>
-          <div className="mt-s2 flex items-center gap-s8">
-            <span className="text-ts-fn text-tx-secondary">{ROLE_LABEL[selected.role]}</span>
+        <AvatarBubble name={selected.fullName} size="sm" />
+        <div className="text-left">
+          <p className="text-ts-fn font-semibold text-tx-primary">{selected.fullName}</p>
+          <div className="flex items-center gap-s6">
+            <span className="text-ts-cap1 text-tx-secondary">{ROLE_LABEL[selected.role]}</span>
+            <span className="text-ts-cap2 text-tx-muted">·</span>
             <StatusBadge isActive={selected.isActive} />
           </div>
-          <p className="mt-s4 text-ts-cap1 text-tx-subtle">
-            {metrics.totalCatatan === 0
-              ? 'Belum ada catatan'
-              : `${metrics.totalCatatan} catatan · ${metrics.totalHari} hari tidak hadir`}
-          </p>
-          {metrics.nextLeave && (
-            <p className="mt-s2 text-ts-cap1 text-tx-secondary">
-              Cuti berikutnya:{' '}
-              <span className="font-medium text-st-confirmed">
-                {formatDateShort(metrics.nextLeave)}
-              </span>
-            </p>
-          )}
         </div>
-
-        {/* Chevron — affordance only, no dead zone */}
         {open ? (
-          <CaretUp size={14} weight="duotone" className="shrink-0 text-tx-muted" aria-hidden />
+          <CaretUp
+            size={13}
+            weight="duotone"
+            className="ml-s4 shrink-0 text-tx-muted"
+            aria-hidden
+          />
         ) : (
-          <CaretDown size={14} weight="duotone" className="shrink-0 text-tx-muted" aria-hidden />
+          <CaretDown
+            size={13}
+            weight="duotone"
+            className="ml-s4 shrink-0 text-tx-muted"
+            aria-hidden
+          />
         )}
       </button>
 
@@ -308,7 +310,7 @@ function StaffPicker({ staff, selectedId, metrics, onSelect }: StaffPickerProps)
       {open && (
         <div
           role="listbox"
-          className="absolute left-0 right-0 top-full z-20 mt-s4 overflow-hidden rounded-r12 border border-bd-card bg-bg-card shadow-card"
+          className="absolute left-0 top-full z-20 mt-s4 min-w-full overflow-hidden rounded-r12 border border-bd-card bg-bg-card shadow-card"
         >
           {staff.map((member) => {
             const isSelected = member.id === selectedId;
@@ -323,25 +325,26 @@ function StaffPicker({ staff, selectedId, metrics, onSelect }: StaffPickerProps)
                   setOpen(false);
                 }}
                 className={cn(
-                  'flex w-full items-center gap-s12 border-b border-bd-row px-s16 py-s8 transition-colors last:border-b-0 hover:bg-bg-hover',
+                  'flex w-full items-center gap-s8 border-b border-bd-row px-s12 py-s8 transition-colors last:border-b-0 hover:bg-bg-hover',
                   isSelected && 'bg-bg-hover'
                 )}
               >
-                <AvatarBubble name={member.fullName} />
+                <AvatarBubble name={member.fullName} size="sm" />
                 <div className="min-w-0 flex-1 text-left">
                   <p className="truncate text-ts-fn font-semibold text-tx-primary">
                     {member.fullName}
                   </p>
-                  <div className="mt-s2 flex items-center gap-s8">
+                  <div className="flex items-center gap-s6">
                     <span className="text-ts-cap1 text-tx-secondary">
                       {ROLE_LABEL[member.role]}
                     </span>
+                    <span className="text-ts-cap2 text-tx-muted">·</span>
                     <StatusBadge isActive={member.isActive} />
                   </div>
                 </div>
                 {isSelected && (
                   <Check
-                    size={14}
+                    size={13}
                     weight="duotone"
                     className="shrink-0 text-ac-primary"
                     aria-hidden
@@ -460,15 +463,22 @@ export function LeaveSection({ ctrl }: Props) {
         }
       />
 
-      {/* ── Staff picker ─────────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-s8">
-        <p className="text-ts-fn font-medium text-tx-primary">Pilih Staff</p>
-        <StaffPicker
-          staff={activeStaff}
-          selectedId={resolvedId}
-          metrics={metrics}
-          onSelect={handleStaffChange}
-        />
+      {/* ── Staff picker + supporting metadata ──────────────────────────── */}
+      <div className="flex flex-col gap-s6">
+        <StaffPicker staff={activeStaff} selectedId={resolvedId} onSelect={handleStaffChange} />
+        <p className="text-ts-cap1 text-tx-subtle">
+          {metrics.totalCatatan === 0
+            ? 'Belum ada catatan'
+            : `${metrics.totalCatatan} catatan · ${metrics.totalHari} hari tidak hadir`}
+          {metrics.nextLeave && (
+            <>
+              {' · '}
+              <span className="font-medium text-st-confirmed">
+                Cuti berikutnya: {formatDateShort(metrics.nextLeave)}
+              </span>
+            </>
+          )}
+        </p>
       </div>
 
       {/* ── Inline add form ───────────────────────────────────────────────── */}
