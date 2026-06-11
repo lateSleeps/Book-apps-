@@ -38,7 +38,11 @@ export function BundlesSection({
       <SettingsSectionHeader
         title="Paket Bundle"
         description="Gabungkan beberapa layanan dengan harga spesial."
-        action={<SettingsAddButton onClick={onAdd}>Buat Paket</SettingsAddButton>}
+        action={
+          <SettingsAddButton onClick={onAdd} disabled={services.length === 0}>
+            Buat Paket
+          </SettingsAddButton>
+        }
       />
 
       {bundles.length === 0 ? (
@@ -46,7 +50,16 @@ export function BundlesSection({
           <SettingsEmptyState
             icon={<Package size={24} weight="duotone" />}
             title="Belum ada paket bundle"
-            description="Buat paket untuk menawarkan kombinasi layanan dengan harga lebih hemat."
+            description={
+              services.length === 0
+                ? 'Tambahkan layanan terlebih dahulu sebelum membuat paket bundle.'
+                : 'Buat paket untuk menawarkan kombinasi layanan dengan harga lebih hemat.'
+            }
+            action={
+              services.length > 0 ? (
+                <SettingsAddButton onClick={onAdd}>Buat Paket</SettingsAddButton>
+              ) : undefined
+            }
           />
         </div>
       ) : (

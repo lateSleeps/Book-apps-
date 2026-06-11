@@ -82,6 +82,9 @@ export function ServicesAccordion({
               icon={<Tag size={24} weight="duotone" />}
               title="Belum ada kategori"
               description="Tambah kategori untuk mengelompokkan layanan salon."
+              action={
+                <SettingsAddButton onClick={onAddCategory}>Tambah Kategori</SettingsAddButton>
+              }
             />
           </div>
         ) : (
@@ -192,6 +195,11 @@ export function ServicesAccordion({
               icon={<Scissors size={24} weight="duotone" />}
               title="Belum ada layanan"
               description="Tambah layanan pertama untuk kategori ini."
+              action={
+                <SettingsAddButton onClick={() => onAddService(selectedCatId ?? undefined)}>
+                  Tambah Layanan
+                </SettingsAddButton>
+              }
             />
           </div>
         )}

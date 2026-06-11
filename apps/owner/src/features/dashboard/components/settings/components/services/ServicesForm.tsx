@@ -125,11 +125,11 @@ export function ServicesForm({ ctrl, activeTab }: ServicesFormProps) {
     const serviceCount = domain.services.filter((s) => s.categoryId === cat.id).length;
     const message =
       serviceCount > 0
-        ? `Kategori "${cat.name}" masih memiliki ${serviceCount} layanan. Menghapus kategori akan menghapus seluruh layanan di dalamnya. Tindakan ini tidak dapat dibatalkan.`
-        : `Kategori "${cat.name}" akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`;
+        ? `${serviceCount} layanan di dalam kategori ini juga akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`
+        : `Kategori ini akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`;
 
     setConfirm({
-      title: 'Hapus kategori?',
+      title: `Hapus kategori ${cat.name}?`,
       message,
       confirmLabel: 'Hapus Permanen',
       variant: 'danger',

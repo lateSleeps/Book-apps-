@@ -35,6 +35,7 @@ export function AddOnsSection({ addons, onAdd, onEdit, onDelete }: AddOnsSection
             icon={<ShoppingBag size={24} weight="duotone" />}
             title="Belum ada produk add-on"
             description="Tambah produk pelengkap yang bisa dipesan bersamaan dengan layanan."
+            action={<SettingsAddButton onClick={onAdd}>Tambah Produk</SettingsAddButton>}
           />
         </div>
       ) : (
