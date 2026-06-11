@@ -6,6 +6,10 @@
 
 ---
 
+> **See also: Regression #2 below** — same symptom, different trigger. Occurred after the Team Domain refactor commit when `pnpm build` was run to verify the build, overwriting the dev server's `.next` directory.
+
+---
+
 ## 1. Exact Root Cause
 
 **Webpack dev cache invalidation after file deletions during an active dev server session.**
@@ -169,3 +173,70 @@ Expected results:
 | Settings page typography                                        | DM Sans font applied          |
 | Settings page buttons                                           | Tailwind token styles applied |
 | Tailwind spacing (gap-s16, px-s24 etc.)                         | Present                       |
+
+---
+
+# CSS Regression #2
+
+**Date:** 2026-06-11
+**Trigger:** `pnpm build` ran at 11:46 after Team Domain refactor commit `69676ec` to verify it compiled cleanly
+**Status:** Fixed — same fix as Regression #1
+
+## Root Cause
+
+Running `pnpm build` while the dev server is active **completely replaces the `.next` directory** with production build artifacts. The production build writes:
+
+- `.next/static/css/<contenthash>.css` — production CSS bundle
+- `.next/BUILD_ID` — production hash (e.g. `agepjS7KHONxTvYu4VGMl`)
+
+It does **not** write:
+
+- `.next/static/css/app/layout.css` — dev-only CSS chunk
+
+After the production build, the dev server continues serving HTML with:
+
+```html
+<link rel="stylesheet" href="/_next/static/css/app/layout.css" />
+```
+
+But that file no longer exists. The request returns 404. Browser receives no CSS.
+
+## Evidence Chain
+
+1. Dev server started at approximately 11:24 (per `ps` output from investigation)
+2. Team Domain refactor committed at `69676ec`
+3. `pnpm build` ran at 11:46 to verify the refactor compiled cleanly
+4. All files in `.next/` have timestamps of 11:46:xx — the production build timestamp
+5. `BUILD_ID` = `agepjS7KHONxTvYu4VGMl` — a production content hash, not `"development"`
+6. `.next/static/css/app/` directory exists but is empty — production build created the dir, skipped the file
+7. `pnpm --filter owner build` output: `✓ Compiled successfully` — no source errors
+
+The source code (Team refactor) was NOT the cause. The CSS regression was caused entirely by the production build overwriting `.next`.
+
+## Fix
+
+```bash
+# From repo root:
+rm -rf apps/owner/.next
+pnpm --filter owner dev
+```
+
+## Prevention
+
+Never run `pnpm build` while the dev server is running. To verify a build compiles cleanly, either:
+
+1. Stop the dev server first (`pkill -f "next dev"`), run `pnpm build`, then restart dev
+2. Or build in a separate terminal and restart dev after the build completes
+
+Add this to team practice: **treat `.next` as exclusively owned by whichever process is running** (dev server OR build, never both).
+
+## Verification
+
+After clearing `.next` and restarting dev:
+
+| Check                                                           | Expected              |
+| --------------------------------------------------------------- | --------------------- |
+| `cat apps/owner/.next/BUILD_ID`                                 | `development`         |
+| `ls apps/owner/.next/static/css/app/`                           | `layout.css` present  |
+| `curl -I http://localhost:3001/_next/static/css/app/layout.css` | `HTTP/1.1 200 OK`     |
+| Settings page in browser                                        | Tailwind styles apply |
