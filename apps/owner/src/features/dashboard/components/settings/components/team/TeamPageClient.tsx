@@ -32,7 +32,12 @@ export function TeamPageClient() {
   return (
     <SettingsPageShell>
       <SettingsTabbedCard tabs={TEAM_TABS} activeTab={activeTab} onTabChange={setActiveTab}>
-        <TeamForm ctrl={ctrl} activeTab={activeTab} services={servicesCtrl.domain.services} />
+        <TeamForm
+          ctrl={ctrl}
+          activeTab={activeTab}
+          services={servicesCtrl.domain.services}
+          categories={servicesCtrl.domain.categories}
+        />
       </SettingsTabbedCard>
     </SettingsPageShell>
   );
