@@ -190,11 +190,11 @@ function StaffTableRow({ member, schedule, onEdit, onDeactivate, onDelete }: Sta
           <img
             src={member.avatarUrl}
             alt={member.fullName}
-            className="h-10 w-10 shrink-0 rounded-r10 object-cover"
+            className="h-12 w-12 shrink-0 rounded-r10 object-cover"
           />
         ) : (
           <div
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-r10 font-semibold text-tx-primary ${
+            className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-r10 font-semibold text-tx-primary ${
               isTwoChar ? 'text-ts-fn' : 'text-ts-body'
             }`}
             style={{ background: bg }}
@@ -202,7 +202,7 @@ function StaffTableRow({ member, schedule, onEdit, onDeactivate, onDelete }: Sta
             {initials}
           </div>
         )}
-        <span className="truncate text-ts-fn font-medium text-tx-primary">{member.fullName}</span>
+        <span className="truncate text-ts-sub font-medium text-tx-primary">{member.fullName}</span>
       </div>
 
       {/* Role badge */}
