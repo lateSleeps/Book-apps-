@@ -4,15 +4,20 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
 import { useState } from 'react';
 import superjson from 'superjson';
+import { supabaseBrowser } from './supabase-browser';
 import { trpc } from './trpc';
 
-// Sprint 4.5: send the Supabase access token as a Bearer header.
-// context.ts verifies it server-side and derives salonId + userId from salon_users.
-// The token is written to localStorage by AuthContext on every session change.
-function getAuthHeaders(): Record<string, string> {
+// Read the Bearer token directly from the live Supabase session.
+// This avoids relying on the manual 'authAccessToken' key in localStorage,
+// which is deleted whenever onAuthStateChange fires a null session —
+// including spurious events from React Strict Mode or token refresh cycles.
+async function getAuthHeaders(): Promise<Record<string, string>> {
   if (typeof window === 'undefined') return {};
   try {
-    const token = localStorage.getItem('authAccessToken');
+    const {
+      data: { session },
+    } = await supabaseBrowser.auth.getSession();
+    const token = session?.access_token ?? null;
     if (!token) return {};
     return { Authorization: `Bearer ${token}` };
   } catch {

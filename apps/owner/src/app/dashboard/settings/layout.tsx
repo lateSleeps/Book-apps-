@@ -12,6 +12,7 @@
 import type { ReactNode } from 'react';
 import { SettingsNavigationPanel } from '@/features/dashboard/components/settings/SettingsNavigationPanel';
 import { SettingsPageHeader } from '@/features/dashboard/components/settings/SettingsPageHeader';
+import { SettingsContentGate } from '@/features/dashboard/components/settings/layout/SettingsContentGate';
 import { SettingsHeaderActionsProvider } from '@/features/dashboard/components/settings/layout/SettingsHeaderActionsContext';
 
 export default function SettingsLayout({ children }: { children: ReactNode }) {
@@ -29,7 +30,9 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
 
           {/* Scrollable content area */}
           <div className="flex-1 overflow-y-auto">
-            <div className="px-s16 py-s16 md:px-s24 md:py-s24">{children}</div>
+            <div className="px-s16 py-s16 md:px-s24 md:py-s24">
+              <SettingsContentGate>{children}</SettingsContentGate>
+            </div>
           </div>
         </div>
       </div>

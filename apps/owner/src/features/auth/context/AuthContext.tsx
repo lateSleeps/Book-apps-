@@ -34,13 +34,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const setCurrentUser = useCallback((user: User | null) => {
     setCurrentUserState(user);
-    // Keep localStorage in sync so TRPCProvider can read the user data if needed
     try {
       if (user) {
         localStorage.setItem('currentUser', JSON.stringify(user));
       } else {
         localStorage.removeItem('currentUser');
-        localStorage.removeItem('authAccessToken');
       }
     } catch {
       // localStorage unavailable in some environments — safe to ignore
@@ -48,31 +46,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   useEffect(() => {
-    // Load initial session
     supabaseBrowser.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
-        // Store the raw access token so TRPCProvider can send it as Bearer header
-        try {
-          localStorage.setItem('authAccessToken', session.access_token);
-        } catch {
-          /* ignore */
-        }
         const user = await fetchUserProfile(session.access_token);
         setCurrentUser(user);
       }
       setLoading(false);
     });
 
-    // Subscribe to subsequent auth changes
     const {
       data: { subscription },
     } = supabaseBrowser.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
-        try {
-          localStorage.setItem('authAccessToken', session.access_token);
-        } catch {
-          /* ignore */
-        }
         const user = await fetchUserProfile(session.access_token);
         setCurrentUser(user);
       } else {
@@ -88,7 +73,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setCurrentUser(null);
   }, [setCurrentUser]);
 
-  // switchUser kept for dev convenience — triggers only when explicitly called
   const switchUser = useCallback((_userId: string) => {
     // No-op in production. Use Supabase Auth sign-in flow.
   }, []);

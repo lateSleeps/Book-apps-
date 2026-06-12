@@ -11,18 +11,18 @@ import { db } from '../db';
  * Flow:
  *   1. Read Authorization: Bearer <token>
  *   2. db.auth.getUser(token) — verify JWT server-side (service role)
- *   3. SELECT salon_users WHERE auth_user_id = authUser.id AND status IN ('ACTIVE','INVITED')
- *   4. Return real salonId + salon_users.id as userId
+ *   3. SELECT users WHERE auth_user_id = authUser.id
+ *   4. Return real salonId + users.id as userId
  *
  * Both fields are null when the token is missing, invalid, or the user has
- * no active salon_users row. protectedProcedure throws UNAUTHORIZED in that case.
+ * no matching users row. protectedProcedure throws UNAUTHORIZED in that case.
  */
 export interface TRPCContext {
   salonId: string | null;
   userId: string | null;
 }
 
-interface SalonUserIdRow {
+interface UserIdRow {
   id: string;
   salon_id: string;
 }
@@ -40,15 +40,15 @@ export async function createContext(opts: CreateNextContextOptions): Promise<TRP
     data: { user: authUser },
     error: authError,
   } = await db.auth.getUser(token);
+
   if (authError || !authUser) {
     return { salonId: null, userId: null };
   }
 
   const { data, error: dbError } = await db
-    .from('salon_users')
+    .from('users')
     .select('id, salon_id')
     .eq('auth_user_id', authUser.id)
-    .in('status', ['ACTIVE', 'INVITED'])
     .limit(1)
     .maybeSingle();
 
@@ -56,7 +56,7 @@ export async function createContext(opts: CreateNextContextOptions): Promise<TRP
     return { salonId: null, userId: null };
   }
 
-  const row = data as unknown as SalonUserIdRow;
+  const row = data as unknown as UserIdRow;
   return {
     salonId: row.salon_id,
     userId: row.id,

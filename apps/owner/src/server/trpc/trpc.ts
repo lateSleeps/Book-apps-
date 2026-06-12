@@ -21,14 +21,13 @@ export const publicProcedure = t.procedure;
  * Throws UNAUTHORIZED if salonId is missing.
  * Narrows ctx.salonId from string | null to string for downstream use.
  *
- * Phase 1: salonId comes from 'x-salon-id' header sent by TRPCProvider.
- * Phase 4: replace context.ts to derive salonId from Supabase session.
+ * salonId is derived from the verified Supabase JWT in context.ts.
  */
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
   if (!ctx.salonId) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
-      message: 'Missing salon context. Ensure x-salon-id header is set.',
+      message: 'Missing salon context. Authorization token missing or invalid.',
     });
   }
 
