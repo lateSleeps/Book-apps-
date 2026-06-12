@@ -294,7 +294,7 @@ interface Props {
 }
 
 export function ServiceAssignmentSection({ ctrl, services, categories }: Props) {
-  const activeStaff = ctrl.domain.staff.filter((s) => s.isActive);
+  const activeStaff = ctrl.staff.data.filter((s) => s.isActive);
   const [selectedStaffId, setSelectedStaffId] = useState<string>(activeStaff[0]?.id ?? '');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -321,7 +321,7 @@ export function ServiceAssignmentSection({ ctrl, services, categories }: Props) 
   const selectedMember = activeStaff.find((s) => s.id === selectedStaffId) ?? activeStaff[0]!;
   const resolvedStaffId = selectedMember.id;
 
-  const assignment = ctrl.domain.assignments.find((a) => a.staffId === resolvedStaffId);
+  const assignment = ctrl.assignments.data.find((a) => a.staffId === resolvedStaffId);
   const assignedIds = new Set(assignment?.serviceIds ?? []);
 
   const activeServices = services.filter((s) => s.isActive);
@@ -354,18 +354,18 @@ export function ServiceAssignmentSection({ ctrl, services, categories }: Props) 
     const next = assignedIds.has(serviceId)
       ? [...assignedIds].filter((id) => id !== serviceId)
       : [...assignedIds, serviceId];
-    ctrl.setAssignment(resolvedStaffId, next);
+    ctrl.assignments.set(resolvedStaffId, next);
   }
 
   function selectAll(serviceIds: string[]) {
     const next = [...new Set([...assignedIds, ...serviceIds])];
-    ctrl.setAssignment(resolvedStaffId, next);
+    ctrl.assignments.set(resolvedStaffId, next);
   }
 
   function clearAll(serviceIds: string[]) {
     const removeSet = new Set(serviceIds);
     const next = [...assignedIds].filter((id) => !removeSet.has(id));
-    ctrl.setAssignment(resolvedStaffId, next);
+    ctrl.assignments.set(resolvedStaffId, next);
   }
 
   // ── Render ────────────────────────────────────────────────────────────

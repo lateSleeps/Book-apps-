@@ -1,47 +1,28 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { BaseSettingsController } from './types/BaseSettingsController';
 import type {
-  BrandProfile,
-  BrandIdentity,
   BrandContact,
-  BrandSocial,
+  BrandIdentity,
   BrandLocation,
+  BrandProfile,
+  BrandSocial,
 } from '@/features/dashboard/components/settings/types/brand.types';
+import { trpc } from '@/lib/trpc';
 
-// ── Mock initial data (replace with tRPC query when backend is ready) ─────────
+// ── Empty defaults ────────────────────────────────────────────────────────────
+// Shown while the initial query is in-flight.
 
-const MOCK_PROFILE: BrandProfile = {
-  identity: {
-    salonName: 'Rara Beauty Salon',
-    tagline: 'Kecantikan yang memancarkan kepercayaan diri',
-    description:
-      'Salon kecantikan premium dengan layanan lengkap untuk rambut, kuku, wajah, dan perawatan tubuh.',
-  },
-  media: {
-    logoUrl: null,
-    coverImageUrl: null,
-  },
-  contact: {
-    phone: '+62 812-3456-7890',
-    whatsapp: '6281234567890',
-    email: '',
-    website: '',
-  },
-  social: {
-    instagram: '',
-    tiktok: '',
-    facebook: '',
-  },
-  location: {
-    address: 'Jl. Sudirman No. 12, Jakarta',
-    city: 'Jakarta',
-    mapsUrl: '',
-  },
+const EMPTY_BRAND_PROFILE: BrandProfile = {
+  identity: { salonName: '', tagline: '', description: '' },
+  media: { logoUrl: null, coverImageUrl: null },
+  contact: { phone: '', whatsapp: '', email: '', website: '' },
+  social: { instagram: '', tiktok: '', facebook: '' },
+  location: { address: '', city: '', mapsUrl: '' },
 };
 
-// ── Controller ────────────────────────────────────────────────────────────────
+// ── Public interface ──────────────────────────────────────────────────────────
 
 export interface BrandProfileController extends BaseSettingsController {
   profile: BrandProfile;
@@ -53,8 +34,19 @@ export interface BrandProfileController extends BaseSettingsController {
   setSocial: (patch: Partial<BrandSocial>) => void;
   setLocation: (patch: Partial<BrandLocation>) => void;
 
+  /**
+   * Stage a new logo file.
+   * previewUrl is a local blob: URL for immediate UI feedback.
+   * The actual upload to Supabase Storage happens in Sprint 4.
+   * Until then, save() will not persist the file — it keeps the existing DB value.
+   */
   setLogo: (file: File, previewUrl: string) => void;
   removeLogo: () => void;
+
+  /**
+   * Stage a new cover image file.
+   * Same Sprint 4 limitation as setLogo.
+   */
   setCoverImage: (file: File, previewUrl: string) => void;
   removeCoverImage: () => void;
 
@@ -62,77 +54,143 @@ export interface BrandProfileController extends BaseSettingsController {
   handleReset: () => void;
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/**
+ * Returns true if a URL is safe to persist to the DB:
+ * - null (explicit removal) is always safe
+ * - https:// URLs are safe
+ * - blob: / data: URLs are NOT safe — they are local-only previews
+ */
+function isSafeMediaUrl(url: string | null): boolean {
+  if (url === null) return true;
+  return url.startsWith('https://');
+}
+
+// ── Hook ──────────────────────────────────────────────────────────────────────
+
 export function useBrandProfileController(): BrandProfileController {
-  const [saved, setSaved] = useState<BrandProfile>(MOCK_PROFILE);
-  const [profile, setProfile] = useState<BrandProfile>(MOCK_PROFILE);
-  const [isSaving, setIsSaving] = useState(false);
+  const utils = trpc.useUtils();
+
+  // ── Server state ──────────────────────────────────────────────────────────
+  const { data: savedProfile } = trpc.settings.brand.getBrandProfile.useQuery(undefined, {
+    staleTime: 30_000,
+  });
+
+  const { mutateAsync: upsertBrand, isLoading: isSaving } =
+    trpc.settings.brand.updateBrandProfile.useMutation({
+      onSuccess: () => {
+        void utils.settings.brand.getBrandProfile.invalidate();
+      },
+    });
+
+  // ── Draft state ───────────────────────────────────────────────────────────
+  // Initialized from the query result on first load. Subsequent query
+  // invalidations (after save) do NOT overwrite an active draft — the user
+  // stays in the form with their current edits.
+
+  const [draft, setDraft] = useState<BrandProfile>(EMPTY_BRAND_PROFILE);
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    if (savedProfile && !hasInitialized.current) {
+      hasInitialized.current = true;
+      setDraft(savedProfile);
+    }
+  }, [savedProfile]);
+
+  // ── Pending file uploads (Sprint 4) ──────────────────────────────────────
+  // Stored here so Sprint 4 can read them and issue presigned URL requests.
+  // Not persisted to DB in Sprint 1.2.
   const pendingFilesRef = useRef<{ logo?: File; cover?: File }>({});
 
-  // Shallow comparison of nested profile to detect dirty state
-  const isDirty = JSON.stringify(profile) !== JSON.stringify(saved);
+  // ── Dirty check ───────────────────────────────────────────────────────────
+  const isDirty =
+    hasInitialized.current &&
+    JSON.stringify(draft) !== JSON.stringify(savedProfile ?? EMPTY_BRAND_PROFILE);
+
+  // ── Field setters ─────────────────────────────────────────────────────────
 
   const setIdentity = useCallback((patch: Partial<BrandIdentity>) => {
-    setProfile((p) => ({ ...p, identity: { ...p.identity, ...patch } }));
+    setDraft((p) => ({ ...p, identity: { ...p.identity, ...patch } }));
   }, []);
 
   const setContact = useCallback((patch: Partial<BrandContact>) => {
-    setProfile((p) => ({ ...p, contact: { ...p.contact, ...patch } }));
+    setDraft((p) => ({ ...p, contact: { ...p.contact, ...patch } }));
   }, []);
 
   const setSocial = useCallback((patch: Partial<BrandSocial>) => {
-    setProfile((p) => ({ ...p, social: { ...p.social, ...patch } }));
+    setDraft((p) => ({ ...p, social: { ...p.social, ...patch } }));
   }, []);
 
   const setLocation = useCallback((patch: Partial<BrandLocation>) => {
-    setProfile((p) => ({ ...p, location: { ...p.location, ...patch } }));
+    setDraft((p) => ({ ...p, location: { ...p.location, ...patch } }));
   }, []);
 
   const setLogo = useCallback((_file: File, previewUrl: string) => {
     pendingFilesRef.current.logo = _file;
-    setProfile((p) => ({ ...p, media: { ...p.media, logoUrl: previewUrl } }));
+    setDraft((p) => ({ ...p, media: { ...p.media, logoUrl: previewUrl } }));
   }, []);
 
   const removeLogo = useCallback(() => {
     pendingFilesRef.current.logo = undefined;
-    setProfile((p) => ({ ...p, media: { ...p.media, logoUrl: null } }));
+    // null = explicit removal — persisted to DB on save
+    setDraft((p) => ({ ...p, media: { ...p.media, logoUrl: null } }));
   }, []);
 
   const setCoverImage = useCallback((_file: File, previewUrl: string) => {
     pendingFilesRef.current.cover = _file;
-    setProfile((p) => ({ ...p, media: { ...p.media, coverImageUrl: previewUrl } }));
+    setDraft((p) => ({ ...p, media: { ...p.media, coverImageUrl: previewUrl } }));
   }, []);
 
   const removeCoverImage = useCallback(() => {
     pendingFilesRef.current.cover = undefined;
-    setProfile((p) => ({ ...p, media: { ...p.media, coverImageUrl: null } }));
+    setDraft((p) => ({ ...p, media: { ...p.media, coverImageUrl: null } }));
   }, []);
 
+  // ── Save ──────────────────────────────────────────────────────────────────
+
   const handleSave = useCallback(async () => {
-    setIsSaving(true);
-    try {
-      // Future upload flow (do not implement here — use a service layer):
-      // const logoUrl  = pendingFilesRef.current.logo
-      //   ? await uploadAsset(pendingFilesRef.current.logo, { bucket: 'salon-assets', variant: 'logo' })
-      //   : profile.media.logoUrl;
-      // const coverUrl = pendingFilesRef.current.cover
-      //   ? await uploadAsset(pendingFilesRef.current.cover, { bucket: 'salon-assets', variant: 'cover' })
-      //   : profile.media.coverImageUrl;
-      // await trpc.salons.update.mutateAsync({ ...profile, logoUrl, coverImageUrl: coverUrl });
-      await new Promise<void>((resolve) => setTimeout(resolve, 800)); // mock delay
-      pendingFilesRef.current = {};
-      setSaved(profile);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [profile]);
+    const dbMedia = savedProfile?.media ?? { logoUrl: null, coverImageUrl: null };
+
+    // Blob URLs (pending local file selections) cannot be persisted to the DB.
+    // - null: user explicitly removed → persist null
+    // - https://: already a real URL → persist it
+    // - blob:/data:: pending upload → keep the current DB value unchanged
+    const safeLogoUrl =
+      draft.media.logoUrl === null
+        ? null
+        : isSafeMediaUrl(draft.media.logoUrl)
+          ? draft.media.logoUrl
+          : dbMedia.logoUrl;
+
+    const safeCoverUrl =
+      draft.media.coverImageUrl === null
+        ? null
+        : isSafeMediaUrl(draft.media.coverImageUrl)
+          ? draft.media.coverImageUrl
+          : dbMedia.coverImageUrl;
+
+    await upsertBrand({
+      ...draft,
+      media: { logoUrl: safeLogoUrl, coverImageUrl: safeCoverUrl },
+    });
+
+    // Clear pending files — upload them in Sprint 4
+    pendingFilesRef.current = {};
+  }, [draft, savedProfile, upsertBrand]);
+
+  // ── Reset ─────────────────────────────────────────────────────────────────
 
   const handleReset = useCallback(() => {
+    if (savedProfile) setDraft(savedProfile);
     pendingFilesRef.current = {};
-    setProfile(saved);
-  }, [saved]);
+  }, [savedProfile]);
+
+  // ── Assemble ──────────────────────────────────────────────────────────────
 
   return {
-    profile,
+    profile: draft,
     isDirty,
     isSaving,
     setIdentity,

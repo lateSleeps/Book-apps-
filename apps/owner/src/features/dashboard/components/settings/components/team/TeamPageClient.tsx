@@ -22,11 +22,13 @@ export function TeamPageClient() {
   const servicesCtrl = useServicesController();
   const [activeTab, setActiveTab] = useState('directory');
 
+  // Team uses immediate mutations and per-section explicit save (schedules only).
+  // No global batch save — action bar is permanently hidden for this page.
   useRegisterSettingsActions({
-    onSave: ctrl.handleSave,
-    onCancel: ctrl.handleReset,
-    isDirty: ctrl.isDirty,
-    isSaving: ctrl.isSaving,
+    onSave: () => void 0,
+    onCancel: () => void 0,
+    isDirty: false,
+    isSaving: false,
   });
 
   return (

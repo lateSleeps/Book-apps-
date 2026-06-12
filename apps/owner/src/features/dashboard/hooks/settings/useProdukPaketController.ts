@@ -1,161 +1,164 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import type { BaseSettingsController } from './types/BaseSettingsController';
+import { useCallback } from 'react';
 import type {
   AddOnProduct,
   ServiceBundle,
 } from '@/features/dashboard/components/settings/types/services.types';
+import { trpc } from '@/lib/trpc';
 
-// ── Domain ────────────────────────────────────────────────────────────────────
+// ── Section interfaces ────────────────────────────────────────────────────────
 
-export interface ProdukPaketDomain {
-  addons: AddOnProduct[];
-  bundles: ServiceBundle[];
+export interface AddonsSection {
+  data: AddOnProduct[];
+  isLoading: boolean;
+  isSaving: boolean;
+  add: (draft: Omit<AddOnProduct, 'id' | 'sortOrder'>) => void;
+  update: (id: string, patch: Partial<Omit<AddOnProduct, 'id' | 'sortOrder'>>) => void;
+  remove: (id: string) => void;
 }
 
-// ── Mock seed data ────────────────────────────────────────────────────────────
+export interface BundlesSection {
+  data: ServiceBundle[];
+  isLoading: boolean;
+  isSaving: boolean;
+  add: (draft: Omit<ServiceBundle, 'id' | 'sortOrder'>) => void;
+  update: (id: string, patch: Partial<Omit<ServiceBundle, 'id' | 'sortOrder'>>) => void;
+  remove: (id: string) => void;
+}
 
-const MOCK_DOMAIN: ProdukPaketDomain = {
-  addons: [
-    {
-      id: 'prod-1',
-      name: 'Makarizo Shampoo',
-      description: 'Shampoo rambut sehat 200ml',
-      price: 45_000,
-      imageUrl: null,
-      isActive: true,
-      sortOrder: 0,
-    },
-    {
-      id: 'prod-2',
-      name: "L'Oreal Conditioner",
-      description: 'Kondisioner nutrisi intensif 175ml',
-      price: 55_000,
-      imageUrl: null,
-      isActive: true,
-      sortOrder: 1,
-    },
-    {
-      id: 'prod-4',
-      name: 'TRESemmé Serum',
-      description: 'Serum rambut anti-frizz 50ml',
-      price: 65_000,
-      imageUrl: null,
-      isActive: true,
-      sortOrder: 2,
-    },
-  ],
-  bundles: [
-    {
-      id: 'bundle-demo-1',
-      name: 'Paket Cantik Lengkap',
-      description: 'Haircut + Root Colour dengan harga spesial.',
-      serviceIds: ['svc-1', 'svc-10'],
-      bundlePrice: 320_000,
-      imageUrl: null,
-      isActive: true,
-      sortOrder: 0,
-    },
-  ],
+// ── Public interface ──────────────────────────────────────────────────────────
+
+export interface ProdukPaketController {
+  addons: AddonsSection;
+  bundles: BundlesSection;
+}
+
+// ── Placeholder data ──────────────────────────────────────────────────────────
+
+const EMPTY_DOMAIN = {
+  addons: [] as AddOnProduct[],
+  bundles: [] as ServiceBundle[],
 };
-
-// ── Controller interface ──────────────────────────────────────────────────────
-
-export interface ProdukPaketController extends BaseSettingsController {
-  domain: ProdukPaketDomain;
-
-  addAddon: (draft: Omit<AddOnProduct, 'id' | 'sortOrder'>) => void;
-  updateAddon: (id: string, patch: Partial<AddOnProduct>) => void;
-  deleteAddon: (id: string) => void;
-
-  addBundle: (draft: Omit<ServiceBundle, 'id' | 'sortOrder'>) => void;
-  updateBundle: (id: string, patch: Partial<ServiceBundle>) => void;
-  deleteBundle: (id: string) => void;
-}
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
 export function useProdukPaketController(): ProdukPaketController {
-  const [domain, setDomain] = useState<ProdukPaketDomain>(MOCK_DOMAIN);
-  const [savedDomain, setSavedDomain] = useState<ProdukPaketDomain>(MOCK_DOMAIN);
-  const [isDirty, setIsDirty] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const utils = trpc.useUtils();
 
-  function nextId(prefix: string) {
-    return `${prefix}-${Date.now()}`;
-  }
+  // ── Domain query ──────────────────────────────────────────────────────────
 
-  function setDirtyDomain(updater: (d: ProdukPaketDomain) => ProdukPaketDomain) {
-    setDomain(updater);
-    setIsDirty(true);
-  }
+  const { data: domainFromDb, isLoading: isDomainLoading } =
+    trpc.settings.produkPaket.getDomain.useQuery(undefined, {
+      staleTime: 30_000,
+      placeholderData: EMPTY_DOMAIN,
+    });
 
-  const handleSave = useCallback(() => {
-    setIsSaving(true);
-    setTimeout(() => {
-      setSavedDomain(domain);
-      setIsDirty(false);
-      setIsSaving(false);
-    }, 600);
-  }, [domain]);
+  // ── Invalidation ──────────────────────────────────────────────────────────
 
-  const handleReset = useCallback(() => {
-    setDomain(savedDomain);
-    setIsDirty(false);
-  }, [savedDomain]);
+  const invalidateDomain = useCallback(() => {
+    void utils.settings.produkPaket.getDomain.invalidate();
+  }, [utils]);
 
-  // ── Add-ons ───────────────────────────────────────────────────────────────
+  // ── Add-on mutations ──────────────────────────────────────────────────────
 
-  const addAddon = useCallback((draft: Omit<AddOnProduct, 'id' | 'sortOrder'>) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      addons: [...d.addons, { ...draft, id: nextId('prod'), sortOrder: d.addons.length }],
-    }));
-  }, []);
+  const { mutateAsync: createAddonMutation, isLoading: isCreatingAddon } =
+    trpc.settings.produkPaket.createAddOn.useMutation({ onSuccess: invalidateDomain });
 
-  const updateAddon = useCallback((id: string, patch: Partial<AddOnProduct>) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      addons: d.addons.map((a) => (a.id === id ? { ...a, ...patch } : a)),
-    }));
-  }, []);
+  const { mutateAsync: updateAddonMutation, isLoading: isUpdatingAddon } =
+    trpc.settings.produkPaket.updateAddOn.useMutation({ onSuccess: invalidateDomain });
 
-  const deleteAddon = useCallback((id: string) => {
-    setDirtyDomain((d) => ({ ...d, addons: d.addons.filter((a) => a.id !== id) }));
-  }, []);
+  const { mutateAsync: deleteAddonMutation, isLoading: isDeletingAddon } =
+    trpc.settings.produkPaket.deleteAddOn.useMutation({ onSuccess: invalidateDomain });
 
-  // ── Bundles ───────────────────────────────────────────────────────────────
+  // ── Bundle mutations ──────────────────────────────────────────────────────
 
-  const addBundle = useCallback((draft: Omit<ServiceBundle, 'id' | 'sortOrder'>) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      bundles: [...d.bundles, { ...draft, id: nextId('bundle'), sortOrder: d.bundles.length }],
-    }));
-  }, []);
+  const { mutateAsync: createBundleMutation, isLoading: isCreatingBundle } =
+    trpc.settings.produkPaket.createBundle.useMutation({ onSuccess: invalidateDomain });
 
-  const updateBundle = useCallback((id: string, patch: Partial<ServiceBundle>) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      bundles: d.bundles.map((b) => (b.id === id ? { ...b, ...patch } : b)),
-    }));
-  }, []);
+  const { mutateAsync: updateBundleMutation, isLoading: isUpdatingBundle } =
+    trpc.settings.produkPaket.updateBundle.useMutation({ onSuccess: invalidateDomain });
 
-  const deleteBundle = useCallback((id: string) => {
-    setDirtyDomain((d) => ({ ...d, bundles: d.bundles.filter((b) => b.id !== id) }));
-  }, []);
+  const { mutateAsync: deleteBundleMutation, isLoading: isDeletingBundle } =
+    trpc.settings.produkPaket.deleteBundle.useMutation({ onSuccess: invalidateDomain });
+
+  // ── Add-on actions ────────────────────────────────────────────────────────
+
+  const addAddon = useCallback(
+    (draft: Omit<AddOnProduct, 'id' | 'sortOrder'>) => {
+      void createAddonMutation({
+        name: draft.name,
+        description: draft.description,
+        price: draft.price,
+        imageUrl: draft.imageUrl,
+        isActive: draft.isActive,
+      });
+    },
+    [createAddonMutation]
+  );
+
+  const updateAddon = useCallback(
+    (id: string, patch: Partial<Omit<AddOnProduct, 'id' | 'sortOrder'>>) => {
+      void updateAddonMutation({ id, patch });
+    },
+    [updateAddonMutation]
+  );
+
+  const removeAddon = useCallback(
+    (id: string) => {
+      void deleteAddonMutation({ id });
+    },
+    [deleteAddonMutation]
+  );
+
+  // ── Bundle actions ────────────────────────────────────────────────────────
+
+  const addBundle = useCallback(
+    (draft: Omit<ServiceBundle, 'id' | 'sortOrder'>) => {
+      void createBundleMutation({
+        name: draft.name,
+        description: draft.description,
+        serviceIds: draft.serviceIds,
+        bundlePrice: draft.bundlePrice,
+        imageUrl: draft.imageUrl,
+        isActive: draft.isActive,
+      });
+    },
+    [createBundleMutation]
+  );
+
+  const updateBundle = useCallback(
+    (id: string, patch: Partial<Omit<ServiceBundle, 'id' | 'sortOrder'>>) => {
+      void updateBundleMutation({ id, patch });
+    },
+    [updateBundleMutation]
+  );
+
+  const removeBundle = useCallback(
+    (id: string) => {
+      void deleteBundleMutation({ id });
+    },
+    [deleteBundleMutation]
+  );
+
+  // ── Assemble ──────────────────────────────────────────────────────────────
 
   return {
-    isDirty,
-    isSaving,
-    handleSave,
-    handleReset,
-    domain,
-    addAddon,
-    updateAddon,
-    deleteAddon,
-    addBundle,
-    updateBundle,
-    deleteBundle,
+    addons: {
+      data: domainFromDb?.addons ?? EMPTY_DOMAIN.addons,
+      isLoading: isDomainLoading,
+      isSaving: isCreatingAddon || isUpdatingAddon || isDeletingAddon,
+      add: addAddon,
+      update: updateAddon,
+      remove: removeAddon,
+    },
+    bundles: {
+      data: domainFromDb?.bundles ?? EMPTY_DOMAIN.bundles,
+      isLoading: isDomainLoading,
+      isSaving: isCreatingBundle || isUpdatingBundle || isDeletingBundle,
+      add: addBundle,
+      update: updateBundle,
+      remove: removeBundle,
+    },
   };
 }

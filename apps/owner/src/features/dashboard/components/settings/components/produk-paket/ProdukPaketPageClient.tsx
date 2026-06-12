@@ -20,11 +20,12 @@ export function ProdukPaketPageClient() {
   const servicesCtrl = useServicesController();
   const [activeTab, setActiveTab] = useState('addons');
 
+  // Produk & Paket uses immediate mutations only — no global batch save.
   useRegisterSettingsActions({
-    onSave: ctrl.handleSave,
-    onCancel: ctrl.handleReset,
-    isDirty: ctrl.isDirty,
-    isSaving: ctrl.isSaving,
+    onSave: () => void 0,
+    onCancel: () => void 0,
+    isDirty: false,
+    isSaving: false,
   });
 
   return (

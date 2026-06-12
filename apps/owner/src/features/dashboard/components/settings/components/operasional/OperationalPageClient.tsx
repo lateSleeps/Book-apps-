@@ -262,7 +262,7 @@ export function OperationalPageClient() {
   // ── Sheet handlers ─────────────────────────────────────────────────────────
 
   function openHoursSheet() {
-    setDraftHours(ctrl.settings.businessHours.map((h) => ({ ...h })));
+    setDraftHours(ctrl.businessHours.data.map((h) => ({ ...h })));
     setSheet({ kind: 'edit-hours' });
   }
 
@@ -270,24 +270,14 @@ export function OperationalPageClient() {
     setDraftHours((prev) => prev.map((h) => (h.dayOfWeek === dow ? { ...h, ...patch } : h)));
   }
 
-  function handleHoursSave() {
-    for (const draft of draftHours) {
-      const original = ctrl.settings.businessHours.find((h) => h.dayOfWeek === draft.dayOfWeek);
-      if (!original) continue;
-      if (
-        draft.isClosed !== original.isClosed ||
-        draft.openTime !== original.openTime ||
-        draft.closeTime !== original.closeTime
-      ) {
-        ctrl.updateBusinessHoursDay(draft.dayOfWeek, {
-          isClosed: draft.isClosed,
-          openTime: draft.openTime,
-          closeTime: draft.closeTime,
-        });
-      }
+  async function handleHoursSave() {
+    try {
+      await ctrl.businessHours.save(draftHours);
+      showToast('Jam operasional disimpan.');
+      setSheet(null);
+    } catch {
+      showToast('Gagal menyimpan jam operasional. Coba lagi.');
     }
-    showToast('Jam operasional disimpan.');
-    setSheet(null);
   }
 
   const canSaveHours = draftHours.every(
@@ -301,7 +291,7 @@ export function OperationalPageClient() {
   }
 
   function openEditHoliday(id: string) {
-    const item = ctrl.settings.specialClosingDates.find((d) => d.id === id);
+    const item = ctrl.specialClosingDates.data.find((d) => d.id === id);
     if (!item) return;
     setDraftDate(item.date);
     setDraftLabel(item.label);
@@ -311,10 +301,10 @@ export function OperationalPageClient() {
   function handleHolidaySave() {
     const label = draftLabel.trim() || 'Hari Libur';
     if (sheet?.kind === 'edit-holiday') {
-      ctrl.updateSpecialClosingDate(sheet.id, { date: draftDate, label });
+      ctrl.specialClosingDates.update(sheet.id, { date: draftDate, label });
       showToast('Hari libur diperbarui.');
     } else {
-      ctrl.addSpecialClosingDate({ date: draftDate, label });
+      ctrl.specialClosingDates.add({ date: draftDate, label });
       showToast('Hari libur ditambahkan.');
     }
     setSheet(null);
@@ -322,17 +312,17 @@ export function OperationalPageClient() {
 
   const editingHoliday =
     sheet?.kind === 'edit-holiday'
-      ? ctrl.settings.specialClosingDates.find((d) => d.id === sheet.id)
+      ? ctrl.specialClosingDates.data.find((d) => d.id === sheet.id)
       : undefined;
 
   const canSaveHoliday =
     draftDate.trim() !== '' &&
     (sheet?.kind === 'edit-holiday'
       ? draftDate !== editingHoliday?.date || draftLabel.trim() !== editingHoliday?.label
-      : !ctrl.settings.specialClosingDates.some((d) => d.date === draftDate));
+      : !ctrl.specialClosingDates.data.some((d) => d.date === draftDate));
 
   function openPolicySheet(field: PolicyField) {
-    setDraftPolicyValue(getPolicyCurrentValue(field, ctrl.settings.bookingPolicy));
+    setDraftPolicyValue(getPolicyCurrentValue(field, ctrl.bookingPolicy.data));
     setSheet({ kind: 'policy', field });
   }
 
@@ -341,13 +331,13 @@ export function OperationalPageClient() {
     const field = sheet.field;
     switch (field) {
       case 'slot':
-        ctrl.updateBookingPolicy({ slotIntervalMinutes: draftPolicyValue as SlotIntervalMinutes });
+        ctrl.bookingPolicy.update({ slotIntervalMinutes: draftPolicyValue as SlotIntervalMinutes });
         showToast(
           `Interval booking diubah. Customer bisa memilih slot setiap ${draftPolicyValue} menit.`
         );
         break;
       case 'lead':
-        ctrl.updateBookingPolicy({ leadTimeHours: draftPolicyValue });
+        ctrl.bookingPolicy.update({ leadTimeHours: draftPolicyValue });
         showToast(
           draftPolicyValue === 0
             ? 'Customer bisa booking hingga menit terakhir.'
@@ -355,11 +345,11 @@ export function OperationalPageClient() {
         );
         break;
       case 'advance':
-        ctrl.updateBookingPolicy({ advanceBookingDays: draftPolicyValue });
+        ctrl.bookingPolicy.update({ advanceBookingDays: draftPolicyValue });
         showToast(`Customer hanya bisa memesan hingga ${draftPolicyValue} hari ke depan.`);
         break;
       case 'cancel':
-        ctrl.updateBookingPolicy({ cancellationWindowHours: draftPolicyValue });
+        ctrl.bookingPolicy.update({ cancellationWindowHours: draftPolicyValue });
         showToast(
           draftPolicyValue === 0
             ? 'Customer bisa membatalkan booking kapan saja.'
@@ -372,10 +362,10 @@ export function OperationalPageClient() {
 
   const canSavePolicy =
     sheet?.kind === 'policy' &&
-    draftPolicyValue !== getPolicyCurrentValue(sheet.field, ctrl.settings.bookingPolicy);
+    draftPolicyValue !== getPolicyCurrentValue(sheet.field, ctrl.bookingPolicy.data);
 
   function requestDeleteHoliday(id: string) {
-    const item = ctrl.settings.specialClosingDates.find((d) => d.id === id);
+    const item = ctrl.specialClosingDates.data.find((d) => d.id === id);
     if (!item) return;
     setConfirmPending({
       title: 'Hapus Hari Libur?',
@@ -383,7 +373,7 @@ export function OperationalPageClient() {
       confirmLabel: 'Hapus',
       variant: 'danger',
       onConfirm: () => {
-        ctrl.removeSpecialClosingDate(id);
+        ctrl.specialClosingDates.remove(id);
         setConfirmPending(null);
         showToast('Hari libur dihapus.');
       },
@@ -396,8 +386,8 @@ export function OperationalPageClient() {
   // ── Derived ────────────────────────────────────────────────────────────────
 
   const today = todayIso();
-  const scheduleGroups = buildScheduleGroups(ctrl.settings.businessHours);
-  const sortedHolidays = [...ctrl.settings.specialClosingDates].sort((a, b) =>
+  const scheduleGroups = buildScheduleGroups(ctrl.businessHours.data);
+  const sortedHolidays = [...ctrl.specialClosingDates.data].sort((a, b) =>
     a.date.localeCompare(b.date)
   );
 
@@ -531,7 +521,7 @@ export function OperationalPageClient() {
                   <div className="flex flex-col items-start gap-s2">
                     <span className="text-ts-cap1 text-tx-secondary">{label}</span>
                     <span className="text-ts-fn font-medium text-tx-primary">
-                      {getPolicyDisplayValue(field, ctrl.settings.bookingPolicy)}
+                      {getPolicyDisplayValue(field, ctrl.bookingPolicy.data)}
                     </span>
                   </div>
                   <CaretRight size={14} weight="bold" className="shrink-0 text-tx-muted" />
@@ -548,8 +538,9 @@ export function OperationalPageClient() {
           title="Ubah Jadwal"
           description="Atur jam buka dan tutup untuk setiap hari."
           onClose={() => setSheet(null)}
-          onSave={handleHoursSave}
+          onSave={() => void handleHoursSave()}
           canSave={canSaveHours}
+          isSaving={ctrl.businessHours.isSaving}
           saveLabel="Simpan"
         >
           <div className="flex flex-col gap-s16">

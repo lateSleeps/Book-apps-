@@ -330,7 +330,7 @@ export function StaffDirectorySection({ ctrl }: Props) {
   const [draft, setDraft] = useState<StaffDraft>(BLANK_DRAFT);
   const [confirmPending, setConfirmPending] = useState<ConfirmPending | null>(null);
 
-  const staff = ctrl.domain.staff;
+  const staff = ctrl.staff.data;
 
   function openAdd() {
     setDraft({
@@ -360,9 +360,9 @@ export function StaffDirectorySection({ ctrl }: Props) {
   const handleSheetSave = useCallback(() => {
     if (!sheet || !draft.fullName.trim()) return;
     if (sheet.mode === 'add') {
-      ctrl.addStaff(draft);
+      ctrl.staff.add(draft);
     } else {
-      ctrl.updateStaff(sheet.staff.id, draft);
+      ctrl.staff.update(sheet.staff.id, draft);
     }
     closeSheet();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -375,16 +375,16 @@ export function StaffDirectorySection({ ctrl }: Props) {
       confirmLabel: 'Nonaktifkan',
       variant: 'danger',
       onConfirm: () => {
-        ctrl.deactivateStaff(member.id);
+        ctrl.staff.deactivate(member.id);
         setConfirmPending(null);
       },
     });
   }
 
   function handleDelete(member: StaffMember) {
-    const assignment = ctrl.domain.assignments.find((a) => a.staffId === member.id);
+    const assignment = ctrl.assignments.data.find((a) => a.staffId === member.id);
     const hasAssignments = (assignment?.serviceIds.length ?? 0) > 0;
-    const schedule = ctrl.domain.schedules.find((s) => s.staffId === member.id);
+    const schedule = ctrl.schedules.data.find((s) => s.staffId === member.id);
     const hasSchedule = schedule?.days.some((d) => d.enabled) ?? false;
     const hasData = hasAssignments || hasSchedule;
 
@@ -396,7 +396,7 @@ export function StaffDirectorySection({ ctrl }: Props) {
       confirmLabel: 'Hapus Permanen',
       variant: 'danger',
       onConfirm: () => {
-        ctrl.deleteStaff(member.id);
+        ctrl.staff.remove(member.id);
         setConfirmPending(null);
       },
     });
@@ -429,7 +429,7 @@ export function StaffDirectorySection({ ctrl }: Props) {
         <div className="overflow-hidden rounded-r16 border border-bd-card bg-bg-card shadow-card">
           <StaffTableHeader />
           {staff.map((member) => {
-            const schedule = ctrl.domain.schedules.find((s) => s.staffId === member.id);
+            const schedule = ctrl.schedules.data.find((s) => s.staffId === member.id);
             return (
               <StaffTableRow
                 key={member.id}

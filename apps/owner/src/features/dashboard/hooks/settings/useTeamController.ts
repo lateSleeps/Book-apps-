@@ -1,238 +1,257 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import type { BaseSettingsController } from './types/BaseSettingsController';
+import { useCallback, useState } from 'react';
 import type {
-  StaffMember,
-  WeeklySchedule,
+  LeaveType,
+  ServiceAssignment,
   StaffLeave,
-  TeamDomain,
-  WeekDay,
+  StaffMember,
+  StaffRole,
+  StaffSpecialty,
+  WeeklySchedule,
 } from '@/features/dashboard/components/settings/types/team.types';
+import { trpc } from '@/lib/trpc';
 
-// ── Mock seed data ────────────────────────────────────────────────────────────
+// ── Section interfaces ────────────────────────────────────────────────────────
 
-const ALL_DAYS: WeekDay[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-
-function defaultSchedule(staffId: string): WeeklySchedule {
-  return {
-    staffId,
-    days: ALL_DAYS.map((day) => ({
-      day,
-      enabled: !['SUN'].includes(day),
-      startTime: '09:00',
-      endTime: '18:00',
-    })),
-  };
+export interface StaffSection {
+  data: StaffMember[];
+  isLoading: boolean;
+  isSaving: boolean;
+  add: (draft: Omit<StaffMember, 'id'>) => void;
+  update: (id: string, patch: Partial<Omit<StaffMember, 'id'>>) => void;
+  deactivate: (id: string) => void;
+  remove: (id: string) => void;
 }
 
-const MOCK_STAFF: StaffMember[] = [
-  {
-    id: 'sty-1',
-    fullName: 'Dewi Rahayu',
-    phone: '081234567890',
-    role: 'COLORIST',
-    specialty: 'COLORIST',
-    avatarUrl: null,
-    avatarColor: '#ddedf8',
-    isActive: true,
-  },
-  {
-    id: 'sty-2',
-    fullName: 'Sinta Wulandari',
-    phone: '081298765432',
-    role: 'THERAPIST',
-    specialty: 'THERAPIST',
-    avatarUrl: null,
-    avatarColor: '#d8f3ec',
-    isActive: true,
-  },
-  {
-    id: 'sty-3',
-    fullName: 'Rina Kusuma',
-    phone: '081311223344',
-    role: 'STYLIST',
-    specialty: 'HAIR_STYLIST',
-    avatarUrl: null,
-    avatarColor: '#fde8dc',
-    isActive: true,
-  },
-  {
-    id: 'sty-4',
-    fullName: 'Andi Pratama',
-    phone: '081355667788',
-    role: 'STYLIST',
-    specialty: 'HAIR_STYLIST',
-    avatarUrl: null,
-    avatarColor: '#e8e2f8',
-    isActive: true,
-  },
-];
+export interface AssignmentsSection {
+  data: ServiceAssignment[];
+  isLoading: boolean;
+  isSaving: boolean;
+  set: (staffId: string, serviceIds: string[]) => void;
+}
 
-const MOCK_DOMAIN: TeamDomain = {
-  staff: MOCK_STAFF,
-  assignments: [
-    { staffId: 'sty-1', serviceIds: ['svc-10', 'svc-13'] },
-    { staffId: 'sty-2', serviceIds: ['svc-1', 'svc-2'] },
-    { staffId: 'sty-3', serviceIds: ['svc-1', 'svc-2'] },
-    { staffId: 'sty-4', serviceIds: ['svc-1', 'svc-2'] },
-  ],
-  schedules: MOCK_STAFF.map((s) => defaultSchedule(s.id)),
-  leaves: [
-    {
-      id: 'lv-1',
-      staffId: 'sty-1',
-      type: 'LEAVE',
-      date: '2026-06-20',
-      note: 'Cuti tahunan',
-    },
-  ],
+export interface SchedulesSection {
+  data: WeeklySchedule[];
+  isLoading: boolean;
+  isSaving: boolean;
+  saveForStaff: (staffId: string, schedule: WeeklySchedule) => void;
+}
+
+export interface LeavesSection {
+  data: StaffLeave[];
+  isLoading: boolean;
+  isSaving: boolean;
+  selectedStaffId: string | null;
+  selectStaff: (id: string | null) => void;
+  add: (draft: Omit<StaffLeave, 'id'>) => void;
+  remove: (id: string) => void;
+}
+
+// ── Public interface ──────────────────────────────────────────────────────────
+
+export interface TeamController {
+  staff: StaffSection;
+  assignments: AssignmentsSection;
+  schedules: SchedulesSection;
+  leaves: LeavesSection;
+}
+
+// ── Placeholder data ──────────────────────────────────────────────────────────
+
+const EMPTY_DOMAIN = {
+  staff: [] as StaffMember[],
+  assignments: [] as ServiceAssignment[],
+  schedules: [] as WeeklySchedule[],
 };
-
-// ── Controller interface ──────────────────────────────────────────────────────
-
-export interface TeamController extends BaseSettingsController {
-  domain: TeamDomain;
-
-  // Staff
-  addStaff: (draft: Omit<StaffMember, 'id'>) => void;
-  updateStaff: (id: string, patch: Partial<StaffMember>) => void;
-  deactivateStaff: (id: string) => void;
-  deleteStaff: (id: string) => void;
-
-  // Assignments
-  setAssignment: (staffId: string, serviceIds: string[]) => void;
-
-  // Schedule
-  updateDaySchedule: (
-    staffId: string,
-    day: WeekDay,
-    patch: Partial<{ enabled: boolean; startTime: string; endTime: string }>
-  ) => void;
-
-  // Leave
-  addLeave: (draft: Omit<StaffLeave, 'id'>) => void;
-  removeLeave: (id: string) => void;
-}
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
 export function useTeamController(): TeamController {
-  const [domain, setDomain] = useState<TeamDomain>(MOCK_DOMAIN);
-  const [savedDomain, setSavedDomain] = useState<TeamDomain>(MOCK_DOMAIN);
-  const [isDirty, setIsDirty] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const utils = trpc.useUtils();
 
-  function nextId(prefix: string) {
-    return `${prefix}-${Date.now()}`;
-  }
+  // ── Selected staff for leaves query ──────────────────────────────────────
+  const [leavesStaffId, setLeavesStaffId] = useState<string | null>(null);
 
-  function setDirtyDomain(updater: (d: TeamDomain) => TeamDomain) {
-    setDomain(updater);
-    setIsDirty(true);
-  }
+  // ── Domain query (staff + assignments + schedules) ────────────────────────
+  const { data: domainFromDb, isLoading: isDomainLoading } =
+    trpc.settings.team.getTeamDomain.useQuery(undefined, {
+      staleTime: 30_000,
+      placeholderData: EMPTY_DOMAIN,
+    });
 
-  const handleSave = useCallback(() => {
-    setIsSaving(true);
-    // TODO: replace with tRPC mutation
-    setTimeout(() => {
-      setSavedDomain(domain);
-      setIsDirty(false);
-      setIsSaving(false);
-    }, 600);
-  }, [domain]);
+  // ── Leaves query (parameterized, lazy) ───────────────────────────────────
+  const { data: leavesFromDb, isLoading: isLeavesLoading } =
+    trpc.settings.team.getStaffLeaves.useQuery(
+      { staffId: leavesStaffId! },
+      {
+        enabled: !!leavesStaffId,
+        staleTime: 30_000,
+        placeholderData: [] as StaffLeave[],
+      }
+    );
 
-  const handleReset = useCallback(() => {
-    setDomain(savedDomain);
-    setIsDirty(false);
-  }, [savedDomain]);
+  // ── Invalidation helpers ──────────────────────────────────────────────────
 
-  const addStaff = useCallback((draft: Omit<StaffMember, 'id'>) => {
-    const id = nextId('sty');
-    setDirtyDomain((d) => ({
-      ...d,
-      staff: [...d.staff, { ...draft, id }],
-      assignments: [...d.assignments, { staffId: id, serviceIds: [] }],
-      schedules: [...d.schedules, defaultSchedule(id)],
-    }));
-  }, []);
+  const invalidateDomain = useCallback(() => {
+    void utils.settings.team.getTeamDomain.invalidate();
+  }, [utils]);
 
-  const updateStaff = useCallback((id: string, patch: Partial<StaffMember>) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      staff: d.staff.map((s) => (s.id === id ? { ...s, ...patch } : s)),
-    }));
-  }, []);
+  const invalidateLeaves = useCallback(() => {
+    if (leavesStaffId) {
+      void utils.settings.team.getStaffLeaves.invalidate({ staffId: leavesStaffId });
+    }
+  }, [utils, leavesStaffId]);
 
-  const deactivateStaff = useCallback((id: string) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      staff: d.staff.map((s) => (s.id === id ? { ...s, isActive: false } : s)),
-    }));
-  }, []);
+  // ── Staff mutations ───────────────────────────────────────────────────────
 
-  const deleteStaff = useCallback((id: string) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      staff: d.staff.filter((s) => s.id !== id),
-      assignments: d.assignments.filter((a) => a.staffId !== id),
-      schedules: d.schedules.filter((sch) => sch.staffId !== id),
-      leaves: d.leaves.filter((l) => l.staffId !== id),
-    }));
-  }, []);
+  const { mutateAsync: createStaffMutation, isLoading: isCreatingStaff } =
+    trpc.settings.team.createStaff.useMutation({ onSuccess: invalidateDomain });
 
-  const setAssignment = useCallback((staffId: string, serviceIds: string[]) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      assignments: d.assignments.map((a) => (a.staffId === staffId ? { ...a, serviceIds } : a)),
-    }));
-  }, []);
+  const { mutateAsync: updateStaffMutation, isLoading: isUpdatingStaff } =
+    trpc.settings.team.updateStaff.useMutation({ onSuccess: invalidateDomain });
 
-  const updateDaySchedule = useCallback(
-    (
-      staffId: string,
-      day: WeekDay,
-      patch: Partial<{ enabled: boolean; startTime: string; endTime: string }>
-    ) => {
-      setDirtyDomain((d) => ({
-        ...d,
-        schedules: d.schedules.map((sch) =>
-          sch.staffId !== staffId
-            ? sch
-            : {
-                ...sch,
-                days: sch.days.map((dd) => (dd.day === day ? { ...dd, ...patch } : dd)),
-              }
-        ),
-      }));
+  const { mutateAsync: deactivateStaffMutation, isLoading: isDeactivatingStaff } =
+    trpc.settings.team.deactivateStaff.useMutation({ onSuccess: invalidateDomain });
+
+  const { mutateAsync: deleteStaffMutation, isLoading: isDeletingStaff } =
+    trpc.settings.team.deleteStaff.useMutation({
+      onSuccess: (_data, variables) => {
+        // Clear leaves selection if the deleted staff was selected
+        if (leavesStaffId === variables.id) {
+          setLeavesStaffId(null);
+        }
+        invalidateDomain();
+      },
+    });
+
+  // ── Assignment mutation ───────────────────────────────────────────────────
+
+  const { mutateAsync: setAssignmentMutation, isLoading: isSavingAssignment } =
+    trpc.settings.team.setAssignment.useMutation({ onSuccess: invalidateDomain });
+
+  // ── Schedule mutation ─────────────────────────────────────────────────────
+
+  const { mutateAsync: saveScheduleMutation, isLoading: isSavingSchedule } =
+    trpc.settings.team.saveScheduleForStaff.useMutation({ onSuccess: invalidateDomain });
+
+  // ── Leave mutations ───────────────────────────────────────────────────────
+
+  const { mutateAsync: createLeaveMutation, isLoading: isCreatingLeave } =
+    trpc.settings.team.createLeave.useMutation({ onSuccess: invalidateLeaves });
+
+  const { mutateAsync: deleteLeaveMutation, isLoading: isDeletingLeave } =
+    trpc.settings.team.deleteLeave.useMutation({ onSuccess: invalidateLeaves });
+
+  // ── Staff actions ─────────────────────────────────────────────────────────
+
+  const addStaff = useCallback(
+    (draft: Omit<StaffMember, 'id'>) => {
+      void createStaffMutation({
+        fullName: draft.fullName,
+        phone: draft.phone,
+        role: draft.role as StaffRole,
+        specialty: draft.specialty as StaffSpecialty | null,
+        avatarUrl: draft.avatarUrl,
+        avatarColor: draft.avatarColor,
+        isActive: draft.isActive,
+      });
     },
-    []
+    [createStaffMutation]
   );
 
-  const addLeave = useCallback((draft: Omit<StaffLeave, 'id'>) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      leaves: [...d.leaves, { ...draft, id: nextId('lv') }],
-    }));
-  }, []);
+  const updateStaff = useCallback(
+    (id: string, patch: Partial<Omit<StaffMember, 'id'>>) => {
+      void updateStaffMutation({ id, patch });
+    },
+    [updateStaffMutation]
+  );
 
-  const removeLeave = useCallback((id: string) => {
-    setDirtyDomain((d) => ({ ...d, leaves: d.leaves.filter((l) => l.id !== id) }));
-  }, []);
+  const deactivateStaff = useCallback(
+    (id: string) => {
+      void deactivateStaffMutation({ id });
+    },
+    [deactivateStaffMutation]
+  );
+
+  const removeStaff = useCallback(
+    (id: string) => {
+      void deleteStaffMutation({ id });
+    },
+    [deleteStaffMutation]
+  );
+
+  // ── Assignment action ─────────────────────────────────────────────────────
+
+  const setAssignment = useCallback(
+    (staffId: string, serviceIds: string[]) => {
+      void setAssignmentMutation({ staffId, serviceIds });
+    },
+    [setAssignmentMutation]
+  );
+
+  // ── Schedule action ───────────────────────────────────────────────────────
+
+  const saveScheduleForStaff = useCallback(
+    (staffId: string, schedule: WeeklySchedule) => {
+      void saveScheduleMutation({ staffId, days: schedule.days });
+    },
+    [saveScheduleMutation]
+  );
+
+  // ── Leave actions ─────────────────────────────────────────────────────────
+
+  const addLeave = useCallback(
+    (draft: Omit<StaffLeave, 'id'>) => {
+      void createLeaveMutation({
+        staffId: draft.staffId,
+        type: draft.type as LeaveType,
+        date: draft.date,
+        note: draft.note,
+      });
+    },
+    [createLeaveMutation]
+  );
+
+  const removeLeave = useCallback(
+    (id: string) => {
+      void deleteLeaveMutation({ id });
+    },
+    [deleteLeaveMutation]
+  );
+
+  // ── Assemble ──────────────────────────────────────────────────────────────
 
   return {
-    isDirty,
-    isSaving,
-    handleSave,
-    handleReset,
-    domain,
-    addStaff,
-    updateStaff,
-    deactivateStaff,
-    deleteStaff,
-    setAssignment,
-    updateDaySchedule,
-    addLeave,
-    removeLeave,
+    staff: {
+      data: domainFromDb?.staff ?? EMPTY_DOMAIN.staff,
+      isLoading: isDomainLoading,
+      isSaving: isCreatingStaff || isUpdatingStaff || isDeactivatingStaff || isDeletingStaff,
+      add: addStaff,
+      update: updateStaff,
+      deactivate: deactivateStaff,
+      remove: removeStaff,
+    },
+    assignments: {
+      data: domainFromDb?.assignments ?? EMPTY_DOMAIN.assignments,
+      isLoading: isDomainLoading,
+      isSaving: isSavingAssignment,
+      set: setAssignment,
+    },
+    schedules: {
+      data: domainFromDb?.schedules ?? EMPTY_DOMAIN.schedules,
+      isLoading: isDomainLoading,
+      isSaving: isSavingSchedule,
+      saveForStaff: saveScheduleForStaff,
+    },
+    leaves: {
+      data: leavesFromDb ?? [],
+      isLoading: isLeavesLoading,
+      isSaving: isCreatingLeave || isDeletingLeave,
+      selectedStaffId: leavesStaffId,
+      selectStaff: setLeavesStaffId,
+      add: addLeave,
+      remove: removeLeave,
+    },
   };
 }

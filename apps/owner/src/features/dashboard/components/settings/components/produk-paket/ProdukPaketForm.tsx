@@ -49,16 +49,16 @@ export function ProdukPaketForm({ ctrl, activeTab, services }: ProdukPaketFormPr
     if (!draft || !sheet) return;
     switch (sheet.mode) {
       case 'add-addon':
-        if (draft.kind === 'addon') ctrl.addAddon(draft.value);
+        if (draft.kind === 'addon') ctrl.addons.add(draft.value);
         break;
       case 'edit-addon':
-        if (draft.kind === 'addon') ctrl.updateAddon(sheet.addon.id, draft.value);
+        if (draft.kind === 'addon') ctrl.addons.update(sheet.addon.id, draft.value);
         break;
       case 'add-bundle':
-        if (draft.kind === 'bundle') ctrl.addBundle(draft.value);
+        if (draft.kind === 'bundle') ctrl.bundles.add(draft.value);
         break;
       case 'edit-bundle':
-        if (draft.kind === 'bundle') ctrl.updateBundle(sheet.bundle.id, draft.value);
+        if (draft.kind === 'bundle') ctrl.bundles.update(sheet.bundle.id, draft.value);
         break;
     }
     closeSheet();
@@ -82,7 +82,7 @@ export function ProdukPaketForm({ ctrl, activeTab, services }: ProdukPaketFormPr
       confirmLabel: 'Hapus Permanen',
       variant: 'danger',
       onConfirm: () => {
-        ctrl.deleteAddon(addon.id);
+        ctrl.addons.remove(addon.id);
         setConfirm(null);
       },
     });
@@ -95,7 +95,7 @@ export function ProdukPaketForm({ ctrl, activeTab, services }: ProdukPaketFormPr
       confirmLabel: 'Hapus Permanen',
       variant: 'danger',
       onConfirm: () => {
-        ctrl.deleteBundle(bundle.id);
+        ctrl.bundles.remove(bundle.id);
         setConfirm(null);
       },
     });
@@ -147,7 +147,7 @@ export function ProdukPaketForm({ ctrl, activeTab, services }: ProdukPaketFormPr
 
       {activeTab === 'addons' && (
         <AddOnsSection
-          addons={ctrl.domain.addons}
+          addons={ctrl.addons.data}
           onAdd={() => {
             setDraft(null);
             setSheet({ mode: 'add-addon' });
@@ -162,7 +162,7 @@ export function ProdukPaketForm({ ctrl, activeTab, services }: ProdukPaketFormPr
 
       {activeTab === 'bundles' && (
         <BundlesSection
-          bundles={ctrl.domain.bundles}
+          bundles={ctrl.bundles.data}
           services={services}
           onAdd={() => {
             setDraft(null);

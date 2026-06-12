@@ -1,97 +1,116 @@
 'use client';
 
-/**
- * Auth Context
- * Provides global authentication state and permission checking
- */
-
 import React, { createContext, useState, useCallback, useEffect } from 'react';
 import type { User, AuthContextType } from '../types/auth.types';
 import type { Permission } from '../types/permissions.types';
-import { DEFAULT_CURRENT_USER, getMockUserById } from '../mocks/auth-mock';
 import {
   hasPermission as checkPermission,
   hasAnyPermission as checkAnyPermission,
   hasAllPermissions as checkAllPermissions,
 } from '../utils/permission.utils';
+import { supabaseBrowser } from '@/lib/supabase-browser';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
   children: React.ReactNode;
-  initialUser?: User | null;
 }
 
-export function AuthProvider({ children, initialUser = DEFAULT_CURRENT_USER }: AuthProviderProps) {
-  const [currentUser, setCurrentUserState] = useState<User | null>(initialUser);
+async function fetchUserProfile(accessToken: string): Promise<User | null> {
+  try {
+    const res = await fetch('/api/auth/me', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as User;
+  } catch {
+    return null;
+  }
+}
 
-  // Initialize from localStorage if available
-  useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem('currentUser');
-      if (storedUser) {
-        setCurrentUserState(JSON.parse(storedUser));
-      }
-    } catch (error) {
-      console.error('Failed to load user from localStorage:', error);
-    }
-  }, []);
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [currentUser, setCurrentUserState] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const setCurrentUser = useCallback((user: User | null) => {
     setCurrentUserState(user);
-    if (user) {
-      try {
+    // Keep localStorage in sync so TRPCProvider can read the user data if needed
+    try {
+      if (user) {
         localStorage.setItem('currentUser', JSON.stringify(user));
-      } catch (error) {
-        console.error('Failed to save user to localStorage:', error);
-      }
-    } else {
-      try {
+      } else {
         localStorage.removeItem('currentUser');
-      } catch (error) {
-        console.error('Failed to remove user from localStorage:', error);
+        localStorage.removeItem('authAccessToken');
       }
+    } catch {
+      // localStorage unavailable in some environments — safe to ignore
     }
   }, []);
 
-  const logout = useCallback(() => {
+  useEffect(() => {
+    // Load initial session
+    supabaseBrowser.auth.getSession().then(async ({ data: { session } }) => {
+      if (session) {
+        // Store the raw access token so TRPCProvider can send it as Bearer header
+        try {
+          localStorage.setItem('authAccessToken', session.access_token);
+        } catch {
+          /* ignore */
+        }
+        const user = await fetchUserProfile(session.access_token);
+        setCurrentUser(user);
+      }
+      setLoading(false);
+    });
+
+    // Subscribe to subsequent auth changes
+    const {
+      data: { subscription },
+    } = supabaseBrowser.auth.onAuthStateChange(async (_event, session) => {
+      if (session) {
+        try {
+          localStorage.setItem('authAccessToken', session.access_token);
+        } catch {
+          /* ignore */
+        }
+        const user = await fetchUserProfile(session.access_token);
+        setCurrentUser(user);
+      } else {
+        setCurrentUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [setCurrentUser]);
+
+  const logout = useCallback(async () => {
+    await supabaseBrowser.auth.signOut();
     setCurrentUser(null);
   }, [setCurrentUser]);
 
-  const switchUser = useCallback(
-    (userId: string) => {
-      const user = getMockUserById(userId);
-      if (user) {
-        setCurrentUser(user);
-      }
-    },
-    [setCurrentUser]
-  );
+  // switchUser kept for dev convenience — triggers only when explicitly called
+  const switchUser = useCallback((_userId: string) => {
+    // No-op in production. Use Supabase Auth sign-in flow.
+  }, []);
 
   const hasPermissionFn = useCallback(
-    (permission: Permission) => {
-      return checkPermission(currentUser, permission);
-    },
+    (permission: Permission) => checkPermission(currentUser, permission),
     [currentUser]
   );
 
   const hasAnyPermissionFn = useCallback(
-    (permissions: Permission[]) => {
-      return checkAnyPermission(currentUser, permissions);
-    },
+    (permissions: Permission[]) => checkAnyPermission(currentUser, permissions),
     [currentUser]
   );
 
   const hasAllPermissionsFn = useCallback(
-    (permissions: Permission[]) => {
-      return checkAllPermissions(currentUser, permissions);
-    },
+    (permissions: Permission[]) => checkAllPermissions(currentUser, permissions),
     [currentUser]
   );
 
   const value: AuthContextType = {
     currentUser,
-    loading: false,
+    loading,
     setCurrentUser,
     logout,
     switchUser,

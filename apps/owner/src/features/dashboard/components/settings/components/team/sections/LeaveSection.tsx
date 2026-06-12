@@ -370,15 +370,22 @@ interface Props {
 }
 
 export function LeaveSection({ ctrl }: Props) {
-  const activeStaff = ctrl.domain.staff.filter((s) => s.isActive);
-  const [selectedStaffId, setSelectedStaffId] = useState<string>(activeStaff[0]?.id ?? '');
+  const activeStaff = ctrl.staff.data.filter((s) => s.isActive);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<LeaveForm>({
-    staffId: selectedStaffId,
+    staffId: ctrl.leaves.selectedStaffId ?? '',
     type: 'LEAVE',
     date: '',
     note: '',
   });
+
+  // Initialize leaves query on mount when staff is available
+  useEffect(() => {
+    if (!ctrl.leaves.selectedStaffId && activeStaff.length > 0) {
+      ctrl.leaves.selectStaff(activeStaff[0]!.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeStaff.length]);
 
   if (activeStaff.length === 0) {
     return (
@@ -396,8 +403,9 @@ export function LeaveSection({ ctrl }: Props) {
     );
   }
 
-  const resolvedId = activeStaff.find((s) => s.id === selectedStaffId)?.id ?? activeStaff[0]!.id;
-  const staffLeaves = ctrl.domain.leaves.filter((l) => l.staffId === resolvedId);
+  const resolvedId =
+    activeStaff.find((s) => s.id === ctrl.leaves.selectedStaffId)?.id ?? activeStaff[0]!.id;
+  const staffLeaves = ctrl.leaves.data;
   const metrics = computeMetrics(staffLeaves);
   const groups = groupByMonth(staffLeaves);
 
@@ -408,12 +416,12 @@ export function LeaveSection({ ctrl }: Props) {
 
   function handleSave() {
     if (!form.date) return;
-    ctrl.addLeave({ ...form, staffId: resolvedId });
+    ctrl.leaves.add({ ...form, staffId: resolvedId });
     setShowForm(false);
   }
 
   function handleStaffChange(id: string) {
-    setSelectedStaffId(id);
+    ctrl.leaves.selectStaff(id);
     setShowForm(false);
   }
 
@@ -512,7 +520,7 @@ export function LeaveSection({ ctrl }: Props) {
               </div>
               {/* Leave cards */}
               {group.entries.map((leave) => (
-                <TimelineEntry key={leave.id} leave={leave} onDelete={ctrl.removeLeave} />
+                <TimelineEntry key={leave.id} leave={leave} onDelete={ctrl.leaves.remove} />
               ))}
             </div>
           ))}

@@ -47,7 +47,7 @@ export interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
   setCurrentUser: (user: User | null) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   switchUser: (userId: string) => void; // For testing/demo purposes
   hasPermission: (permission: Permission) => boolean;
   hasAnyPermission: (permissions: Permission[]) => boolean;

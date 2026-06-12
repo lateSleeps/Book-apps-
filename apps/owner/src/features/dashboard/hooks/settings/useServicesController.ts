@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import type { BaseSettingsController } from './types/BaseSettingsController';
 import type {
   ServiceCategory,
@@ -8,124 +8,24 @@ import type {
   ServiceQuestion,
   ServicesDomain,
 } from '@/features/dashboard/components/settings/types/services.types';
+import { trpc } from '@/lib/trpc';
 
-// ── Mock seed data ────────────────────────────────────────────────────────────
-// Replace with tRPC query: trpc.services.getBySalon.useQuery({ salonId })
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-const MOCK_DOMAIN: ServicesDomain = {
-  categories: [
-    {
-      id: 'cat-1',
-      name: 'Hair',
-      description: 'Haircut, wash, styling & braiding',
-      color: 'bg-c-peach',
-      blobColor: '#f5c4ab',
-      iconName: 'Scissors',
-      isActive: true,
-      sortOrder: 0,
-    },
-    {
-      id: 'cat-2',
-      name: 'Colour & Treatment',
-      description: 'Colouring, keratin & hair spa',
-      color: 'bg-c-blue',
-      blobColor: '#b8d6f0',
-      iconName: 'Drop',
-      isActive: true,
-      sortOrder: 1,
-    },
-    {
-      id: 'cat-3',
-      name: 'Face & Lashes',
-      description: 'Facial, make up & lash extensions',
-      color: 'bg-c-mint',
-      blobColor: '#a8e6d4',
-      iconName: 'Eye',
-      isActive: true,
-      sortOrder: 2,
-    },
-    {
-      id: 'cat-4',
-      name: 'Massage',
-      description: 'Full body, reflexology & scrub',
-      color: 'bg-c-yellow',
-      blobColor: '#f5d98a',
-      iconName: 'FlowerLotus',
-      isActive: true,
-      sortOrder: 3,
-    },
-    {
-      id: 'cat-5',
-      name: 'Nail',
-      description: 'Manicure, pedicure & nail art',
-      color: 'bg-c-lilac',
-      blobColor: '#c8bef0',
-      iconName: 'PaintBrush',
-      isActive: true,
-      sortOrder: 4,
-    },
-  ],
-  services: [
-    {
-      id: 'svc-1',
-      categoryId: 'cat-1',
-      name: 'Ladies Haircut + Wash',
-      description: 'Potongan presisi dengan keramas produk premium.',
-      price: 180_000,
-      duration: 45,
-      priceType: 'fixed',
-      serviceFlow: 'STYLING_HAIR',
-      requiresSpecialist: false,
-      isActive: true,
-      sortOrder: 0,
-      questions: [],
-    },
-    {
-      id: 'svc-2',
-      categoryId: 'cat-1',
-      name: 'Men Haircut + Wash + Dry',
-      description: 'Potongan rapi modern, keramas, dan blow-dry.',
-      price: 150_000,
-      duration: 40,
-      priceType: 'fixed',
-      serviceFlow: 'STYLING_HAIR',
-      requiresSpecialist: false,
-      isActive: true,
-      sortOrder: 1,
-      questions: [],
-    },
-    {
-      id: 'svc-10',
-      categoryId: 'cat-2',
-      name: 'Root Colour',
-      description: 'Tutup akar rambut dengan warna merata dan segar.',
-      price: 300_000,
-      duration: 60,
-      priceType: 'starting_from',
-      serviceFlow: 'STYLING_COLOUR',
-      requiresSpecialist: true,
-      isActive: true,
-      sortOrder: 0,
-      questions: [],
-    },
-    {
-      id: 'svc-13',
-      categoryId: 'cat-2',
-      name: 'Full Highlight',
-      description: 'Highlight foil menyeluruh untuk dimensi warna.',
-      price: 650_000,
-      duration: 120,
-      priceType: 'starting_from',
-      serviceFlow: 'STYLING_COLOUR',
-      requiresSpecialist: true,
-      isActive: true,
-      sortOrder: 1,
-      questions: [],
-    },
-  ],
-};
+function nextId(): string {
+  // Optimistic IDs for React key stability during mutation in-flight.
+  // The real ID is returned from the DB and replaces this after invalidation.
+  return `opt-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
 
-// ── Controller interface ──────────────────────────────────────────────────────
+// ── Empty fallback ────────────────────────────────────────────────────────────
+
+const EMPTY_DOMAIN: ServicesDomain = { categories: [], services: [] };
+
+// ── Public interface ──────────────────────────────────────────────────────────
+// IMPORTANT: This interface is kept identical to the mock version so that
+// ServicesPageClient, ServicesForm, ServicesAccordion, and all sheet components
+// require zero changes.
 
 export interface ServicesController extends BaseSettingsController {
   domain: ServicesDomain;
@@ -140,7 +40,7 @@ export interface ServicesController extends BaseSettingsController {
   updateService: (id: string, patch: Partial<ServiceItem>) => void;
   deleteService: (id: string) => void;
 
-  // Consultation Questions
+  // Consultation Questions (stored as jsonb in service row)
   addQuestion: (draft: Omit<ServiceQuestion, 'id' | 'sortOrder'>) => void;
   updateQuestion: (questionId: string, patch: Partial<ServiceQuestion>) => void;
   deleteQuestion: (questionId: string) => void;
@@ -149,119 +49,189 @@ export interface ServicesController extends BaseSettingsController {
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
 export function useServicesController(): ServicesController {
-  const [domain, setDomain] = useState<ServicesDomain>(MOCK_DOMAIN);
-  const [savedDomain, setSavedDomain] = useState<ServicesDomain>(MOCK_DOMAIN);
-  const [isDirty, setIsDirty] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const utils = trpc.useUtils();
 
-  function nextId(prefix: string) {
-    return `${prefix}-${Date.now()}`;
+  // ── Server state ──────────────────────────────────────────────────────────
+  const { data: domainFromDb } = trpc.settings.services.getServicesDomain.useQuery(undefined, {
+    staleTime: 30_000,
+    placeholderData: EMPTY_DOMAIN,
+  });
+
+  const domain = domainFromDb ?? EMPTY_DOMAIN;
+
+  // ── Invalidation helper ───────────────────────────────────────────────────
+  function invalidate() {
+    void utils.settings.services.getServicesDomain.invalidate();
   }
 
-  function setDirtyDomain(updater: (d: ServicesDomain) => ServicesDomain) {
-    setDomain(updater);
-    setIsDirty(true);
-  }
+  // ── Category mutations ────────────────────────────────────────────────────
+
+  const { mutateAsync: createCategoryMutation, isLoading: isCreatingCategory } =
+    trpc.settings.services.createCategory.useMutation({ onSuccess: invalidate });
+
+  const { mutateAsync: updateCategoryMutation, isLoading: isUpdatingCategory } =
+    trpc.settings.services.updateCategory.useMutation({ onSuccess: invalidate });
+
+  const { mutateAsync: deleteCategoryMutation, isLoading: isDeletingCategory } =
+    trpc.settings.services.deleteCategory.useMutation({ onSuccess: invalidate });
+
+  // ── Service mutations ─────────────────────────────────────────────────────
+
+  const { mutateAsync: createServiceMutation, isLoading: isCreatingService } =
+    trpc.settings.services.createService.useMutation({ onSuccess: invalidate });
+
+  const { mutateAsync: updateServiceMutation, isLoading: isUpdatingService } =
+    trpc.settings.services.updateService.useMutation({ onSuccess: invalidate });
+
+  const { mutateAsync: deleteServiceMutation, isLoading: isDeletingService } =
+    trpc.settings.services.deleteService.useMutation({ onSuccess: invalidate });
+
+  // ── isSaving ──────────────────────────────────────────────────────────────
+  // Any in-flight mutation = saving.
+  const isSaving =
+    isCreatingCategory ||
+    isUpdatingCategory ||
+    isDeletingCategory ||
+    isCreatingService ||
+    isUpdatingService ||
+    isDeletingService;
+
+  // ── BaseSettingsController stubs ──────────────────────────────────────────
+  // Mutations are immediate — no staged draft, so isDirty is always false.
+  // handleSave is a no-op; header Save button stays disabled (intentional).
+  // handleReset re-fetches from DB so the list reflects the latest server state.
+
+  const isDirty = false;
 
   const handleSave = useCallback(() => {
-    setIsSaving(true);
-    // TODO: replace with tRPC mutation
-    setTimeout(() => {
-      setSavedDomain(domain);
-      setIsDirty(false);
-      setIsSaving(false);
-    }, 600);
-  }, [domain]);
+    // No-op: all mutations fire immediately on each CRUD action.
+  }, []);
 
   const handleReset = useCallback(() => {
-    setDomain(savedDomain);
-    setIsDirty(false);
-  }, [savedDomain]);
-
-  // ── Categories ────────────────────────────────────────────────────────────
-
-  const addCategory = useCallback((draft: Omit<ServiceCategory, 'id' | 'sortOrder'>) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      categories: [
-        ...d.categories,
-        { ...draft, id: nextId('cat'), sortOrder: d.categories.length },
-      ],
-    }));
+    invalidate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateCategory = useCallback((id: string, patch: Partial<ServiceCategory>) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      categories: d.categories.map((c) => (c.id === id ? { ...c, ...patch } : c)),
-    }));
-  }, []);
+  // ── Category actions ──────────────────────────────────────────────────────
 
-  const deleteCategory = useCallback((id: string) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      categories: d.categories.filter((c) => c.id !== id),
-      services: d.services.filter((s) => s.categoryId !== id),
-    }));
-  }, []);
+  const addCategory = useCallback(
+    (draft: Omit<ServiceCategory, 'id' | 'sortOrder'>) => {
+      void createCategoryMutation({
+        name: draft.name,
+        description: draft.description,
+        iconName: draft.iconName,
+        color: draft.color,
+        blobColor: draft.blobColor,
+        isActive: draft.isActive,
+        sortOrder: domain.categories.length,
+      });
+    },
+    [createCategoryMutation, domain.categories.length]
+  );
 
-  // ── Services ──────────────────────────────────────────────────────────────
+  const updateCategory = useCallback(
+    (id: string, patch: Partial<ServiceCategory>) => {
+      void updateCategoryMutation({ id, patch });
+    },
+    [updateCategoryMutation]
+  );
 
-  const addService = useCallback((draft: Omit<ServiceItem, 'id' | 'sortOrder' | 'questions'>) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      services: [
-        ...d.services,
-        { ...draft, id: nextId('svc'), sortOrder: d.services.length, questions: [] },
-      ],
-    }));
-  }, []);
+  const deleteCategory = useCallback(
+    (id: string) => {
+      void deleteCategoryMutation({ id });
+    },
+    [deleteCategoryMutation]
+  );
 
-  const updateService = useCallback((id: string, patch: Partial<ServiceItem>) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      services: d.services.map((s) => (s.id === id ? { ...s, ...patch } : s)),
-    }));
-  }, []);
+  // ── Service actions ───────────────────────────────────────────────────────
 
-  const deleteService = useCallback((id: string) => {
-    setDirtyDomain((d) => ({ ...d, services: d.services.filter((s) => s.id !== id) }));
-  }, []);
+  const addService = useCallback(
+    (draft: Omit<ServiceItem, 'id' | 'sortOrder' | 'questions'>) => {
+      void createServiceMutation({
+        categoryId: draft.categoryId,
+        name: draft.name,
+        description: draft.description,
+        price: draft.price,
+        duration: draft.duration,
+        priceType: draft.priceType,
+        serviceFlow: draft.serviceFlow,
+        requiresSpecialist: draft.requiresSpecialist,
+        isActive: draft.isActive,
+        sortOrder: domain.services.length,
+      });
+    },
+    [createServiceMutation, domain.services.length]
+  );
 
-  // ── Consultation Questions ────────────────────────────────────────────────
+  const updateService = useCallback(
+    (id: string, patch: Partial<ServiceItem>) => {
+      void updateServiceMutation({ id, patch });
+    },
+    [updateServiceMutation]
+  );
 
-  const addQuestion = useCallback((draft: Omit<ServiceQuestion, 'id' | 'sortOrder'>) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      services: d.services.map((s) => {
-        if (s.id !== draft.serviceId) return s;
-        return {
-          ...s,
-          questions: [...s.questions, { ...draft, id: nextId('q'), sortOrder: s.questions.length }],
-        };
-      }),
-    }));
-  }, []);
+  const deleteService = useCallback(
+    (id: string) => {
+      void deleteServiceMutation({ id });
+    },
+    [deleteServiceMutation]
+  );
 
-  const updateQuestion = useCallback((questionId: string, patch: Partial<ServiceQuestion>) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      services: d.services.map((s) => ({
-        ...s,
-        questions: s.questions.map((q) => (q.id === questionId ? { ...q, ...patch } : q)),
-      })),
-    }));
-  }, []);
+  // ── Question actions ──────────────────────────────────────────────────────
+  // Questions are stored as jsonb in their owning service row.
+  // All question operations find the service in domainFromDb, modify the
+  // questions array, and call updateService with the updated questions list.
 
-  const deleteQuestion = useCallback((questionId: string) => {
-    setDirtyDomain((d) => ({
-      ...d,
-      services: d.services.map((s) => ({
-        ...s,
-        questions: s.questions.filter((q) => q.id !== questionId),
-      })),
-    }));
-  }, []);
+  const addQuestion = useCallback(
+    (draft: Omit<ServiceQuestion, 'id' | 'sortOrder'>) => {
+      const service = domain.services.find((s) => s.id === draft.serviceId);
+      if (!service) return;
+
+      const newQuestion: ServiceQuestion = {
+        ...draft,
+        id: nextId(),
+        sortOrder: service.questions.length,
+      };
+
+      void updateServiceMutation({
+        id: service.id,
+        patch: { questions: [...service.questions, newQuestion] },
+      });
+    },
+    [updateServiceMutation, domain.services]
+  );
+
+  const updateQuestion = useCallback(
+    (questionId: string, patch: Partial<ServiceQuestion>) => {
+      const service = domain.services.find((s) => s.questions.some((q) => q.id === questionId));
+      if (!service) return;
+
+      void updateServiceMutation({
+        id: service.id,
+        patch: {
+          questions: service.questions.map((q) => (q.id === questionId ? { ...q, ...patch } : q)),
+        },
+      });
+    },
+    [updateServiceMutation, domain.services]
+  );
+
+  const deleteQuestion = useCallback(
+    (questionId: string) => {
+      const service = domain.services.find((s) => s.questions.some((q) => q.id === questionId));
+      if (!service) return;
+
+      void updateServiceMutation({
+        id: service.id,
+        patch: {
+          questions: service.questions.filter((q) => q.id !== questionId),
+        },
+      });
+    },
+    [updateServiceMutation, domain.services]
+  );
+
+  // ── Assemble ──────────────────────────────────────────────────────────────
 
   return {
     isDirty,

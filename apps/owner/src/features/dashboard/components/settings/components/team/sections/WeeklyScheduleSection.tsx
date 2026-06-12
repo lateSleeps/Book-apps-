@@ -214,8 +214,9 @@ interface Props {
 }
 
 export function WeeklyScheduleSection({ ctrl }: Props) {
-  const activeStaff = ctrl.domain.staff.filter((s) => s.isActive);
+  const activeStaff = ctrl.staff.data.filter((s) => s.isActive);
   const [selectedStaffId, setSelectedStaffId] = useState<string>(activeStaff[0]?.id ?? '');
+  const [draftSchedule, setDraftSchedule] = useState<WeeklySchedule | null>(null);
 
   if (activeStaff.length === 0) {
     return (
@@ -235,8 +236,46 @@ export function WeeklyScheduleSection({ ctrl }: Props) {
 
   const selectedMember = activeStaff.find((s) => s.id === selectedStaffId) ?? activeStaff[0]!;
   const resolvedId = selectedMember.id;
-  const schedule = ctrl.domain.schedules.find((s) => s.staffId === resolvedId);
-  const { hariKerja, totalMinutes } = scheduleMetrics(schedule);
+
+  // Saved schedule from DB (source of truth)
+  const savedSchedule = ctrl.schedules.data.find((s) => s.staffId === resolvedId);
+
+  // Draft shows pending edits; falls back to saved schedule if no draft yet
+  const displaySchedule = draftSchedule?.staffId === resolvedId ? draftSchedule : savedSchedule;
+
+  const isDirty =
+    draftSchedule?.staffId === resolvedId &&
+    savedSchedule !== undefined &&
+    JSON.stringify(draftSchedule) !== JSON.stringify(savedSchedule);
+
+  const { hariKerja, totalMinutes } = scheduleMetrics(displaySchedule);
+
+  function handleStaffSelect(id: string) {
+    setSelectedStaffId(id);
+    setDraftSchedule(null); // discard draft when switching staff
+  }
+
+  function patchDay(
+    day: WeekDay,
+    patch: Partial<{ enabled: boolean; startTime: string; endTime: string }>
+  ) {
+    const base = displaySchedule;
+    if (!base) return;
+    setDraftSchedule({
+      staffId: resolvedId,
+      days: base.days.map((d) => (d.day === day ? { ...d, ...patch } : d)),
+    });
+  }
+
+  function handleSave() {
+    if (!draftSchedule || draftSchedule.staffId !== resolvedId) return;
+    ctrl.schedules.saveForStaff(resolvedId, draftSchedule);
+    setDraftSchedule(null);
+  }
+
+  function handleCancel() {
+    setDraftSchedule(null);
+  }
 
   return (
     <div className="flex flex-col gap-s16">
@@ -253,14 +292,14 @@ export function WeeklyScheduleSection({ ctrl }: Props) {
           selectedId={resolvedId}
           hariKerja={hariKerja}
           totalMinutes={totalMinutes}
-          onSelect={setSelectedStaffId}
+          onSelect={handleStaffSelect}
         />
       </div>
 
       {/* ── Day rows ─────────────────────────────────────────────────────── */}
-      {schedule && (
+      {displaySchedule && (
         <div className="overflow-hidden rounded-r12 border border-bd-card bg-bg-card shadow-card">
-          {schedule.days.map((dd) => {
+          {displaySchedule.days.map((dd) => {
             const duration = dd.enabled ? dayDurationMinutes(dd.startTime, dd.endTime) : 0;
 
             return (
@@ -277,9 +316,7 @@ export function WeeklyScheduleSection({ ctrl }: Props) {
                 <input
                   type="checkbox"
                   checked={dd.enabled}
-                  onChange={(e) =>
-                    ctrl.updateDaySchedule(resolvedId, dd.day, { enabled: e.target.checked })
-                  }
+                  onChange={(e) => patchDay(dd.day, { enabled: e.target.checked })}
                   className="h-4 w-4 shrink-0 rounded accent-tx-primary"
                 />
 
@@ -294,20 +331,12 @@ export function WeeklyScheduleSection({ ctrl }: Props) {
                     <>
                       <TimeInputInline
                         value={dd.startTime}
-                        onChange={(e) =>
-                          ctrl.updateDaySchedule(resolvedId, dd.day, {
-                            startTime: e.target.value,
-                          })
-                        }
+                        onChange={(e) => patchDay(dd.day, { startTime: e.target.value })}
                       />
                       <span className="text-ts-cap1 text-tx-muted">→</span>
                       <TimeInputInline
                         value={dd.endTime}
-                        onChange={(e) =>
-                          ctrl.updateDaySchedule(resolvedId, dd.day, {
-                            endTime: e.target.value,
-                          })
-                        }
+                        onChange={(e) => patchDay(dd.day, { endTime: e.target.value })}
                       />
                     </>
                   ) : (
@@ -322,6 +351,28 @@ export function WeeklyScheduleSection({ ctrl }: Props) {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* ── Explicit save bar — visible only when dirty ───────────────────── */}
+      {isDirty && (
+        <div className="flex items-center justify-end gap-s8">
+          <button
+            type="button"
+            onClick={handleCancel}
+            disabled={ctrl.schedules.isSaving}
+            className="h-9 rounded-r12 border border-bd-card bg-bg-card px-s16 text-ts-fn font-medium text-tx-secondary transition-colors hover:bg-bg-hover disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Batalkan
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={ctrl.schedules.isSaving}
+            className="h-9 rounded-r12 bg-tx-primary px-s16 text-ts-fn font-medium text-bg-card transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {ctrl.schedules.isSaving ? 'Menyimpan...' : 'Simpan Jadwal'}
+          </button>
         </div>
       )}
     </div>

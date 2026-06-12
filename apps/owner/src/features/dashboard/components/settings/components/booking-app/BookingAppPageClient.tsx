@@ -25,9 +25,6 @@ import type { BankAccount } from '@/features/dashboard/components/settings/types
 import { useBookingAppController } from '@/features/dashboard/hooks/settings/useBookingAppController';
 import { ToggleSwitch } from '@/shared/components/ui/toggle-switch';
 
-// Phase 1 mock. Phase 2: from Supabase auth session.
-const CURRENT_USER_ID = 'owner-001';
-
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type SheetState =
@@ -73,9 +70,7 @@ export function BookingAppPageClient() {
   const [draftAccountHolder, setDraftAccountHolder] = useState('');
 
   // ── Draft: Confirmation mode ──────────────────────────────────────────────
-  const [draftConfirmationMode, setDraftConfirmationMode] = useState(
-    ctrl.settings.confirmationMode
-  );
+  const [draftConfirmationMode, setDraftConfirmationMode] = useState(ctrl.confirmation.data);
 
   // ── Draft: Policy ────────────────────────────────────────────────────────
   const [draftPolicy, setDraftPolicy] = useState('');
@@ -99,7 +94,7 @@ export function BookingAppPageClient() {
   // ── QRIS handlers ─────────────────────────────────────────────────────────
 
   function handleQrisRowClick() {
-    if (ctrl.settings.qrisImageUrl) {
+    if (ctrl.paymentMethods.data.qrisImageUrl) {
       // Already has QRIS — confirm before replace
       setConfirmPending({
         title: 'Ganti Foto QRIS?',
@@ -109,7 +104,7 @@ export function BookingAppPageClient() {
         variant: 'warning',
         onConfirm: () => {
           setConfirmPending(null);
-          setQrisPreviewUrl(ctrl.settings.qrisImageUrl);
+          setQrisPreviewUrl(ctrl.paymentMethods.data.qrisImageUrl);
           setSheet({ kind: 'qris-upload' });
         },
       });
@@ -121,8 +116,9 @@ export function BookingAppPageClient() {
 
   function handleQrisSave() {
     if (!qrisPreviewUrl) return;
-    // Phase 1: store preview URL directly. Phase 2: upload to Supabase Storage.
-    ctrl.setQrisImageUrl(qrisPreviewUrl, CURRENT_USER_ID);
+    // Blob URLs (local file picker) are silently ignored by setQrisImageUrl.
+    // Real persistence happens in Sprint 4 after Supabase Storage upload.
+    ctrl.paymentMethods.setQrisImageUrl(qrisPreviewUrl);
     showToast('Foto QRIS berhasil diperbarui.');
     setSheet(null);
   }
@@ -134,7 +130,7 @@ export function BookingAppPageClient() {
       confirmLabel: 'Hapus',
       variant: 'danger',
       onConfirm: () => {
-        ctrl.setQrisImageUrl(null, CURRENT_USER_ID);
+        ctrl.paymentMethods.setQrisImageUrl(null);
         setConfirmPending(null);
         showToast('Foto QRIS dihapus.');
       },
@@ -151,7 +147,7 @@ export function BookingAppPageClient() {
   }
 
   function openEditBank(id: string) {
-    const acc = ctrl.settings.bankAccounts.find((a) => a.id === id);
+    const acc = ctrl.bankAccounts.data.find((a) => a.id === id);
     if (!acc) return;
     setDraftBankName(acc.bankName);
     setDraftAccountNumber(acc.accountNumber);
@@ -167,17 +163,17 @@ export function BookingAppPageClient() {
       isActive: true,
     };
     if (sheet?.kind === 'edit-bank') {
-      ctrl.updateBankAccount(sheet.id, account, CURRENT_USER_ID);
+      ctrl.bankAccounts.update(sheet.id, account);
       showToast('Rekening bank diperbarui.');
     } else {
-      ctrl.addBankAccount(account, CURRENT_USER_ID);
+      ctrl.bankAccounts.add(account);
       showToast('Rekening bank ditambahkan.');
     }
     setSheet(null);
   }
 
   function requestDeleteBank(id: string) {
-    const acc = ctrl.settings.bankAccounts.find((a) => a.id === id);
+    const acc = ctrl.bankAccounts.data.find((a) => a.id === id);
     if (!acc) return;
     setConfirmPending({
       title: 'Hapus Rekening?',
@@ -185,7 +181,7 @@ export function BookingAppPageClient() {
       confirmLabel: 'Hapus',
       variant: 'danger',
       onConfirm: () => {
-        ctrl.removeBankAccount(id, CURRENT_USER_ID);
+        ctrl.bankAccounts.remove(id);
         setConfirmPending(null);
         showToast('Rekening bank dihapus.');
       },
@@ -197,12 +193,12 @@ export function BookingAppPageClient() {
   // ── Confirmation mode handlers ────────────────────────────────────────────
 
   function openConfirmationSheet() {
-    setDraftConfirmationMode(ctrl.settings.confirmationMode);
+    setDraftConfirmationMode(ctrl.confirmation.data);
     setSheet({ kind: 'confirmation' });
   }
 
   function handleConfirmationSave() {
-    ctrl.setConfirmationMode(draftConfirmationMode);
+    ctrl.confirmation.save(draftConfirmationMode);
     showToast(
       draftConfirmationMode === 'auto'
         ? 'Booking dikonfirmasi otomatis.'
@@ -211,27 +207,30 @@ export function BookingAppPageClient() {
     setSheet(null);
   }
 
-  const canSaveConfirmation = draftConfirmationMode !== ctrl.settings.confirmationMode;
+  const canSaveConfirmation = draftConfirmationMode !== ctrl.confirmation.data;
 
   // ── Policy handlers ───────────────────────────────────────────────────────
 
   function openPolicySheet() {
-    setDraftPolicy(ctrl.settings.salonPolicy ?? '');
+    setDraftPolicy(ctrl.salonPolicy.data ?? '');
     setSheet({ kind: 'policy' });
   }
 
   function handlePolicySave() {
-    ctrl.setSalonPolicy(draftPolicy);
+    ctrl.salonPolicy.save(draftPolicy);
     showToast('Kebijakan salon disimpan.');
     setSheet(null);
   }
 
-  const canSavePolicy = draftPolicy.trim() !== (ctrl.settings.salonPolicy ?? '');
+  const canSavePolicy = draftPolicy.trim() !== (ctrl.salonPolicy.data ?? '');
 
   // ── Derived ───────────────────────────────────────────────────────────────
 
-  const { paymentMethods, qrisImageUrl, bankAccounts, confirmationMode, salonPolicy } =
-    ctrl.settings;
+  const { methods: paymentMethods, qrisImageUrl } = ctrl.paymentMethods.data;
+  const bankAccounts = ctrl.bankAccounts.data;
+  const confirmationMode = ctrl.confirmation.data;
+  const salonPolicy = ctrl.salonPolicy.data;
+
   const qrisActive = paymentMethods.includes('qris');
   const transferActive = paymentMethods.includes('transfer');
   const cashActive = paymentMethods.includes('cash');
@@ -268,7 +267,7 @@ export function BookingAppPageClient() {
               </div>
               <ToggleSwitch
                 checked={qrisActive}
-                onChange={(v) => ctrl.setPaymentMethod('qris', v)}
+                onChange={(v) => ctrl.paymentMethods.setMethod('qris', v)}
                 aria-label="Toggle QRIS"
               />
             </div>
@@ -327,7 +326,7 @@ export function BookingAppPageClient() {
               </div>
               <ToggleSwitch
                 checked={transferActive}
-                onChange={(v) => ctrl.setPaymentMethod('transfer', v)}
+                onChange={(v) => ctrl.paymentMethods.setMethod('transfer', v)}
                 aria-label="Toggle Transfer Bank"
               />
             </div>
@@ -385,7 +384,7 @@ export function BookingAppPageClient() {
             </div>
             <ToggleSwitch
               checked={cashActive}
-              onChange={(v) => ctrl.setPaymentMethod('cash', v)}
+              onChange={(v) => ctrl.paymentMethods.setMethod('cash', v)}
               aria-label="Toggle Tunai"
             />
           </div>
@@ -443,11 +442,13 @@ export function BookingAppPageClient() {
       {/* ── Sheet: Upload / Ganti QRIS ────────────────────────────────────── */}
       {sheet?.kind === 'qris-upload' && (
         <SettingsSideSheet
-          title={ctrl.settings.qrisImageUrl ? 'Ganti Foto QRIS' : 'Upload Foto QRIS'}
+          title={ctrl.paymentMethods.data.qrisImageUrl ? 'Ganti Foto QRIS' : 'Upload Foto QRIS'}
           description="Pastikan kode QR terlihat jelas sebelum menyimpan."
           onClose={() => setSheet(null)}
           onSave={handleQrisSave}
-          canSave={qrisPreviewUrl !== null && qrisPreviewUrl !== ctrl.settings.qrisImageUrl}
+          canSave={
+            qrisPreviewUrl !== null && qrisPreviewUrl !== ctrl.paymentMethods.data.qrisImageUrl
+          }
           saveLabel="Simpan"
         >
           <SettingsUploadField
@@ -514,6 +515,7 @@ export function BookingAppPageClient() {
           onClose={() => setSheet(null)}
           onSave={handleConfirmationSave}
           canSave={canSaveConfirmation}
+          isSaving={ctrl.confirmation.isSaving}
           saveLabel="Simpan"
         >
           <SettingsFieldGroup
@@ -543,6 +545,7 @@ export function BookingAppPageClient() {
           onClose={() => setSheet(null)}
           onSave={handlePolicySave}
           canSave={canSavePolicy}
+          isSaving={ctrl.salonPolicy.isSaving}
           saveLabel="Simpan"
         >
           <SettingsFieldGroup label="Kebijakan" hint={`${draftPolicy.length}/500`}>

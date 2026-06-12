@@ -12,7 +12,7 @@ import {
 import type { Icon } from '@phosphor-icons/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useHasPermission } from '@/features/auth/hooks/useAuth';
+import { useAuth, useHasPermission } from '@/features/auth/hooks/useAuth';
 import { Permission } from '@/features/auth/types/permissions.types';
 import { cn } from '@/shared/lib/cn';
 
@@ -98,6 +98,7 @@ const NAV_GROUPS: NavGroup[] = [
 
 export function SettingsNavigationPanel() {
   const pathname = usePathname();
+  const { isLoading } = useAuth();
 
   const canEditBusiness = useHasPermission(Permission.EDIT_BUSINESS_INFO);
   const canManageServices = useHasPermission(Permission.MANAGE_SERVICES);
@@ -121,8 +122,9 @@ export function SettingsNavigationPanel() {
   }
 
   // Flat list for mobile — groups not shown
+  // During auth loading, show all items (isLoading = true). After load, filter by real permissions.
   const allItems = NAV_GROUPS.flatMap((g) => g.items).filter(
-    (item) => permMap[item.permission] !== false
+    (item) => isLoading || permMap[item.permission] !== false
   );
 
   return (
@@ -159,7 +161,9 @@ export function SettingsNavigationPanel() {
         className="ml-s24 mt-s24 hidden w-64 shrink-0 flex-col self-start rounded-r16 border border-bd-card bg-bg-card p-s12 shadow-card md:flex"
       >
         {NAV_GROUPS.map((group, groupIdx) => {
-          const visibleItems = group.items.filter((item) => permMap[item.permission] !== false);
+          const visibleItems = group.items.filter(
+            (item) => isLoading || permMap[item.permission] !== false
+          );
           if (visibleItems.length === 0) return null;
 
           return (
