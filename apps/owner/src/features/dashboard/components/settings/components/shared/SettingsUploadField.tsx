@@ -4,7 +4,7 @@ import { Image, X, UploadSimple } from '@phosphor-icons/react';
 import { useRef, useState } from 'react';
 import { cn } from '@/shared/lib/cn';
 
-export type UploadVariant = 'logo' | 'cover' | 'avatar' | 'addon';
+export type UploadVariant = 'logo' | 'cover' | 'avatar' | 'addon' | 'qris';
 
 interface UploadConfig {
   /** Display label shown above the upload zone */
@@ -41,6 +41,12 @@ const VARIANT_CONFIG: Record<UploadVariant, UploadConfig> = {
     aspectClass: 'aspect-square',
     maxBytes: 5_242_880,
     hint: 'PNG, JPG, atau WebP — otomatis dikonversi ke WebP',
+  },
+  qris: {
+    label: 'Foto QRIS',
+    aspectClass: 'aspect-square',
+    maxBytes: 5_242_880,
+    hint: 'PNG atau JPG, maks 5MB. Pastikan kode QR terlihat jelas dan tidak buram.',
   },
 };
 
