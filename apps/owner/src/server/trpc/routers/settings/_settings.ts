@@ -3,6 +3,7 @@ import { bookingAppRouter } from './booking-app';
 import { brandRouter } from './brand';
 import { operationalRouter } from './operational';
 import { penggunaRouter } from './pengguna';
+import { previewRouter } from './preview';
 import { produkPaketRouter } from './produkpaket';
 import { servicesRouter } from './services';
 import { teamRouter } from './team';
@@ -27,4 +28,5 @@ export const settingsRouter = router({
   team: teamRouter,
   produkPaket: produkPaketRouter,
   pengguna: penggunaRouter,
+  preview: previewRouter,
 });

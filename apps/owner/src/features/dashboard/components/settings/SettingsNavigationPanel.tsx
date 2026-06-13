@@ -8,6 +8,7 @@ import {
   Clock,
   CalendarCheck,
   UserGear,
+  Eye,
 } from '@phosphor-icons/react';
 import type { Icon } from '@phosphor-icons/react';
 import Link from 'next/link';
@@ -90,6 +91,13 @@ const NAV_GROUPS: NavGroup[] = [
         label: 'Booking App',
         path: '/dashboard/settings/booking',
         Icon: CalendarCheck,
+        permission: Permission.EDIT_BUSINESS_INFO,
+      },
+      {
+        id: 'preview',
+        label: 'Preview',
+        path: '/dashboard/settings/preview',
+        Icon: Eye,
         permission: Permission.EDIT_BUSINESS_INFO,
       },
     ],

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useIsPreview } from "../preview-context";
 import { BottomCTA } from "@/features/booking/components/bottom-cta";
 import { PaymentOptions } from "@/features/booking/components/payment-options";
 import { StepHeader } from "@/features/booking/components/step-header";
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function StepPayment({ onNext, onBack, slug }: Props) {
+  const isPreview = useIsPreview();
   const {
     paymentType,
     proofImageUrl,
@@ -49,6 +51,7 @@ export function StepPayment({ onNext, onBack, slug }: Props) {
   });
 
   async function handleSubmit() {
+    if (isPreview) return; // Block all mutations in preview mode
     // Validation phase
     if (!services.length) {
       setError("Pilih minimal satu layanan");
@@ -240,10 +243,16 @@ export function StepPayment({ onNext, onBack, slug }: Props) {
         </div>
       </div>
       <BottomCTA
-        label={isSubmitting ? "Memproses..." : "Konfirmasi Pembayaran →"}
+        label={
+          isPreview
+            ? "Pratinjau — Pembayaran dinonaktifkan"
+            : isSubmitting
+              ? "Memproses..."
+              : "Konfirmasi Pembayaran →"
+        }
         onClick={handleSubmit}
-        disabled={!canSubmit}
-        variant={canSubmit ? "ready" : "default"}
+        disabled={isPreview || !canSubmit}
+        variant={canSubmit && !isPreview ? "ready" : "default"}
       />
     </div>
   );

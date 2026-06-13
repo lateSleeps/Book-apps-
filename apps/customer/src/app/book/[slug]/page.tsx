@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { StepConfirm } from "./_steps/StepConfirm";
@@ -10,6 +10,7 @@ import { StepServiceDetail } from "./_steps/StepServiceDetail";
 import { StepServices } from "./_steps/StepServices";
 import { StepStylist } from "./_steps/StepStylist";
 import { StepTicket } from "./_steps/StepTicket";
+import { PreviewContext } from "./preview-context";
 
 type Step =
   | "services"
@@ -20,54 +21,54 @@ type Step =
   | "payment"
   | "ticket";
 
+// ── Page ──────────────────────────────────────────────────────────────────────
+
 export default function BookingPage() {
   const params = useParams<{ slug: string }>();
+  const searchParams = useSearchParams();
   const slug = params?.slug ?? "";
+  const isPreview = searchParams?.get("preview") === "true";
+
   const [step, setStep] = useState<Step>("services");
 
-  switch (step) {
-    case "services":
-      return (
+  return (
+    <PreviewContext.Provider value={isPreview}>
+      {step === "services" && (
         <StepServices
           slug={slug}
           onNext={(needsDetail) =>
             setStep(needsDetail ? "service-detail" : "stylist")
           }
         />
-      );
-    case "service-detail":
-      return (
+      )}
+      {step === "service-detail" && (
         <StepServiceDetail
           onNext={() => setStep("stylist")}
           onBack={() => setStep("services")}
         />
-      );
-    case "stylist":
-      return (
+      )}
+      {step === "stylist" && (
         <StepStylist
           slug={slug}
           onNext={() => setStep("confirm")}
           onBack={() => setStep("services")}
         />
-      );
-    case "confirm":
-      return (
+      )}
+      {step === "confirm" && (
         <StepConfirm
           onNext={() => setStep("contact")}
           onBack={() => setStep("stylist")}
         />
-      );
-    case "contact":
-      return <StepContact onNext={() => setStep("payment")} />;
-    case "payment":
-      return (
+      )}
+      {step === "contact" && <StepContact onNext={() => setStep("payment")} />}
+      {step === "payment" && (
         <StepPayment
           slug={slug}
           onNext={() => setStep("ticket")}
           onBack={() => setStep("contact")}
         />
-      );
-    case "ticket":
-      return <StepTicket onDone={() => setStep("services")} />;
-  }
+      )}
+      {step === "ticket" && <StepTicket onDone={() => setStep("services")} />}
+    </PreviewContext.Provider>
+  );
 }
