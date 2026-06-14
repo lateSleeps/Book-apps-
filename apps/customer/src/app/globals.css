@@ -35,11 +35,6 @@
   }
 
   body {
-    background-color: #e8e3db;
-    background-image:
-      radial-gradient(ellipse 80% 60% at 20% -10%, rgba(245, 196, 171, 0.45) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 85% 100%, rgba(184, 214, 240, 0.35) 0%, transparent 55%),
-      radial-gradient(ellipse 50% 40% at 50% 50%, rgba(168, 230, 212, 0.15) 0%, transparent 60%);
-    background-attachment: fixed;
+    background-color: #F2F2F7;
   }
 }

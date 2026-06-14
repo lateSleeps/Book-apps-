@@ -1,7 +1,8 @@
 "use client";
 
-import { BottomCTA } from "@/features/booking/components/bottom-cta";
+import { CheckCircle } from "@phosphor-icons/react";
 import { useBookingStore } from "@/features/booking/hooks/use-booking-store";
+import { InlineNotice } from "@/shared/components/ui/InlineNotice";
 
 interface Props {
   onDone: () => void;
@@ -15,119 +16,80 @@ export function StepTicket({ onDone }: Props) {
     onDone();
   }
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("id-ID", {
+  const formatDate = (dateStr: string) =>
+    new Date(dateStr).toLocaleDateString("id-ID", {
       weekday: "long",
-      year: "numeric",
-      month: "long",
       day: "numeric",
+      month: "long",
+      year: "numeric",
     });
-  };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-bg">
+    <div className="flex flex-col h-full overflow-hidden bg-bg-page">
       <div className="flex-1 overflow-y-auto">
-        <div className="flex flex-col items-center px-s20 pt-s48 pb-s32 text-center gap-6">
-          {/* Icon */}
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#f0fdf4]">
-            <svg
-              width="40"
-              height="40"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#16a34a"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-              <polyline points="22 4 12 14.01 9 11.01" />
-            </svg>
+        <div className="flex flex-col items-center px-s20 pt-s48 pb-s32 text-center">
+          {/* ── Success icon — bg-c-mint + text-accent matches InlineNotice success variant ── */}
+          <div className="flex h-[80px] w-[80px] items-center justify-center rounded-full bg-c-mint mb-s24">
+            <CheckCircle size={40} weight="fill" className="text-accent" />
           </div>
 
-          {/* Title */}
-          <div className="flex flex-col gap-2">
-            <h1 className="text-[28px] font-bold text-label leading-tight">
-              Bukti pembayaran diterima!
-            </h1>
-            <p className="text-[15px] text-label2 leading-relaxed">
-              Booking kamu sedang menunggu konfirmasi dari salon.
-            </p>
-          </div>
+          {/* ── Heading — booking outcome, not payment receipt ── */}
+          <h1 className="text-[28px] font-bold text-label leading-tight tracking-tight">
+            Booking kamu sudah dikirim
+          </h1>
+          <p className="text-ts-fn text-label2 mt-s8 leading-snug mb-s24">
+            Kami sedang menunggu konfirmasi dari salon.
+          </p>
 
-          {/* Info card */}
-          <div className="w-full rounded-2xl border border-sep bg-surface p-5 text-left flex flex-col gap-3">
+          {/* ── Appointment summary — human, not administrative ── */}
+          <div className="w-full bg-bg-card rounded-r20 shadow-card px-s20 py-s24 mb-s16 text-center">
             {date && (
-              <div className="flex justify-between text-[14px]">
-                <span className="text-label3">Tanggal</span>
-                <span className="font-medium text-label">
-                  {formatDate(date)}
-                </span>
-              </div>
-            )}
-            {timeSlot && (
-              <div className="flex justify-between text-[14px]">
-                <span className="text-label3">Waktu</span>
-                <span className="font-medium text-label">{timeSlot}</span>
-              </div>
+              <p className="text-ts-t3 font-bold text-label leading-tight">
+                {formatDate(date)}
+                {timeSlot ? ` · ${timeSlot}` : ""}
+              </p>
             )}
             {stylist && (
-              <div className="flex justify-between text-[14px]">
-                <span className="text-label3">Stylist</span>
-                <span className="font-medium text-label">{stylist.name}</span>
-              </div>
+              <p className="text-ts-fn text-label2 mt-s8">
+                bersama {stylist.name}
+              </p>
             )}
           </div>
 
-          {/* Timeline */}
-          <div className="w-full rounded-2xl bg-[#fffbeb] border border-[#fde68a] p-5 text-left flex flex-col gap-3">
-            <p className="text-[13px] font-semibold text-[#92400e] uppercase tracking-wide">
-              Selanjutnya
-            </p>
-            <div className="flex flex-col gap-3">
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f59e0b] text-white text-[10px] font-bold">
-                  1
-                </div>
-                <p className="text-[13px] text-[#78350f] leading-snug">
-                  Salon akan mengkonfirmasi booking kamu dalam{" "}
-                  <strong>maksimal 1 jam</strong>. Jika tidak ada respons,
-                  booking otomatis dikonfirmasi.
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f59e0b] text-white text-[10px] font-bold">
-                  2
-                </div>
-                <p className="text-[13px] text-[#78350f] leading-snug">
-                  Cek status booking kamu di halaman{" "}
-                  <strong>Cek Booking</strong> menggunakan nomor HP dan PIN dari
-                  tiket.
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f59e0b] text-white text-[10px] font-bold">
-                  3
-                </div>
-                <p className="text-[13px] text-[#78350f] leading-snug">
-                  Jika terkonfirmasi, tiket QR code kamu akan tersedia di
-                  halaman Cek Booking.
-                </p>
-              </div>
-            </div>
+          {/* ── Info notice — shared design system component, no custom yellow card ── */}
+          <div className="w-full mb-s16">
+            <InlineNotice
+              variant="info"
+              title="Konfirmasi kurang dari 1 jam"
+              description="Salon biasanya segera mengonfirmasi. Jika tidak ada respons, booking akan otomatis dikonfirmasi."
+            />
           </div>
 
-          {/* CTA ke check booking */}
-          <a
-            href="/check-booking"
-            className="w-full rounded-2xl border border-sep bg-surface py-4 text-center text-[14px] font-semibold text-label transition-all hover:bg-sep active:scale-[0.98]"
-          >
-            Cek Status Booking →
-          </a>
+          {/* ── Status check context — below the notice ── */}
+          <p className="text-ts-cap1 text-label3 leading-snug px-s4">
+            Cek status booking kapan saja menggunakan nomor HP yang digunakan
+            saat booking.
+          </p>
         </div>
       </div>
 
-      <BottomCTA label="Selesai" variant="ready" onClick={handleDone} />
+      {/* ── Bottom actions — primary "Cek Status" + secondary ghost "Selesai" ── */}
+      <div className="flex-none w-full border-t border-sep bg-white/95 backdrop-blur-sm px-s16 pb-[max(env(safe-area-inset-bottom),24px)] pt-s16 flex flex-col gap-s4">
+        {/* Primary — Cek Status Booking */}
+        <a
+          href="/check-booking"
+          className="flex w-full items-center justify-center rounded-rF min-h-[50px] px-s24 text-t16 font-semibold bg-label text-white shadow-button transition-all active:scale-[0.98] active:shadow-none"
+        >
+          Cek Status Booking →
+        </a>
+        {/* Secondary ghost — Selesai */}
+        <button
+          onClick={handleDone}
+          className="w-full py-s12 text-ts-fn text-label3 transition-colors active:text-label2"
+        >
+          Selesai
+        </button>
+      </div>
     </div>
   );
 }

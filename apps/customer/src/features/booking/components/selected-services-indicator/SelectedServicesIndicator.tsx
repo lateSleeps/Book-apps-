@@ -1,7 +1,11 @@
 "use client";
 
+import { CaretDown, CaretUp, X } from "@phosphor-icons/react";
 import { useState } from "react";
+
 import type { Service } from "../../types/booking.types";
+import { cn } from "@/shared/lib/cn";
+import { formatRupiah } from "@/shared/lib/format";
 
 interface SelectedServicesIndicatorProps {
   services: Service[];
@@ -9,112 +13,110 @@ interface SelectedServicesIndicatorProps {
   onRemoveService: (serviceId: string) => void;
 }
 
-/** Compact badge showing selected services count - expands to show details */
 export function SelectedServicesIndicator({
   services,
+  totalPrice,
   onRemoveService,
 }: SelectedServicesIndicatorProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!services || services.length === 0) return null;
 
+  const firstService = services[0];
+
   return (
-    <div className="px-s20 mb-s16">
+    <div className="px-s16 mb-s12">
       {!isExpanded ? (
-        /* Compact badge */
+        /* ── Collapsed — Apple Wallet compact summary pill ── */
         <button
           onClick={() => setIsExpanded(true)}
-          className="w-full flex items-center justify-between gap-s12 px-s16 py-s12 rounded-r16 bg-accent border-2 border-accent text-white font-semibold text-[14px] transition-all active:scale-[0.98] shadow-[0_4px_12px_rgba(74,155,127,0.2)]"
+          className={cn(
+            "w-full flex items-center justify-between gap-s12",
+            "px-s16 py-s12 rounded-r16 bg-surface border border-sep",
+            "transition-all active:scale-[0.98] shadow-sm text-left",
+          )}
         >
-          <div className="flex items-center gap-s8">
-            <div className="flex h-[20px] w-[20px] items-center justify-center rounded-full bg-white/30">
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </div>
-            <span>{services.length} Layanan Dipilih</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[15px] font-semibold text-label leading-tight truncate">
+              {firstService?.name}
+              {services.length > 1 && (
+                <span className="text-label3 font-normal">
+                  {" "}
+                  +{services.length - 1} lainnya
+                </span>
+              )}
+            </p>
+            <p className="text-[13px] text-label3 mt-[3px]">
+              {formatRupiah(totalPrice)}
+            </p>
           </div>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
+          <CaretDown
+            size={14}
+            weight="duotone"
+            className="flex-shrink-0 text-label3"
+          />
         </button>
       ) : (
-        /* Expanded card */
-        <div className="rounded-r16 bg-white border-2 border-accent overflow-hidden animate-slideUp">
+        /* ── Expanded — Apple Store checkout summary ── */
+        <div className="rounded-[20px] bg-surface border border-sep overflow-hidden shadow-sm">
           {/* Header */}
-          <div className="bg-accent px-s16 py-s12 flex items-center justify-between">
-            <span className="text-white font-semibold text-[14px]">
-              {services.length} Layanan Dipilih
-            </span>
+          <div className="flex items-start justify-between px-s20 pt-s20 pb-s4">
+            <div>
+              <p className="text-[17px] font-semibold text-label leading-tight">
+                Layanan Dipilih
+              </p>
+              <p className="text-[13px] text-label3 mt-[3px]">
+                {services.length} layanan
+              </p>
+            </div>
             <button
               onClick={() => setIsExpanded(false)}
-              className="flex h-[20px] w-[20px] items-center justify-center rounded hover:bg-white/20 transition-colors"
               aria-label="Tutup"
+              className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-sep text-label3 hover:bg-label hover:text-surface transition-all mt-[2px]"
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
+              <CaretUp size={14} weight="duotone" />
             </button>
           </div>
 
-          {/* Service list */}
-          <div className="px-s16 py-s12 space-y-s8">
+          {/* Service rows — no dividers between, breathing room only */}
+          <div className="px-s20 pt-s16 pb-s4 flex flex-col gap-[18px]">
             {services.map((svc) => (
               <div
                 key={svc.id}
-                className="flex items-center justify-between gap-s8 p-s12 rounded-r12 bg-accent/5 border border-accent/20"
+                className="flex items-start justify-between gap-s12"
               >
-                <span className="text-[13px] font-semibold text-label flex-1">
-                  {svc.name}
-                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[16px] font-medium text-label leading-snug">
+                    {svc.name}
+                  </p>
+                  <p className="text-[13px] text-label3 mt-[3px]">
+                    {svc.duration} menit · {formatRupiah(svc.price)}
+                  </p>
+                </div>
+                {/* Remove — subtle text action, never dominant */}
                 <button
                   onClick={() => onRemoveService(svc.id)}
                   aria-label={`Hapus ${svc.name}`}
-                  className="flex-shrink-0 flex h-[18px] w-[18px] items-center justify-center hover:bg-red-100 rounded transition-colors"
+                  className="flex-shrink-0 flex items-center gap-[4px] text-[13px] text-label3 hover:text-c-salmon transition-colors mt-[2px]"
                 >
-                  <svg
-                    width="10"
-                    height="10"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#E8705A"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
+                  <X size={12} weight="duotone" />
+                  <span>Hapus</span>
                 </button>
               </div>
             ))}
+          </div>
+
+          {/* Single divider before total */}
+          <div className="mx-s20 mt-s16 h-px bg-sep" />
+
+          {/* Total */}
+          <div className="px-s20 pt-s16 pb-s20 flex items-end justify-between">
+            <p className="text-[14px] text-label3 leading-none">
+              Estimasi Total
+            </p>
+            <p className="text-[26px] font-semibold text-label leading-none">
+              {formatRupiah(totalPrice)}
+            </p>
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 "use client";
 
+import { CaretRight, X } from "@phosphor-icons/react";
 import {
   addDays,
   format,
@@ -8,40 +9,25 @@ import {
   isToday,
   startOfDay,
 } from "date-fns";
-import { useMemo, useState, useEffect } from "react";
-
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { BottomCTA } from "@/features/booking/components/bottom-cta";
+import { SalonHero } from "@/features/booking/components/salon-hero/SalonHero";
 import { SelectedServicesIndicator } from "@/features/booking/components/selected-services-indicator";
+import { ServiceCard } from "@/features/booking/components/service-card/ServiceCard";
 import { Toast } from "@/features/booking/components/toast/Toast";
 import { useBookingStore } from "@/features/booking/hooks/use-booking-store";
 import { useToast } from "@/features/booking/hooks/use-toast";
 import type { Service } from "@/features/booking/types/booking.types";
 import { useSalon, useServices } from "@/hooks";
+import { InlineNotice } from "@/shared/components/ui/InlineNotice";
+import { SegmentedControl } from "@/shared/components/ui/segmented-control/SegmentedControl";
 import { cn } from "@/shared/lib/cn";
-import { formatRupiah } from "@/shared/lib/format";
+import { resolveIcon, resolveIconBySlug } from "@/shared/lib/resolveIcon";
 
-const DAY_LABELS = ["M", "S", "S", "R", "K", "J", "S"];
+// Indonesian short day labels Sun→Sat
+const DAY_LABELS = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
-type RawCategory = {
-  id: string;
-  name: string;
-  slug?: string;
-  description?: string;
-  icon?: string;
-  color?: string;
-};
-type RawService = {
-  id: string;
-  name: string;
-  description?: string;
-  price: number;
-  duration: number;
-  category?: RawCategory;
-  price_type?: "fixed" | "starting_from";
-  requires_specialist?: boolean;
-  service_questions?: unknown[];
-};
-
+// ── Color helpers — derive pastel backgrounds from owner-configured hex ──────
 function hexToHsl(hex: string): [number, number, number] {
   const num = parseInt(hex.replace("#", ""), 16);
   const r = (num >> 16) / 255;
@@ -81,12 +67,9 @@ function hslToHex(h: number, s: number, l: number): string {
   };
   const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
   const p = 2 * l - q;
-  const rr = hue2rgb(p, q, h + 1 / 3);
-  const gg = hue2rgb(p, q, h);
-  const bb = hue2rgb(p, q, h - 1 / 3);
   return (
     "#" +
-    [rr, gg, bb]
+    [hue2rgb(p, q, h + 1 / 3), hue2rgb(p, q, h), hue2rgb(p, q, h - 1 / 3)]
       .map((x) =>
         Math.round(x * 255)
           .toString(16)
@@ -96,34 +79,58 @@ function hslToHex(h: number, s: number, l: number): string {
   );
 }
 
+function lightenColor(hex: string): string {
+  const [h, s] = hexToHsl(hex);
+  return hslToHex(h, Math.min(1, s * 1.8), 0.94);
+}
+
 function saturateColor(hex: string): string {
   const [h, s] = hexToHsl(hex);
   return hslToHex(h, Math.min(1, s * 2.5), 0.78);
 }
 
-function lightenColor(hex: string): string {
-  const [h, s] = hexToHsl(hex);
-  return hslToHex(h, Math.min(1, s * 2.5), 0.92);
-}
-
+// ── Date strip builder ────────────────────────────────────────────────────────
 function buildStrip() {
   const today = startOfDay(new Date());
   return Array.from({ length: 30 }, (_, i) => {
-    const date = addDays(today, i);
-    const dow = getDay(date);
-    const isPast = isBefore(date, today);
+    const d = addDays(today, i);
+    const dow = getDay(d);
+    const isPast = isBefore(d, today);
     const isClosed = dow === 0;
     return {
-      isoString: format(date, "yyyy-MM-dd"),
-      dayNum: format(date, "dd"),
-      dayLabel: DAY_LABELS[dow] ?? "S",
-      isToday: isToday(date),
+      isoString: format(d, "yyyy-MM-dd"),
+      dayNum: format(d, "d"),
+      dayLabel: DAY_LABELS[dow] ?? "Sen",
+      isToday: isToday(d),
       isPast,
       isClosed,
     };
   });
 }
 
+// ── Types ─────────────────────────────────────────────────────────────────────
+type RawCategory = {
+  id: string;
+  name: string;
+  slug?: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+};
+
+type RawService = {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  duration: number;
+  category?: RawCategory;
+  price_type?: "fixed" | "starting_from";
+  requires_specialist?: boolean;
+  service_questions?: unknown[];
+};
+
+// ── Component ─────────────────────────────────────────────────────────────────
 interface Props {
   slug: string;
   onNext: (needsDetail: boolean) => void;
@@ -131,8 +138,8 @@ interface Props {
 
 export function StepServices({ slug, onNext }: Props) {
   const {
-    salonId,
     salon,
+    salonId,
     isLoading: salonLoading,
     error: salonError,
   } = useSalon(slug);
@@ -145,19 +152,30 @@ export function StepServices({ slug, onNext }: Props) {
     addService,
     removeService,
     totalPrice,
-    reset,
   } = useBookingStore();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    reset();
-  }, []);
-
   const strip = useMemo(() => buildStrip(), []);
+  const [activeTab, setActiveTab] = useState("services");
   const [sheetCategoryId, setSheetCategoryId] = useState<string | null>(null);
   const [sheetOpenCount, setSheetOpenCount] = useState(0);
+  const [noticeDismissed, setNoticeDismissed] = useState(false);
+  useEffect(() => {
+    setNoticeDismissed(false);
+  }, [sheetOpenCount]);
   const { toast, hideToast } = useToast();
 
+  const handleShare = useCallback(() => {
+    if (navigator.share) {
+      void navigator.share({
+        title: salon?.name ?? "Booking",
+        url: window.location.href,
+      });
+    } else {
+      void navigator.clipboard.writeText(window.location.href);
+    }
+  }, [salon?.name]);
+
+  // ── Group services by category ─────────────────────────────────────────────
   const grouped = useMemo(() => {
     if (!services) return {};
     return services.reduce(
@@ -190,17 +208,11 @@ export function StepServices({ slug, onNext }: Props) {
     ? saturateColor(sheetGroup.category.color)
     : "#E4E5E7";
 
-  const canProceed = !!date && selectedServices.length > 0;
-
   function handleServiceSelect(svc: RawService) {
     const isSelected = selectedServices.some((s) => s.id === svc.id);
     if (isSelected) {
       removeService(svc.id);
     } else {
-      console.log("selected service:", {
-        name: svc.name,
-        price_type: svc.price_type,
-      });
       addService({
         id: svc.id,
         name: svc.name,
@@ -216,246 +228,237 @@ export function StepServices({ slug, onNext }: Props) {
     }
   }
 
-  function handleShare() {
-    if (navigator.share) {
-      void navigator.share({
-        title: salon?.name ?? "Rara Beauty",
-        url: window.location.href,
-      });
-    } else {
-      void navigator.clipboard.writeText(window.location.href);
-    }
-  }
-
-  const hour = new Date().getHours();
-  const greeting =
-    hour < 11
-      ? "Selamat pagi"
-      : hour < 15
-        ? "Selamat siang"
-        : hour < 18
-          ? "Selamat sore"
-          : "Selamat malam";
-
+  const canProceed = !!date && selectedServices.length > 0;
   const isLoading = salonLoading || servicesLoading;
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden">
+    <div className="relative flex flex-col h-full overflow-hidden bg-bg-page">
       <div className="flex-1 overflow-y-auto overflow-x-hidden">
-        {/* Header */}
-        <div className="px-s20 pt-s48 pb-s20">
-          <p className="text-ts-cap1 font-semibold uppercase tracking-widest text-label3 mb-s8">
-            {salon?.name ?? "Rara Beauty"}
+        {/* ── Salon profile hero ────────────────────────── */}
+        <SalonHero
+          salon={salon}
+          isLoading={salonLoading}
+          onShare={handleShare}
+        />
+
+        {/* ── Date selection — unified with hero ───────── */}
+        <div className="bg-bg-page px-s20 pt-s20 pb-s24">
+          {/* Contextual label */}
+          <p className="text-ts-cap1 font-semibold text-tx-secondary uppercase tracking-wider mb-s16">
+            Pilih tanggal kunjungan
           </p>
-          <div className="flex items-center justify-between">
-            <h1 className="text-ts-hero font-bold text-label leading-none">
-              {greeting}.
-            </h1>
-            <div className="flex items-center gap-2">
-              <a
-                href="/check-booking"
-                className="flex h-9 items-center gap-1.5 rounded-rF border border-sep bg-surface px-3 text-[12px] font-medium text-label2 transition-all hover:bg-sep active:scale-95"
-              >
-                <svg
-                  width="13"
-                  height="13"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M9 11l3 3L22 4" />
-                  <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
-                </svg>
-                Cek Booking
-              </a>
-              <button
-                onClick={handleShare}
-                aria-label="Bagikan"
-                className="flex h-9 w-9 items-center justify-center rounded-rF border border-sep bg-surface text-label2 transition-all hover:bg-sep active:scale-95"
-              >
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                  <polyline points="16 6 12 2 8 6" />
-                  <line x1="12" y1="2" x2="12" y2="15" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
 
-        {/* Calendar strip */}
-        <div className="px-s16 pt-s4 pb-s12">
-          <div className="flex overflow-x-auto scrollbar-hide">
-            {strip.map((day) => {
-              const isSelected = date === day.isoString;
-              const disabled = day.isPast || day.isClosed;
-
+          {/* Individual date pills — white cards on gray page */}
+          <div className="flex gap-[6px]">
+            {strip.slice(0, 7).map((day) => {
+              const sel = date === day.isoString;
+              const dis = day.isPast || day.isClosed;
+              const today = day.isToday;
               return (
                 <button
                   key={day.isoString}
+                  disabled={dis}
                   onClick={() => {
-                    if (!disabled) setDate(day.isoString);
+                    if (!dis) setDate(day.isoString);
                   }}
-                  disabled={disabled}
                   className={cn(
-                    "flex-shrink-0 flex flex-col items-center gap-[6px] w-[56px] py-s8",
-                    disabled && "opacity-30 cursor-not-allowed",
+                    "flex-1 flex flex-col items-center py-s12 rounded-r16 transition-all duration-150",
+                    dis && "opacity-25 pointer-events-none",
+                    sel
+                      ? "bg-label"
+                      : "bg-bg-card border border-bd-card shadow-tab",
                   )}
                 >
-                  <span
-                    className={cn(
-                      "flex h-[24px] w-[24px] items-center justify-center rounded-full text-[12px] font-semibold transition-all",
-                      day.isToday ? "text-white" : "text-label3",
-                    )}
-                    style={
-                      day.isToday ? { backgroundColor: "#111110" } : undefined
-                    }
-                  >
-                    {day.dayLabel}
-                  </span>
-
-                  <div
-                    className={cn(
-                      "flex flex-col items-center gap-[16px] px-[6px] pt-[6px] pb-[8px] rounded-r24 transition-all duration-150",
-                      isSelected && "bg-sep",
-                    )}
-                  >
+                  <span className="text-t14 font-medium leading-none">
                     <span
                       className={cn(
-                        "flex h-[40px] w-[40px] items-center justify-center rounded-full text-[20px] font-semibold transition-all",
-                        isSelected ? "bg-accent text-white" : "text-label",
+                        sel
+                          ? "text-surface"
+                          : today
+                            ? "text-accent"
+                            : "text-tx-secondary",
+                      )}
+                    >
+                      {day.dayLabel}
+                    </span>
+                  </span>
+                  <span className="text-t18 font-bold leading-none mt-s8">
+                    <span
+                      className={cn(
+                        sel
+                          ? "text-surface"
+                          : today
+                            ? "text-accent"
+                            : "text-tx-primary",
                       )}
                     >
                       {day.dayNum}
                     </span>
-                    <span
-                      className={cn(
-                        "h-[5px] w-[5px] rounded-full transition-all duration-200",
-                        isSelected && canProceed && "bg-accent",
-                      )}
-                    />
-                  </div>
+                  </span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        <div className="h-px bg-sep mx-s20 mb-s4" />
-
-        {/* Category cards */}
-        {salonError ? (
-          <div className="flex justify-center py-16">
-            <div className="text-center">
-              <p className="text-label2 font-semibold text-red-500 mb-2">
-                Salon tidak ditemukan
-              </p>
-              <p className="text-label3 text-label3">
-                Salon dengan nama &quot;{slug}&quot; tidak tersedia.
-              </p>
+        {/* ── Category list — booking content begins here ── */}
+        <div className="px-s16 pb-s24">
+          <div className="bg-bg-card rounded-r20 shadow-card border border-bd-card overflow-hidden">
+            {/* Tabs */}
+            <div className="px-s12 pt-s16 pb-s8 border-b border-bd-row">
+              <SegmentedControl
+                items={[
+                  { id: "services", label: "Layanan" },
+                  { id: "paket", label: "Paket" },
+                ]}
+                activeId={activeTab}
+                onChange={setActiveTab}
+                fullWidth
+              />
             </div>
-          </div>
-        ) : isLoading ? (
-          <div className="flex justify-center py-16">
-            <div className="text-label2">Loading...</div>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-s12 px-s16 pt-s12 pb-32">
-            {groupEntries.map(({ category, services: catServices }) => {
-              const selectedInCat = catServices.find((s) =>
-                selectedServices.some((sel) => sel.id === s.id),
-              );
 
-              return (
-                <button
-                  key={category.id}
-                  onClick={() => {
-                    setSheetCategoryId(category.id);
-                    setSheetOpenCount((n) => n + 1);
-                  }}
-                  className="relative w-full overflow-hidden rounded-r24 px-s20 pt-s20 pb-s24 text-left transition-all duration-150 active:scale-[0.98]"
-                  style={{ backgroundColor: "#F1F2F3" }}
-                >
-                  <div
-                    className="pointer-events-none absolute right-[-32px] top-[-32px] h-40 w-40 rounded-[45%_55%_60%_40%/50%_40%_60%_50%] opacity-60"
-                    style={{
-                      background: category.color
-                        ? saturateColor(category.color)
-                        : "#E4E5E7",
-                    }}
-                  />
-                  <div
-                    className="pointer-events-none absolute right-[16px] top-[28px] flex h-[64px] w-[64px] items-center justify-center rounded-full text-3xl"
-                    style={{
-                      background: category.color
-                        ? lightenColor(category.color)
-                        : "#F0F0F0",
-                    }}
+            {/* Content */}
+            {salonError ? (
+              <div className="px-s20 py-16 text-center">
+                <p className="text-ts-head font-semibold text-c-salmon mb-s8">
+                  Salon tidak ditemukan
+                </p>
+                <p className="text-ts-fn text-label3">
+                  Salon &quot;{slug}&quot; tidak tersedia.
+                </p>
+              </div>
+            ) : isLoading ? (
+              <div className="flex flex-col">
+                {[1, 2, 3, 4].map((i) => (
+                  <button
+                    key={i}
+                    className="flex w-full items-stretch pl-s16 animate-pulse"
                   >
-                    {category.icon ?? "✨"}
-                  </div>
-
-                  <div className="relative z-10">
-                    <div className="flex items-start justify-between gap-s8">
-                      <div>
-                        <p className="text-[18px] font-bold text-label leading-tight">
-                          {category.name}
-                        </p>
-                        {category.description && (
-                          <p className="text-[13px] mt-[3px] text-label">
-                            {category.description}
-                          </p>
-                        )}
-                      </div>
-                      {selectedInCat && (
-                        <div className="flex h-[24px] w-[24px] flex-shrink-0 items-center justify-center rounded-full bg-accent mt-[2px]">
-                          <svg
-                            width="11"
-                            height="11"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="white"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
+                    {/* Icon column */}
+                    <div className="flex-shrink-0 flex items-center py-[22px] pr-[12px]">
+                      <div className="h-[56px] w-[56px] rounded-r16 bg-bg-control" />
+                    </div>
+                    {/* Text column — border-b as inset divider */}
+                    <div
+                      className={cn(
+                        "flex flex-1 items-center gap-s16 py-[22px] pr-s16",
+                        i < 4 && "border-b border-bd-card",
+                      )}
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-[6px]">
+                          <div className="h-[15px] w-[90px] bg-sep rounded-r8" />
+                          <div className="h-[13px] w-[48px] bg-sep rounded-r8" />
                         </div>
-                      )}
+                        <div className="h-[13px] w-[160px] bg-sep rounded-r8" />
+                      </div>
+                      <div className="h-[16px] w-[16px] bg-sep rounded-full opacity-40" />
                     </div>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col">
+                {groupEntries.map(
+                  ({ category, services: catServices }, index) => {
+                    const selectedInCat = catServices.find((svc) =>
+                      selectedServices.some((sel) => sel.id === svc.id),
+                    );
+                    const CategoryIcon = resolveIconBySlug(
+                      category.icon,
+                      category.slug,
+                    );
+                    const preview = catServices
+                      .slice(0, 2)
+                      .map((s) => s.name)
+                      .join(" • ");
+                    const isLast = index === groupEntries.length - 1;
 
-                    <div className="mt-s16 flex flex-col gap-[2px]">
-                      {selectedInCat && (
-                        <span className="text-[13px] font-semibold text-accent">
-                          ✓ {selectedInCat.name}
-                        </span>
-                      )}
-                      <span className="text-[11px] font-semibold text-label">
-                        {catServices.length} layanan tersedia
-                      </span>
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
+                    return (
+                      <button
+                        key={category.id}
+                        onClick={() => {
+                          setSheetCategoryId(category.id);
+                          setSheetOpenCount((n) => n + 1);
+                        }}
+                        className={cn(
+                          "flex w-full items-stretch pl-s16 text-left",
+                          "transition-all duration-200 hover:bg-black/[0.015] active:scale-[0.995]",
+                          selectedInCat && "bg-accent/5",
+                        )}
+                      >
+                        {/* Icon column — centered, own padding */}
+                        <div className="flex-shrink-0 flex items-center py-[22px] pr-[12px]">
+                          <div
+                            className="flex h-[56px] w-[56px] items-center justify-center rounded-r16"
+                            style={{
+                              background: lightenColor(
+                                category.color ?? "#e8e7e3",
+                              ),
+                            }}
+                          >
+                            <CategoryIcon
+                              size={26}
+                              weight="duotone"
+                              className="text-tx-primary"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Text + chevron column — border-b IS the divider */}
+                        <div
+                          className={cn(
+                            "flex flex-1 min-w-0 items-center gap-s16 py-[22px] pr-s16",
+                            !isLast && "border-b border-bd-card",
+                          )}
+                        >
+                          {/* Text block */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-baseline justify-between gap-[8px]">
+                              <p className="text-[17px] font-semibold text-tx-primary leading-tight truncate">
+                                {category.name}
+                              </p>
+                              {!selectedInCat && (
+                                <span className="text-[13px] font-medium text-tx-secondary flex-shrink-0">
+                                  {catServices.length} layanan
+                                </span>
+                              )}
+                            </div>
+                            <p
+                              className={cn(
+                                "text-[14px] font-normal mt-[4px] leading-snug truncate",
+                                selectedInCat
+                                  ? "text-accent"
+                                  : "text-tx-secondary",
+                              )}
+                            >
+                              {selectedInCat ? selectedInCat.name : preview}
+                            </p>
+                          </div>
+
+                          {/* Chevron */}
+                          <CaretRight
+                            size={18}
+                            weight="duotone"
+                            className={cn(
+                              "flex-shrink-0 opacity-50",
+                              selectedInCat
+                                ? "text-accent"
+                                : "text-tx-tertiary",
+                            )}
+                          />
+                        </div>
+                      </button>
+                    );
+                  },
+                )}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Toast */}
+      {/* ── Toast ─────────────────────────────────────── */}
       {toast && (
         <div className="absolute bottom-[88px] left-s16 right-s16 z-50 animate-up shadow-button rounded-r16 overflow-hidden">
           <Toast
@@ -484,21 +487,14 @@ export function StepServices({ slug, onNext }: Props) {
         variant={canProceed ? "ready" : "default"}
         disabled={!canProceed}
         onClick={() => {
-          const firstService = selectedServices[0];
-          const needsDetail = firstService?.price_type === "starting_from";
-          console.log("[StepServices] Lanjutkan:", {
-            id: firstService?.id,
-            name: firstService?.name,
-            price_type: firstService?.price_type,
-            requires_specialist: firstService?.requires_specialist,
-            service_questions: firstService?.service_questions,
-            needsDetail,
-          });
+          const needsDetail = selectedServices.some(
+            (service) => service.price_type === "starting_from",
+          );
           onNext(needsDetail);
         }}
       />
 
-      {/* Bottom Sheet */}
+      {/* ── Bottom Sheet ──────────────────────────────── */}
       {sheetCategoryId && sheetGroup && (
         <>
           <div
@@ -507,131 +503,84 @@ export function StepServices({ slug, onNext }: Props) {
           />
 
           <div
-            className="absolute bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-[28px] bg-bg animate-sheetUp"
+            className="absolute bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-[28px] bg-bg-card animate-sheetUp"
             style={{ maxHeight: "82%" }}
           >
+            {/* Drag handle */}
             <div className="flex justify-center pt-s12 pb-s4 flex-shrink-0">
-              <div className="h-[4px] w-[36px] rounded-full bg-sep" />
+              <div className="h-[4px] w-[36px] rounded-full bg-bd-card" />
             </div>
 
-            <div className="flex items-center gap-s12 px-s20 pt-s8 pb-s16 flex-shrink-0">
-              <div
-                className="flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-r12 text-xl"
-                style={{ background: sheetColor, filter: "brightness(0.88)" }}
-              >
-                {sheetGroup.category.icon ?? "✨"}
-              </div>
-              <div className="flex-1">
-                <h2 className="text-[20px] font-bold text-label leading-tight">
+            {/* Sheet header */}
+            <div className="flex items-center gap-s16 px-s20 pt-s12 pb-s16 flex-shrink-0">
+              {(() => {
+                const SheetIcon = resolveIconBySlug(
+                  sheetGroup.category.icon,
+                  sheetGroup.category.slug,
+                );
+                return (
+                  <div
+                    className="flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-r16"
+                    style={{
+                      background: lightenColor(
+                        sheetGroup.category.color ?? "#e8e7e3",
+                      ),
+                    }}
+                  >
+                    <SheetIcon
+                      size={22}
+                      weight="duotone"
+                      className="text-tx-primary"
+                    />
+                  </div>
+                );
+              })()}
+              <div className="flex-1 min-w-0">
+                <h2 className="text-ts-t3 font-semibold text-label leading-tight">
                   {sheetGroup.category.name}
                 </h2>
-                <p className="text-[13px] text-label3">
+                <p className="text-ts-fn text-tx-secondary mt-[2px]">
                   {sheetServices.length} layanan tersedia
                 </p>
               </div>
               <button
                 onClick={() => setSheetCategoryId(null)}
-                className="flex h-[32px] w-[32px] items-center justify-center rounded-full bg-sep text-label2 hover:bg-label hover:text-white transition-all"
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-bg-control border border-bd-card text-tx-secondary hover:bg-label hover:text-white transition-all duration-200"
                 aria-label="Tutup"
               >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
+                <X size={16} weight="duotone" />
               </button>
             </div>
 
-            <div className="h-px bg-sep mx-s20 flex-shrink-0" />
+            <div className="h-px bg-bd-card mx-s20 flex-shrink-0" />
 
+            {/* Services inside sheet */}
             <div className="flex-1 overflow-y-auto px-s16 pt-s12 pb-s24">
               {["hair", "colour-treatment", "nail"].includes(
                 sheetGroup.category.slug ?? "",
-              ) && (
-                <Toast
-                  key={sheetOpenCount}
-                  title="Estimasi Harga"
-                  description="Harga akhir menyesuaikan kondisi & produk. Cukup bayar DP dulu."
-                  variant="warning"
-                  shake
-                />
-              )}
-              <div className="flex flex-col gap-s8">
-                {sheetServices.map((svc: RawService) => {
-                  const isSelected = selectedServices.some(
-                    (sel) => sel.id === svc.id,
-                  );
-                  return (
-                    <button
-                      key={svc.id}
-                      onClick={() => handleServiceSelect(svc)}
-                      className={cn(
-                        "w-full rounded-r20 bg-white p-s20 text-left shadow-sm transition-all duration-150 active:scale-[0.98]",
-                        isSelected && "ring-2 ring-accent",
-                      )}
-                    >
-                      <div className="flex items-start justify-between gap-s12">
-                        <p className="text-[17px] font-bold text-label leading-snug">
-                          {svc.name}
-                        </p>
-                        <div
-                          className="flex-shrink-0 mt-[2px] flex h-[22px] w-[22px] items-center justify-center rounded-full border-2 transition-all duration-150"
-                          style={
-                            isSelected
-                              ? {
-                                  borderColor: "#4a9b7f",
-                                  backgroundColor: "#4a9b7f",
-                                }
-                              : {
-                                  borderColor: sheetColor,
-                                  filter: "brightness(0.7)",
-                                }
-                          }
-                        >
-                          {isSelected && (
-                            <svg
-                              width="10"
-                              height="10"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="white"
-                              strokeWidth="3"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                          )}
-                        </div>
-                      </div>
+              ) &&
+                !noticeDismissed && (
+                  <InlineNotice
+                    variant="info"
+                    title="Harga Estimasi"
+                    description="Harga akhir ditentukan setelah konsultasi."
+                    onDismiss={() => setNoticeDismissed(true)}
+                    className="mb-s16"
+                  />
+                )}
 
-                      {svc.description && (
-                        <p className="mt-[4px] text-[14px] text-label2 leading-snug">
-                          {svc.description}
-                        </p>
-                      )}
-
-                      <div className="mt-s16">
-                        <p className="text-[11px] text-label3 font-medium">
-                          {svc.price_type === "starting_from"
-                            ? "Mulai dari"
-                            : "Harga"}
-                        </p>
-                        <p className="text-[14px] font-bold text-label mt-[2px]">
-                          {formatRupiah(svc.price)}
-                        </p>
-                      </div>
-                    </button>
-                  );
-                })}
+              {/* Product picker — independent cards */}
+              <div className="flex flex-col gap-[12px]">
+                {sheetServices.map((svc: RawService) => (
+                  <ServiceCard
+                    key={svc.id}
+                    service={svc}
+                    isSelected={selectedServices.some(
+                      (sel) => sel.id === svc.id,
+                    )}
+                    onSelect={() => handleServiceSelect(svc)}
+                  />
+                ))}
               </div>
             </div>
           </div>

@@ -21,8 +21,6 @@ type Step =
   | "payment"
   | "ticket";
 
-// ── Page ──────────────────────────────────────────────────────────────────────
-
 export default function BookingPage() {
   const params = useParams<{ slug: string }>();
   const searchParams = useSearchParams();
@@ -33,42 +31,50 @@ export default function BookingPage() {
 
   return (
     <PreviewContext.Provider value={isPreview}>
-      {step === "services" && (
-        <StepServices
-          slug={slug}
-          onNext={(needsDetail) =>
-            setStep(needsDetail ? "service-detail" : "stylist")
-          }
-        />
-      )}
-      {step === "service-detail" && (
-        <StepServiceDetail
-          onNext={() => setStep("stylist")}
-          onBack={() => setStep("services")}
-        />
-      )}
-      {step === "stylist" && (
-        <StepStylist
-          slug={slug}
-          onNext={() => setStep("confirm")}
-          onBack={() => setStep("services")}
-        />
-      )}
-      {step === "confirm" && (
-        <StepConfirm
-          onNext={() => setStep("contact")}
-          onBack={() => setStep("stylist")}
-        />
-      )}
-      {step === "contact" && <StepContact onNext={() => setStep("payment")} />}
-      {step === "payment" && (
-        <StepPayment
-          slug={slug}
-          onNext={() => setStep("ticket")}
-          onBack={() => setStep("contact")}
-        />
-      )}
-      {step === "ticket" && <StepTicket onDone={() => setStep("services")} />}
+      <div className="flex flex-col h-full">
+        <div className="flex-1 relative overflow-hidden">
+          {step === "services" && (
+            <StepServices
+              slug={slug}
+              onNext={(needsDetail) =>
+                setStep(needsDetail ? "service-detail" : "stylist")
+              }
+            />
+          )}
+          {step === "service-detail" && (
+            <StepServiceDetail
+              onNext={() => setStep("stylist")}
+              onBack={() => setStep("services")}
+            />
+          )}
+          {step === "stylist" && (
+            <StepStylist
+              slug={slug}
+              onNext={() => setStep("confirm")}
+              onBack={() => setStep("services")}
+            />
+          )}
+          {step === "confirm" && (
+            <StepConfirm
+              onNext={() => setStep("contact")}
+              onBack={() => setStep("stylist")}
+            />
+          )}
+          {step === "contact" && (
+            <StepContact onNext={() => setStep("payment")} />
+          )}
+          {step === "payment" && (
+            <StepPayment
+              slug={slug}
+              onNext={() => setStep("ticket")}
+              onBack={() => setStep("contact")}
+            />
+          )}
+          {step === "ticket" && (
+            <StepTicket onDone={() => setStep("services")} />
+          )}
+        </div>
+      </div>
     </PreviewContext.Provider>
   );
 }

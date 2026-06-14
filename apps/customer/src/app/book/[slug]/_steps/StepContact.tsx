@@ -1,30 +1,12 @@
 "use client";
 
+import { Minus, Plus } from "@phosphor-icons/react";
 import { useState, useMemo, useCallback } from "react";
 import { BottomCTA } from "@/features/booking/components/bottom-cta";
 import { useBookingStore } from "@/features/booking/hooks/use-booking-store";
 import { useMockData } from "@/features/booking/hooks/use-mock-data";
 import { cn } from "@/shared/lib/cn";
 import { formatRupiah } from "@/shared/lib/format";
-
-function InputCard({
-  children,
-  focused,
-}: {
-  children: React.ReactNode;
-  focused: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        "rounded-r16 bg-surface border overflow-hidden transition-all",
-        focused ? "border-label ring-2 ring-label/10" : "border-sep",
-      )}
-    >
-      {children}
-    </div>
-  );
-}
 
 interface Props {
   onNext: () => void;
@@ -54,7 +36,7 @@ export function StepContact({ onNext }: Props) {
     setShowAddons(true);
   }
 
-  const previewProducts = useMemo(() => products.slice(0, 4), [products]);
+  const previewProducts = useMemo(() => products.slice(0, 10), [products]);
 
   const getQuantity = useCallback(
     (productId: string) =>
@@ -64,110 +46,144 @@ export function StepContact({ onNext }: Props) {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Hero */}
+      {/* ── Banner — Owner app blue gradient, centered composition ── */}
       <div
-        className="relative flex-shrink-0"
-        style={{ height: "30%", backgroundColor: "#E8705A" }}
+        className="relative flex-shrink-0 overflow-hidden"
+        style={{
+          height: "16%",
+          background: "linear-gradient(145deg, #0071E3 0%, #3A9BFF 100%)",
+        }}
       >
         <svg
           className="absolute inset-0 w-full h-full"
-          viewBox="0 0 390 300"
-          preserveAspectRatio="xMidYMid slice"
+          viewBox="0 0 390 200"
           fill="none"
+          preserveAspectRatio="xMidYMid slice"
         >
-          <circle cx="320" cy="40" r="120" fill="#F4856B" fillOpacity="0.5" />
-          <circle cx="60" cy="260" r="100" fill="#D4604A" fillOpacity="0.4" />
+          {/* Depth — large background circles, centered */}
+          <circle cx="195" cy="100" r="140" fill="white" opacity="0.06" />
+          <circle cx="195" cy="100" r="90" fill="white" opacity="0.06" />
+
+          {/* Off-center depth blobs for dimension */}
+          <circle cx="320" cy="40" r="80" fill="white" opacity="0.07" />
+          <circle cx="70" cy="165" r="60" fill="white" opacity="0.05" />
+
+          {/* Dashed stroke rings around center */}
+          <circle
+            cx="195"
+            cy="100"
+            r="62"
+            stroke="white"
+            strokeWidth="1.5"
+            opacity="0.18"
+            fill="none"
+            strokeDasharray="4 3"
+          />
+          <circle
+            cx="195"
+            cy="100"
+            r="42"
+            stroke="white"
+            strokeWidth="1"
+            opacity="0.12"
+            fill="none"
+            strokeDasharray="3 4"
+          />
+
+          {/* Central hero element — soft glow + symbol */}
+          <circle cx="195" cy="100" r="26" fill="white" opacity="0.15" />
+          <circle cx="195" cy="100" r="18" fill="white" opacity="0.20" />
+          {/* Confirmation mark */}
           <path
-            d="M100 280 C90 240 85 200 95 170 C98 158 108 152 118 158 L130 165 C136 142 150 138 158 148 L162 155 C168 134 182 132 188 144 L192 154 C198 136 212 136 216 150 L218 200 C218 220 210 255 200 280Z"
-            fill="#FDDCB0"
-          />
-          <path
-            d="M290 280 C300 240 305 200 295 170 C292 158 282 152 272 158 L260 165 C254 142 240 138 232 148 L228 155 C222 134 208 132 202 144 L198 154 C196 136 184 136 182 150 L180 200 C180 220 188 255 198 280Z"
-            fill="#FDDCB0"
-          />
-          <rect
-            x="128"
-            y="80"
-            width="134"
-            height="148"
-            rx="8"
-            fill="white"
-            fillOpacity="0.95"
-          />
-          <rect x="136" y="88" width="118" height="104" rx="4" fill="#c8ede2" />
-          <g
-            transform="translate(195, 140)"
-            stroke="#3a7a62"
+            d="M186 100 L192.5 107 L205 93"
+            stroke="white"
+            strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
+            opacity="0.90"
+          />
+
+          {/* Wavy decorative paths */}
+          <path
+            d="M0 150 Q50 132 100 150 Q150 168 200 150 Q250 132 300 150 Q350 168 390 150"
+            stroke="white"
+            strokeWidth="1.2"
+            opacity="0.14"
             fill="none"
-          >
-            <circle
-              cx="0"
-              cy="0"
-              r="28"
-              strokeWidth="3"
-              fill="white"
-              fillOpacity="0.7"
-            />
-            <circle cx="-10" cy="-6" r="3.5" fill="#3a7a62" stroke="none" />
-            <circle cx="10" cy="-6" r="3.5" fill="#3a7a62" stroke="none" />
-            <path d="M-12 10 C-6 18 6 18 12 10" strokeWidth="3" />
-          </g>
-          <rect x="148" y="204" width="94" height="8" rx="4" fill="#e0e0e0" />
-          <rect x="162" y="218" width="66" height="6" rx="3" fill="#ececec" />
-          <g fill="white" fillOpacity="0.8">
-            <path d="M320 110 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" />
-            <path d="M68 120 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" />
-            <path d="M340 200 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2z" />
-          </g>
+            strokeLinecap="round"
+          />
+          <path
+            d="M0 170 Q60 154 120 170 Q180 186 240 170 Q300 154 390 170"
+            stroke="white"
+            strokeWidth="0.8"
+            opacity="0.09"
+            fill="none"
+            strokeLinecap="round"
+          />
+
+          {/* Floating dot particles */}
+          <circle cx="60" cy="45" r="2.5" fill="white" opacity="0.28" />
+          <circle cx="330" cy="155" r="2" fill="white" opacity="0.22" />
+          <circle cx="310" cy="60" r="2" fill="white" opacity="0.20" />
+          <circle cx="80" cy="145" r="1.5" fill="white" opacity="0.18" />
+          <circle cx="355" cy="95" r="1.5" fill="white" opacity="0.20" />
         </svg>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto bg-bg relative z-10">
-        <div className="flex flex-col gap-s20 px-s20 pt-s32 pb-s32">
-          <div>
-            <p className="text-[13px] font-semibold text-label3 mb-[6px]">
-              Hampir selesai! 🙏
-            </p>
-            <h1 className="text-[26px] font-bold text-label leading-tight">
-              Maaf, perlu data
-              <br />
-              dirimu dulu.
-            </h1>
-            <p className="text-[14px] text-label2 mt-[8px] leading-snug">
-              Kami butuh ini buat ngabarin kamu sebelum sesi dimulai.
-            </p>
-          </div>
+      {/* ── Content ── */}
+      <div className="flex-1 overflow-y-auto bg-bg-page">
+        <div className="px-s20 pt-s20 pb-s8">
+          <p className="text-[12px] font-semibold text-label2 tracking-widest uppercase mb-[4px]">
+            Satu langkah lagi
+          </p>
+          <h1 className="text-[26px] font-bold text-label leading-snug tracking-tight">
+            Lengkapi data kontak
+          </h1>
+          <p className="text-[14px] text-label2 mt-[6px] leading-snug">
+            Kami perlu data ini agar stylist dapat menghubungimu jika
+            diperlukan.
+          </p>
+        </div>
 
-          <div className="flex flex-col gap-s8 mt-s12">
-            <p className="text-[14px] font-medium text-label2">Nama lengkap</p>
-            <InputCard focused={nameFocused}>
+        {/* ── Grouped form — iOS Settings style ── */}
+        <div className="px-s16 pt-s16 pb-s24">
+          <div className="bg-bg-card rounded-r20 shadow-card overflow-hidden">
+            {/* Nama */}
+            <div className="flex items-center gap-s12 px-s20 py-[14px]">
+              <span
+                className={cn(
+                  "text-[14px] w-[96px] flex-shrink-0 transition-colors",
+                  nameFocused ? "text-label font-medium" : "text-label2",
+                )}
+              >
+                Nama
+              </span>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onFocus={() => setNameFocused(true)}
                 onBlur={() => setNameFocused(false)}
-                placeholder="Contoh: Siti Rahayu"
+                placeholder="Siti Rahayu"
                 autoComplete="name"
-                className="w-full px-s16 py-[14px] text-[15px] text-label placeholder:text-label3 outline-none bg-transparent"
+                className="flex-1 text-[15px] text-label placeholder:text-label3 outline-none bg-transparent"
               />
-            </InputCard>
-          </div>
+            </div>
 
-          <div className="flex flex-col gap-s8">
-            <p className="text-[14px] font-medium text-label2">
-              Nomor WhatsApp
-            </p>
-            <InputCard focused={phoneFocused}>
-              <div className="flex items-center">
-                <div className="flex items-center px-s16 py-[14px] border-r border-black/10">
-                  <span className="text-[15px] font-medium text-label2 select-none">
-                    +62
-                  </span>
-                </div>
+            <div className="ml-[calc(1rem+96px+0.75rem)] mr-s20 h-px bg-sep" />
+
+            {/* WhatsApp */}
+            <div className="flex items-center gap-s12 px-s20 py-[14px]">
+              <span
+                className={cn(
+                  "text-[14px] w-[96px] flex-shrink-0 transition-colors",
+                  phoneFocused ? "text-label font-medium" : "text-label2",
+                )}
+              >
+                WhatsApp
+              </span>
+              <div className="flex items-center flex-1 gap-[8px]">
+                <span className="text-[15px] text-label2 select-none">+62</span>
                 <input
                   type="tel"
                   value={phone}
@@ -177,14 +193,15 @@ export function StepContact({ onNext }: Props) {
                   placeholder="812 3456 7890"
                   autoComplete="tel"
                   inputMode="numeric"
-                  className="flex-1 px-s16 py-[14px] text-[15px] text-label placeholder:text-label3 outline-none bg-transparent"
+                  className="flex-1 text-[15px] text-label placeholder:text-label3 outline-none bg-transparent"
                 />
               </div>
-            </InputCard>
-            <p className="text-[12px] text-label3">
-              Konfirmasi booking dikirim ke nomor ini.
-            </p>
+            </div>
           </div>
+
+          <p className="text-[13px] text-label mt-[10px] px-s4">
+            Konfirmasi booking akan dikirim ke nomor ini.
+          </p>
         </div>
       </div>
 
@@ -195,7 +212,7 @@ export function StepContact({ onNext }: Props) {
         onClick={handleContinue}
       />
 
-      {/* Addon bottom sheet */}
+      {/* ── Addon bottom sheet ── */}
       {showAddons && (
         <>
           <div
@@ -203,69 +220,102 @@ export function StepContact({ onNext }: Props) {
             onClick={() => setShowAddons(false)}
           />
           <div
-            className="absolute bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-[28px] bg-bg animate-sheetUp"
-            style={{ maxHeight: "80%" }}
+            className="absolute bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-[28px] bg-bg-page animate-sheetUp"
+            style={{ maxHeight: "84%" }}
           >
+            {/* Drag handle */}
             <div className="flex justify-center pt-s12 pb-s4 flex-shrink-0">
               <div className="h-[4px] w-[36px] rounded-full bg-sep" />
             </div>
 
-            <div className="px-s20 pt-s8 pb-s16 flex-shrink-0">
-              <h2 className="text-[20px] font-bold text-label">
-                Mau tambah produk?
+            {/* Header */}
+            <div className="px-s20 pt-s20 pb-s20 flex-shrink-0">
+              <h2 className="text-ts-t2 font-bold text-label leading-tight">
+                Ada yang ingin ditambahkan?
               </h2>
-              <p className="text-[13px] text-label2 mt-[4px]">
-                Pilih perawatan tambahan buat hasil yang lebih maksimal.
+              <p className="text-ts-fn text-label2 mt-s8 leading-snug">
+                Produk berikut kami pilih khusus untuk melengkapi layananmu hari
+                ini.
               </p>
             </div>
 
-            <div className="h-px bg-sep mx-s20 flex-shrink-0" />
-
-            <div className="flex-1 overflow-y-auto px-s20 pt-s12 pb-s4">
-              <div className="flex flex-col gap-s8">
+            {/* 2-column product grid */}
+            <div className="flex-1 overflow-y-auto px-s16 pb-s4">
+              <div className="grid grid-cols-2 gap-s16">
                 {previewProducts.map((product) => {
                   const qty = getQuantity(product.id);
+                  const initial = product.name.charAt(0).toUpperCase();
                   return (
                     <div
                       key={product.id}
-                      className="flex items-center gap-s12 p-s16 bg-white rounded-r16 border border-sep"
+                      className="bg-bg-card rounded-r20 p-s16 flex flex-col"
                     >
-                      <div className="text-3xl w-12 h-12 flex items-center justify-center bg-bg rounded-r12 flex-shrink-0">
-                        {product.imageEmoji}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-semibold text-label">
-                          {product.name}
-                        </p>
-                        <p className="text-[12px] text-label2 mt-[2px]">
-                          {product.description}
-                        </p>
-                        <p className="text-[13px] font-bold text-accent mt-[4px]">
-                          {formatRupiah(product.price)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-s8 flex-shrink-0">
-                        <button
-                          onClick={() => removeAddon(product.id)}
-                          disabled={qty === 0}
-                          className={cn(
-                            "w-8 h-8 rounded-full border text-[16px] font-bold flex items-center justify-center transition-colors",
-                            qty === 0
-                              ? "border-sep text-label3 cursor-not-allowed"
-                              : "border-accent text-accent hover:bg-accent-soft",
-                          )}
-                        >
-                          −
-                        </button>
-                        <span className="text-[14px] font-semibold text-label w-4 text-center">
-                          {qty}
+                      {/* Product image area — 4:3 landscape, less dominant than square */}
+                      <div className="aspect-[4/3] w-full rounded-r12 bg-bg-control flex items-center justify-center mb-s12 flex-shrink-0">
+                        <span className="text-[32px] font-bold text-label3 leading-none">
+                          {initial}
                         </span>
-                        <button
-                          onClick={() => addAddon(product)}
-                          className="w-8 h-8 rounded-full bg-accent text-white text-[16px] font-bold flex items-center justify-center hover:bg-accent-dark transition-colors"
-                        >
-                          +
-                        </button>
+                      </div>
+
+                      {/* Product info — Name → Price → Description */}
+                      <p className="text-ts-sub font-bold text-label leading-tight">
+                        {product.name}
+                      </p>
+                      <p className="text-ts-fn font-semibold text-label mt-[4px]">
+                        {formatRupiah(product.price)}
+                      </p>
+                      <p className="text-ts-cap1 text-label2 mt-[4px] leading-snug line-clamp-2 flex-1">
+                        {product.description}
+                      </p>
+
+                      {/* Quantity control */}
+                      <div className="mt-s12">
+                        {qty === 0 ? (
+                          /* Add button — full width pill */
+                          <button
+                            onClick={() => addAddon(product)}
+                            aria-label={`Tambah ${product.name}`}
+                            className="w-full rounded-rF bg-bg-control border border-sep py-[8px] flex items-center justify-center gap-[6px] transition-all active:scale-[0.97]"
+                          >
+                            <Plus
+                              size={12}
+                              weight="bold"
+                              className="text-label"
+                            />
+                            <span className="text-[13px] font-semibold text-label">
+                              Tambah
+                            </span>
+                          </button>
+                        ) : (
+                          /* Stepper — minus / count / plus */
+                          <div className="flex items-center justify-between">
+                            <button
+                              onClick={() => removeAddon(product.id)}
+                              aria-label={`Kurangi ${product.name}`}
+                              className="w-[28px] h-[28px] rounded-full bg-bg-control flex items-center justify-center transition-colors active:bg-sep"
+                            >
+                              <Minus
+                                size={12}
+                                weight="bold"
+                                className="text-label2"
+                              />
+                            </button>
+                            <span className="text-[14px] font-semibold text-label min-w-[20px] text-center">
+                              {qty}
+                            </span>
+                            <button
+                              onClick={() => addAddon(product)}
+                              aria-label={`Tambah ${product.name}`}
+                              className="w-[28px] h-[28px] rounded-full bg-label flex items-center justify-center transition-colors active:bg-label2"
+                            >
+                              <Plus
+                                size={12}
+                                weight="bold"
+                                className="text-white"
+                              />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -273,7 +323,8 @@ export function StepContact({ onNext }: Props) {
               </div>
             </div>
 
-            <div className="px-s20 py-s16 flex flex-col gap-s8 flex-shrink-0">
+            {/* CTAs */}
+            <div className="px-s16 pt-s12 pb-s20 flex flex-col gap-s4 flex-shrink-0">
               <button
                 onClick={onNext}
                 className="w-full rounded-rF bg-label py-[16px] text-[15px] font-semibold text-white transition-all active:scale-[0.98]"
@@ -282,7 +333,7 @@ export function StepContact({ onNext }: Props) {
               </button>
               <button
                 onClick={onNext}
-                className="w-full py-[12px] text-[14px] font-medium text-label3 hover:text-label2 transition-colors"
+                className="w-full py-[10px] text-[14px] text-label3 transition-colors active:text-label2"
               >
                 Lewati, tidak perlu
               </button>

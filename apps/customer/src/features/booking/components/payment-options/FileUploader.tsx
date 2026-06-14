@@ -1,11 +1,13 @@
 "use client";
 
+import { UploadSimple } from "@phosphor-icons/react";
 import { useState, useRef, useEffect } from "react";
 import {
   MAX_FILE_SIZE,
   ALLOWED_FILE_TYPES,
 } from "@/features/booking/constants/booking.constants";
 import { useBookingStore } from "@/features/booking/hooks/use-booking-store";
+import { InlineNotice } from "@/shared/components/ui/InlineNotice";
 import { cn } from "@/shared/lib/cn";
 import { logger } from "@/shared/lib/logger";
 
@@ -21,6 +23,7 @@ import { logger } from "@/shared/lib/logger";
 export function FileUploader() {
   const { proofImageUrl, setProofImage } = useBookingStore();
   const [error, setError] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const currentBlobUrl = useRef<string | null>(null);
 
@@ -59,6 +62,7 @@ export function FileUploader() {
       size: file.size,
       type: file.type,
     });
+    setFileName(file.name);
     setProofImage(url, file);
   }
 
@@ -82,53 +86,84 @@ export function FileUploader() {
       URL.revokeObjectURL(currentBlobUrl.current);
       currentBlobUrl.current = null;
     }
+    setFileName(null);
     setProofImage(null);
     if (inputRef.current) inputRef.current.value = "";
   }
 
   return (
-    <div className="mt-s16">
-      <p className="text-t14 font-semibold text-label mb-s12">
-        Unggah Bukti Pembayaran
-      </p>
-
+    <div>
       {proofImageUrl ? (
-        <div className="relative rounded-r16 overflow-hidden border border-sep">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={proofImageUrl}
-            alt="Bukti pembayaran"
-            className="w-full h-48 object-cover"
+        /* ── Uploaded state ── */
+        <div className="space-y-s8">
+          {/* Design-system success notice — same component as elsewhere in flow */}
+          <InlineNotice
+            variant="success"
+            title="Bukti pembayaran siap dikirim"
           />
-          <button
-            onClick={handleReplace}
-            className="absolute top-s8 right-s8 bg-white/90 text-label text-t12 px-s8 py-s4 rounded-rF border border-sep"
-          >
-            Ganti
-          </button>
+
+          {/* Thumbnail card — image + metadata + replace action */}
+          <div className="bg-bg-card rounded-r20 shadow-card overflow-hidden">
+            {/* Preview image — confirmation thumbnail, not a viewer */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={proofImageUrl}
+              alt="Bukti pembayaran"
+              className="w-full h-36 object-cover"
+            />
+
+            {/* File name + replace action */}
+            <div className="px-s16 py-s12 flex items-center justify-between gap-s12">
+              {fileName && (
+                <p className="text-ts-cap1 text-label3 truncate flex-1 min-w-0">
+                  {fileName}
+                </p>
+              )}
+              <button
+                onClick={handleReplace}
+                className="flex-shrink-0 text-ts-cap1 font-semibold text-label2 bg-bg-control border border-sep rounded-rF px-s12 py-[6px] transition-colors active:bg-sep"
+              >
+                Ganti Foto
+              </button>
+            </div>
+          </div>
         </div>
       ) : (
+        /* ── Empty state — calm tappable card ── */
         <div
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onClick={() => inputRef.current?.click()}
           className={cn(
-            "flex flex-col items-center justify-center h-36 rounded-r16 border-2 border-dashed cursor-pointer transition-colors",
-            error
-              ? "border-red-400 bg-red-50"
-              : "border-sep bg-bg hover:border-accent hover:bg-accent-soft",
+            "bg-bg-card rounded-r20 shadow-card px-s20 py-s24 flex flex-col items-center gap-s12 cursor-pointer transition-colors active:bg-bg-control",
+            error ? "ring-1 ring-red-400" : "",
           )}
         >
-          <span className="text-3xl mb-s8">📎</span>
-          <p className="text-t14 text-label2 text-center">
-            Tap atau seret file ke sini
-            <br />
-            <span className="text-t12 text-label3">JPEG, PNG · maks 5MB</span>
-          </p>
+          {/* Upload icon */}
+          <div className="w-[44px] h-[44px] rounded-full bg-bg-control border border-sep flex items-center justify-center">
+            <UploadSimple size={20} weight="regular" className="text-label" />
+          </div>
+
+          {/* Text hierarchy: title → instruction → constraint */}
+          <div className="text-center">
+            <p className="text-ts-sub font-semibold text-label">
+              Unggah bukti pembayaran
+            </p>
+            <p className="text-ts-fn text-label2 mt-s4 leading-snug">
+              Tap untuk memilih foto
+              <br />
+              atau seret file ke sini
+            </p>
+            <p className="text-ts-cap1 text-label3 mt-s8">
+              JPG atau PNG hingga 5 MB
+            </p>
+          </div>
         </div>
       )}
 
-      {error && <p className="text-t12 text-red-500 mt-s8">{error}</p>}
+      {error && (
+        <p className="text-ts-cap1 text-red-500 mt-s8 px-s4">{error}</p>
+      )}
 
       <input
         ref={inputRef}

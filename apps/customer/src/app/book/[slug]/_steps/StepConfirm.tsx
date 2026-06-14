@@ -6,9 +6,7 @@ import { BookingSummary } from "@/features/booking/components/booking-summary";
 import { BottomCTA } from "@/features/booking/components/bottom-cta";
 import { ErrorAlert } from "@/features/booking/components/error-alert";
 import { LoadingState } from "@/features/booking/components/loading-state";
-import { StepHeader } from "@/features/booking/components/step-header";
 import { useBookingStore } from "@/features/booking/hooks/use-booking-store";
-import { formatRupiah } from "@/shared/lib/format";
 
 interface Props {
   onNext: () => void;
@@ -18,7 +16,6 @@ interface Props {
 export function StepConfirm({ onNext, onBack }: Props) {
   const { timeSlot, date, services, stylist, totalPrice, discountAmount } =
     useBookingStore();
-  const finalPrice = totalPrice - discountAmount;
   const [isLoading, setIsLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
@@ -53,7 +50,7 @@ export function StepConfirm({ onNext, onBack }: Props) {
   }, [timeSlot, services.length, date, onBack]);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="relative flex flex-col h-full overflow-hidden bg-bg-page">
       {fetchError && (
         <ErrorAlert
           message={fetchError}
@@ -63,52 +60,57 @@ export function StepConfirm({ onNext, onBack }: Props) {
         />
       )}
 
-      <StepHeader
-        title="Ringkasan"
-        subtitle="Periksa kembali pesanan kamu"
-        onBack={onBack}
-      />
-      <div className="flex-1 overflow-y-auto bg-bg">
-        {isLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <LoadingState message="Memvalidasi pemesanan..." />
-          </div>
-        ) : (
-          <div className="px-s20 py-s24 space-y-s24">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden">
+        {/* ── Page header — matches StepStylist exactly ── */}
+        <div className="px-s20 pt-s20 pb-s4">
+          <button
+            onClick={onBack}
+            aria-label="Kembali"
+            className="mb-[16px] -ml-[4px] flex h-[44px] w-[44px] items-center justify-center rounded-full text-tx-secondary transition-all active:scale-95"
+          >
+            <span className="flex h-[36px] w-[36px] items-center justify-center rounded-full bg-bg-card hover:bg-sep transition-colors">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+            </span>
+          </button>
+          <p className="text-[11px] font-semibold text-tx-muted tracking-[0.08em] uppercase mb-[4px]">
+            Hampir selesai
+          </p>
+          <h1 className="text-[28px] font-bold text-tx-primary leading-tight tracking-tight">
+            Ringkasan
+          </h1>
+          <p className="mt-[6px] text-[15px] text-tx-secondary leading-snug">
+            Periksa kembali pesanan kamu.
+          </p>
+        </div>
+
+        <div className="px-s16 pt-s20 pb-s24">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-s32">
+              <LoadingState message="Memvalidasi pemesanan..." />
+            </div>
+          ) : (
             <BookingSummary
               date={date}
               services={services}
               stylist={stylist}
               timeSlot={timeSlot}
               totalPrice={totalPrice}
+              discountAmount={discountAmount}
             />
-
-            {discountAmount > 0 && (
-              <div className="bg-white rounded-r16 p-s16 space-y-s12 shadow-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-label2">Subtotal</span>
-                  <span className="text-sm font-semibold text-label">
-                    {formatRupiah(totalPrice)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-accent">
-                  <span className="text-sm text-label2">Diskon</span>
-                  <span className="text-sm font-semibold">
-                    -{formatRupiah(discountAmount)}
-                  </span>
-                </div>
-                <div className="border-t border-sep pt-s12 flex justify-between items-center">
-                  <span className="text-base font-bold text-label">
-                    Total Pembayaran
-                  </span>
-                  <span className="text-lg font-bold text-accent">
-                    {formatRupiah(finalPrice)}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <BottomCTA

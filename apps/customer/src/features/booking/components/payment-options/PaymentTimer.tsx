@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export function PaymentTimer() {
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
@@ -9,7 +9,6 @@ export function PaymentTimer() {
     const interval = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -17,10 +16,12 @@ export function PaymentTimer() {
   const seconds = timeLeft % 60;
 
   return (
-    <div className="text-center py-s20">
-      <p className="text-sm text-label2 mb-s8">Selesaikan pembayaran dalam</p>
-      <p className="text-t28 font-bold text-accent">
-        {minutes}:{seconds.toString().padStart(2, '0')}
+    <div className="pb-s8">
+      <p className="text-ts-hero font-black text-label tracking-tight leading-none">
+        {String(minutes).padStart(2, "0")}:{seconds.toString().padStart(2, "0")}
+      </p>
+      <p className="text-ts-fn text-label2 mt-s8 leading-snug">
+        Waktu tersisa untuk menyelesaikan pembayaran
       </p>
     </div>
   );

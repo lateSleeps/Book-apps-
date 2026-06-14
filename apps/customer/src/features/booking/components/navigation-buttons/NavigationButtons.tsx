@@ -1,7 +1,9 @@
-'use client';
+"use client";
 
-import { Button } from '@/shared/components/ui/button';
-import { cn } from '@/shared/lib/cn';
+import { ArrowLeft } from "@phosphor-icons/react";
+
+import { Button } from "@/shared/components/ui/button";
+import { cn } from "@/shared/lib/cn";
 
 export interface NavigationButtonsProps {
   primaryLabel: string;
@@ -30,9 +32,9 @@ export function NavigationButtons({
   return (
     <div
       className={cn(
-        'fixed bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 bg-white px-s16 pb-s32 pt-s16',
-        'border-t border-sep',
-        className
+        "fixed bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 bg-white px-s16 pb-s32 pt-s16",
+        "border-t border-sep",
+        className,
       )}
     >
       {secondaryLabel && onSecondary && (
@@ -45,7 +47,7 @@ export function NavigationButtons({
           {secondaryLabel}
         </Button>
       )}
-      <div className={cn('flex gap-s8', showBack && 'flex-row-reverse')}>
+      <div className={cn("flex gap-s8", showBack && "flex-row-reverse")}>
         <Button
           variant="primary"
           onClick={onPrimary}
@@ -62,21 +64,7 @@ export function NavigationButtons({
             fullWidth={false}
             aria-label="Kembali"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
+            <ArrowLeft size={18} weight="bold" aria-hidden="true" />
           </Button>
         )}
       </div>
